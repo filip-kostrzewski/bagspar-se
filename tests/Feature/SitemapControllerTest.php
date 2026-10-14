@@ -41,6 +41,51 @@ class SitemapControllerTest extends TestCase
         ]);
     }
 
+    #[TestWith(['http://bagspar.se'])]
+    #[TestWith(['http://bagspar.se/'])]
+    public function test_sitemap_lists_https_urls_when_production_app_url_is_http(string $appUrl): void
+    {
+        $this->useProductionAppUrl($appUrl);
+
+        $response = $this->get('/sitemap.xml');
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
+        $this->assertSitemapLists($response->getContent(), [
+            'https://bagspar.se/',
+            'https://bagspar.se/integritet',
+        ]);
+    }
+
+    public function test_generated_urls_use_https_when_production_app_url_is_http(): void
+    {
+        $this->useProductionAppUrl('http://bagspar.se');
+
+        $response = $this->get('/');
+
+        $response->assertSee('<link rel="canonical" href="https://bagspar.se/">', false);
+        $response->assertSee('href="https://bagspar.se/css/site.css"', false);
+        $response->assertSee('action="https://bagspar.se/intresse"', false);
+        $response->assertDontSee('http://bagspar.se', false);
+        $this->assertSame('https://bagspar.se/integritet', route('privacy'));
+        $this->assertSame('https://bagspar.se/integritet', redirect()->route('privacy')->getTargetUrl());
+    }
+
+    #[TestWith(['http://bagspar.test'])]
+    #[TestWith(['http://localhost'])]
+    public function test_sitemap_keeps_http_urls_when_the_app_is_not_in_production(string $appUrl): void
+    {
+        config(['app.url' => $appUrl]);
+
+        $response = $this->get('/sitemap.xml');
+
+        $response->assertOk();
+        $this->assertSitemapLists($response->getContent(), [
+            $appUrl.'/',
+            $appUrl.'/integritet',
+        ]);
+    }
+
     public function test_robots_txt_references_the_sitemap(): void
     {
         $robots = file_get_contents(public_path('robots.txt'));
@@ -49,6 +94,12 @@ class SitemapControllerTest extends TestCase
             "User-agent: *\nDisallow:\n\nSitemap: https://bagspar.se/sitemap.xml\n",
             $robots,
         );
+    }
+
+    private function useProductionAppUrl(string $appUrl): void
+    {
+        $this->app['env'] = 'production';
+        config(['app.url' => $appUrl]);
     }
 
     /**
