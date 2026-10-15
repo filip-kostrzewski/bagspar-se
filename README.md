@@ -87,7 +87,7 @@ Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit
 | `BAGSPAR_ADMIN_TOKEN` | Secret for the signup list. Empty hides those routes with 404 |
 | `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Empty uses `kontakt@bagspar.se`. That domain had no MX record when this was written, so the mailbox has to exist or the variable has to point at an address that already receives mail |
 | `BAGSPAR_PILOT_OFFER` | Optional pilot headline. Empty keeps the default offer |
-| `GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID (`G-XXXXXXXX`). Empty skips the tag, the cookie banner, and the analytics text on the privacy policy. Set it on the server before a deploy so a cached config picks it up |
+| `GA_MEASUREMENT_ID` | Optional Google Analytics 4 measurement ID. Empty uses the public ID `G-SSL2JZK3LY`. `gtag.js` is requested only after the visitor chooses Godkänn |
 
 ## Tests and build
 
@@ -110,5 +110,7 @@ vendor/bin/pint --dirty
 3. Push to `master` only if those commands succeed.
 
 If the live site fails after that deploy, revert the commit on `master`.
+
+A production `composer install` runs `scripts/cache-config.php`, which clears and rebuilds the config cache when `APP_ENV=production` or the deploy is on Forge. That picks up `GA_MEASUREMENT_ID`, including its public default.
 
 On the server, set `APP_URL` to `https://bagspar.se`, `MAIL_MAILER=postmark`, `POSTMARK_API_KEY`, `MAIL_FROM_ADDRESS`, `LEAD_NOTIFICATION_EMAIL`, and `BAGSPAR_ADMIN_TOKEN`. Leave the API key and the admin token out of git.

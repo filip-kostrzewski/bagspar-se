@@ -32,6 +32,20 @@ class GoogleAnalyticsTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_public_id_is_the_default_and_the_tag_stays_out_of_the_html(): void
+    {
+        $this->assertSame('G-SSL2JZK3LY', config('services.google_analytics.measurement_id'));
+
+        $response = $this->get(route('home'));
+
+        $response->assertSee('data-ga-measurement-id="G-SSL2JZK3LY"', false);
+        $response->assertSee('data-cookie-banner', false);
+        $response->assertSee('<button type="button" data-cookie-settings>Cookie-inställningar</button>', false);
+        $response->assertSee("gtag('consent', 'default'", false);
+        $response->assertSee("'analytics_storage': 'denied'", false);
+        $response->assertDontSee('googletagmanager.com', false);
+    }
+
     public function test_public_pages_deny_consent_without_loading_the_tag_when_the_measurement_id_is_missing(): void
     {
         config(['services.google_analytics.measurement_id' => null]);
@@ -96,9 +110,10 @@ class GoogleAnalyticsTest extends TestCase
             "'ad_user_data': 'denied'",
             "'ad_personalization': 'denied'",
             "'analytics_storage': 'granted'",
-            'https://www.googletagmanager.com/gtag/js?id=G-TEST1234',
-            "gtag('config', 'G-TEST1234')",
         ], false);
+        $response->assertSee('data-ga-measurement-id="G-TEST1234"', false);
+        $response->assertDontSee('googletagmanager.com', false);
+        $response->assertDontSee("gtag('config'", false);
         $response->assertSee('<html lang="sv">', false);
         $response->assertSee('Vi mäter besök med Google Analytics 4 bara om du godkänner.', false);
         $response->assertSee('<button type="button" class="cookie-banner__choice" data-cookie-choice="granted">Godkänn</button>', false);
@@ -174,6 +189,10 @@ class GoogleAnalyticsTest extends TestCase
         $this->assertStringContainsString("ad_personalization: 'denied'", $script);
         $this->assertStringContainsString("analytics_storage: granted ? 'granted' : 'denied'", $script);
         $this->assertStringContainsString("value !== 'granted' && value !== 'denied'", $script);
+        $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=', $script);
+        $this->assertStringContainsString("if (value === 'granted') {\n        loadGoogleTag();", $script);
+        $this->assertStringContainsString("if (readChoice() === 'granted') {\n    loadGoogleTag();", $script);
+        $this->assertStringContainsString("window.gtag('config', measurementId)", $script);
         $this->assertStringContainsString('data-cookie-settings', $script);
         $this->assertStringContainsString('.cookie-banner__choice {', $stylesheet);
         $this->assertStringContainsString('grid-template-columns: 1fr 1fr;', $stylesheet);

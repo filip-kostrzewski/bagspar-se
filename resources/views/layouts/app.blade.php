@@ -102,9 +102,6 @@
     @if ($isPublicPage)
         @include('partials.google-consent')
     @endif
-    @if ($showGoogleAnalytics)
-        @include('partials.google-analytics', ['googleAnalyticsId' => $googleAnalyticsId])
-    @endif
     <script src="{{ asset('js/site.js') }}?v={{ config('bagspar.asset_version') }}" data-sw-url="{{ asset('sw.js') }}?v={{ config('bagspar.asset_version') }}" defer></script>
 </head>
 <body>

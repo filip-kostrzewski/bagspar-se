@@ -11,7 +11,7 @@
     ];
     $cookieBanner = $cookieBannerText[$pageLanguage] ?? $cookieBannerText['sv'];
 @endphp
-<div id="cookie-installningar" class="cookie-banner" role="region" aria-labelledby="cookie-banner-title" tabindex="-1" data-cookie-banner>
+<div id="cookie-installningar" class="cookie-banner" role="region" aria-labelledby="cookie-banner-title" tabindex="-1" data-cookie-banner data-ga-measurement-id="{{ $googleAnalyticsId }}">
     <div class="cookie-banner__inner page-shell">
         <div class="cookie-banner__copy">
             <p id="cookie-banner-title" class="cookie-banner__title">{{ $cookieBanner['title'] }}</p>

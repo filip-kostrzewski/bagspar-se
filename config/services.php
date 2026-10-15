@@ -2,6 +2,8 @@
 
 use App\Support\GoogleAnalyticsMeasurementId;
 
+$measurementId = env('GA_MEASUREMENT_ID', 'G-SSL2JZK3LY');
+
 return [
 
     /*
@@ -38,11 +40,16 @@ return [
     ],
 
     /*
-    | Google Analytics 4. An empty or invalid GA_MEASUREMENT_ID disables the
-    | tag, the cookie banner, and the analytics section of the privacy policy.
+    | Google Analytics 4. The public measurement ID is the default.
+    | A blank GA_MEASUREMENT_ID keeps that default. An invalid value disables
+    | the tag. gtag.js is injected only after the visitor grants consent.
     */
     'google_analytics' => [
-        'measurement_id' => GoogleAnalyticsMeasurementId::normalize(env('GA_MEASUREMENT_ID')),
+        'measurement_id' => GoogleAnalyticsMeasurementId::normalize(
+            is_string($measurementId) && trim($measurementId) !== ''
+                ? $measurementId
+                : 'G-SSL2JZK3LY',
+        ),
     ],
 
 ];

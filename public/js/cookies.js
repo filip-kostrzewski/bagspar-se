@@ -1,5 +1,6 @@
 const storageKey = 'bagspar-cookie-consent';
 const banner = document.querySelector('[data-cookie-banner]');
+const measurementId = banner instanceof HTMLElement ? banner.dataset.gaMeasurementId : '';
 
 const consentUpdate = (granted) => ({
     ad_storage: 'denied',
@@ -7,6 +8,14 @@ const consentUpdate = (granted) => ({
     ad_personalization: 'denied',
     analytics_storage: granted ? 'granted' : 'denied',
 });
+
+const readChoice = () => {
+    try {
+        return window.localStorage.getItem(storageKey);
+    } catch (error) {
+        return null;
+    }
+};
 
 const writeChoice = (value) => {
     try {
@@ -16,9 +25,28 @@ const writeChoice = (value) => {
     }
 };
 
+const loadGoogleTag = () => {
+    if (typeof window.gtag !== 'function' || measurementId === '' || document.querySelector('script[data-ga-tag]')) {
+        return;
+    }
+
+    window.gtag('js', new Date());
+    window.gtag('config', measurementId);
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(measurementId);
+    script.dataset.gaTag = 'true';
+    document.head.appendChild(script);
+};
+
 const applyChoice = (value) => {
     if (typeof window.gtag === 'function') {
         window.gtag('consent', 'update', consentUpdate(value === 'granted'));
+    }
+
+    if (value === 'granted') {
+        loadGoogleTag();
     }
 
     document.documentElement.classList.add('cookie-choice-saved');
@@ -64,3 +92,7 @@ document.querySelectorAll('[data-cookie-settings]').forEach((opener) => {
         showBanner();
     });
 });
+
+if (readChoice() === 'granted') {
+    loadGoogleTag();
+}
