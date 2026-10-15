@@ -1,58 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Bågspår
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[Bågspår](https://bagspar.se) is a site for window-sash renovation workshops in Sweden. The product is a work card per sash: marking, photos, notes, and work steps, including when mobile coverage is poor.
 
-## About Laravel
+Live site: [https://bagspar.se](https://bagspar.se). Operated by Prodi Digital AB.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Who it is for
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Workshops that take wooden sashes out, restore them, and put each sash back in the same opening. The site explains that workflow, shows one fictional example card, and takes pilot signups.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Pilot offer
 
-## Learning Laravel
+Copy on the homepage comes from `config/bagspar.php`:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Free 3-month pilot for the first 10 workshops. `BAGSPAR_PILOT_OFFER` replaces that headline when it is set.
+- 790 kr/month excluding VAT after the pilot. No binding period.
+- The pilot starts when three workshops have signed up. The example card is available immediately.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## What this repository ships
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+This repository is the public site and the example card.
 
-## Agentic Development
+| Path | Purpose |
+| --- | --- |
+| `/` | Homepage, pilot offer, and signup form |
+| `/demo` | Example work card for fictional sash B-04 |
+| `GET` and `POST /demo/synk` | Reads and stores that example’s step and notes |
+| `/fonsterrenovering-dokumentation` | Guide: what to record on each sash |
+| `/arbetskort-fonsterbagar` | Guide: one work card per sash |
+| `/markning-av-fonsterbagar` | Guide: marking so a sash returns to the same opening |
+| `/integritetspolicy` | Privacy policy. `/integritet` redirects here (301) |
+| `/sitemap.xml` | Public HTML pages. Locations use `APP_URL` |
+| `/robots.txt` | Static file. Points crawlers at the sitemap |
+| `/manifest.webmanifest` | Web app manifest. Start URL is `/demo` |
+| `POST /intresse` | Saves a pilot signup and sends mail when configured |
+| `/admin/anmalningar` | Signup list. `/admin/anmalningar.csv` downloads the same rows |
+| `/up` | Laravel health check |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+The example card lives in the browser (`localStorage`). Changing the step or notes posts them to `/demo/synk`, which keeps them in cache for 14 days (`config('bagspar.demo_sync_days')`). Photos added on the example stay in the browser and are not uploaded. A service worker (`public/sw.js`) caches `/demo` and its assets so the example can be opened offline. `demo/synk` is exempt from CSRF because a later visit may not have a fresh session token.
+
+`POST /intresse` accepts workshop name (`company`) and email, rejects a `website` honeypot field, and is limited to 5 requests per minute. The signup stores `consented_at` as the time the form was sent. The visitor is redirected back to the homepage. When `LEAD_NOTIFICATION_EMAIL` is set, that address receives a message with the subject “Ny anmälan för Bågspår”. A mail failure is logged; the signup is still saved.
+
+`/admin/anmalningar` returns 404 when `BAGSPAR_ADMIN_TOKEN` is empty. Otherwise it accepts that value as an HTTP Basic password (any username) or as an `Authorization: Bearer` token. Rows are listed newest first, in Europe/Stockholm time. The CSV columns are Företag, E-post, and Datum.
+
+## Stack
+
+- PHP 8.4.1 or newer (`composer.json` allows `^8.3`; the locked Symfony packages require `>=8.4.1`)
+- Laravel ^13.17 (`laravel/framework` v13.35.0 in `composer.lock`)
+- PHPUnit ^12.5 and Laravel Pint
+- SQLite by default (`DB_CONNECTION=sqlite`)
+- Public pages: Blade, `public/css/site.css`, `public/js/site.js`, and `public/js/demo.js`
+- Vite ^8 and Tailwind CSS ^4 (`npm run build` compiles `resources/css/app.css` and `resources/js/app.js`; the public pages do not load that bundle)
+- Postmark via `symfony/postmark-mailer` when `MAIL_MAILER=postmark`
+
+Production sits behind Cloudflare. The app trusts the forwarded scheme and client IP, and forces HTTPS URLs when `APP_ENV=production`.
+
+## Local setup
+
+PHP 8.4.1 or newer, Composer, and Node.js.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+npm install
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+`composer run dev` runs `php artisan dev`. `.env.example` sets `APP_URL` to `http://bagspar.test`. Point `APP_URL` at the URL you actually open.
 
-## Contributing
+## Environment
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit API keys.
 
-## Code of Conduct
+| Variable | Used for |
+| --- | --- |
+| `APP_URL` | Sitemap and canonical URLs. Production rewrites an `http` value to `https`. The sitemap falls back to `https://bagspar.se` when the value is not a usable URL |
+| `APP_KEY` | Application key from `php artisan key:generate` |
+| `LEAD_NOTIFICATION_EMAIL` | Recipient of new pilot signups. Mail is skipped when this is empty. See `config/bagspar.php` |
+| `POSTMARK_API_KEY` | Postmark server token (`config/services.php`). Leave it empty in `.env.example` |
+| `MAIL_MAILER` | `postmark` on the server. Unset, Laravel uses `log` |
+| `MAIL_FROM_ADDRESS` | From address. `.env.example` uses `noreply@bagspar.se` |
+| `MAIL_FROM_NAME` | From name. Defaults to `APP_NAME` |
+| `BAGSPAR_ADMIN_TOKEN` | Secret for the signup list. Empty hides those routes with 404 |
+| `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Hidden when empty |
+| `BAGSPAR_PILOT_OFFER` | Optional pilot headline. Empty keeps the default offer |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Tests and build
 
-## Security Vulnerabilities
+Run these before pushing to `master`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan test
+npm run build
+vendor/bin/pint --dirty
+```
 
-## License
+`php artisan test` uses an in-memory SQLite database and reads `APP_KEY` from `.env`. Pint formats PHP; run it when PHP files changed.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Deploy
+
+[Laravel Forge](https://forge.laravel.com/) deploys this app on every push to `master`.
+
+1. Run `php artisan test` and `npm run build`.
+2. Run Pint when PHP files changed.
+3. Push to `master` only if those commands succeed.
+
+If the live site fails after that deploy, revert the commit on `master`.
+
+On the server, set `APP_URL` to `https://bagspar.se`, `MAIL_MAILER=postmark`, `POSTMARK_API_KEY`, `MAIL_FROM_ADDRESS`, `LEAD_NOTIFICATION_EMAIL`, and `BAGSPAR_ADMIN_TOKEN`. Leave the API key and the admin token out of git.
