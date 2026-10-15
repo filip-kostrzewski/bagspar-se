@@ -6,6 +6,7 @@ use App\Mail\PilotLeadConfirmation;
 use App\Mail\PilotLeadNotification;
 use App\Models\PilotLead;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
@@ -63,6 +64,24 @@ class PilotLeadControllerTest extends TestCase
             return $mail->hasTo('verkstad@example.test')
                 && $mail->hasReplyTo((string) config('bagspar.contact_email'))
                 && $mail->envelope()->subject === 'Vi har tagit emot anmälan till Bågspår';
+        });
+    }
+
+    public function test_internal_notification_shows_the_submission_time_in_stockholm_across_midnight(): void
+    {
+        Mail::fake();
+        config(['bagspar.lead_notification_email' => 'pilot-team@example.test']);
+        $this->travelTo(Carbon::parse('2026-10-15 22:30:00', 'UTC'));
+
+        $this->post(route('pilot-leads.store'), $this->validSubmission())
+            ->assertRedirect(route('home').'#form-result');
+
+        $lead = PilotLead::query()->firstOrFail();
+        $this->assertSame('2026-10-15 22:30:00', $lead->getRawOriginal('created_at'));
+        Mail::assertSent(PilotLeadNotification::class, function (PilotLeadNotification $mail): bool {
+            $mail->assertSeeInHtml('Anmäld: 2026-10-16 00:30:00', false);
+
+            return $mail->hasTo('pilot-team@example.test');
         });
     }
 

@@ -28,6 +28,7 @@ class StoreDemoSyncRequest extends FormRequest
             'step' => ['required', 'string', Rule::in([
                 'inlämnad',
                 'skrapning',
+                'repair',
                 'kittning',
                 'målning',
                 'klar',

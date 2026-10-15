@@ -9,6 +9,7 @@ use App\Models\WindowSash;
 use App\Support\SashQrCodeRenderer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -207,6 +208,28 @@ class WorkshopWorkspaceTest extends TestCase
         $this->assertSame('RIFF', substr(Storage::disk('local')->get($photo->path), 0, 4));
 
         $this->get(route('app.projects.report', $project))->assertOk()->assertSee(route('app.sashes.photos.show', [$project, $sash, $photo]));
+    }
+
+    public function test_project_photo_and_report_dates_use_stockholm_calendar_day_while_storage_stays_utc(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-15 22:30:00', 'UTC'));
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $photo = SashPhoto::factory()->create(['sash_id' => $sash->getKey()]);
+
+        $this->assertSame('2026-10-15 22:30:00', $project->fresh()->getRawOriginal('created_at'));
+        $this->assertSame('2026-10-15 22:30:00', $photo->fresh()->getRawOriginal('created_at'));
+
+        $this->actingAs($owner)
+            ->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('<span>2026-10-16</span>', false);
+
+        $this->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertSee('<dd>2026-10-16</dd>', false)
+            ->assertSee('Rapport från Bågspår · 2026-10-16', false);
     }
 
     public function test_jpeg_exif_orientations_are_applied_and_metadata_is_stripped(): void

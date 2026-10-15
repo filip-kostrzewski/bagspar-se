@@ -190,7 +190,7 @@
                             </a>
                             <figcaption>
                                 <strong>{{ $photo->original_filename ?? 'Foto' }}</strong>
-                                <span>{{ $photo->created_at?->format('Y-m-d') }}</span>
+                                <span>{{ $photo->created_at?->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
                             </figcaption>
                         </figure>
                     @endforeach

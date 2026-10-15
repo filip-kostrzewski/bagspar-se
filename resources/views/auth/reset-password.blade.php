@@ -22,7 +22,7 @@
         <form class="workshop-form auth-form" method="POST" action="{{ route('auth.password.update') }}">
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
-            <input type="hidden" name="email" value="{{ is_string(old('email')) ? old('email') : $email }}">
+            <input type="hidden" name="email" value="{{ is_string(old('email')) ? old('email') : $email }}" autocomplete="username">
 
             <div class="form-field">
                 <label for="password">Nytt lösenord</label>

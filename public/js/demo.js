@@ -1,11 +1,12 @@
 const root = document.querySelector('[data-demo-card]');
 
 if (root) {
-    const STEPS = ['inlämnad', 'skrapning', 'kittning', 'målning', 'klar'];
+    const STEPS = ['inlämnad', 'skrapning', 'repair', 'kittning', 'målning', 'klar'];
     const STEP_LABELS = {
-        inlämnad: 'Inlämnad',
+        inlämnad: 'Mottagen',
         skrapning: 'Skrapning',
-        kittning: 'Kittning',
+        repair: 'Trälagning',
+        kittning: 'Glasning',
         målning: 'Målning',
         klar: 'Klar',
     };
@@ -155,7 +156,7 @@ if (root) {
 
     function captureDefaults() {
         return {
-            step: root.querySelector('[aria-current="step"]')?.dataset.step || 'kittning',
+            step: root.querySelector('[aria-current="step"]')?.dataset.step || 'repair',
             notes: [...root.querySelectorAll('[data-note]')].map((item) => ({
                 id: item.dataset.note,
                 text: item.querySelector('[data-note-text]')?.textContent?.trim() || '',

@@ -46,7 +46,7 @@
                 @endif
                 <div><dt>Antal bågar</dt><dd>{{ $sashCount }}</dd></div>
                 @if ($project->created_at)
-                    <div><dt>Skapat</dt><dd>{{ $project->created_at->format('Y-m-d') }}</dd></div>
+                    <div><dt>Skapat</dt><dd>{{ $project->created_at->timezone('Europe/Stockholm')->format('Y-m-d') }}</dd></div>
                 @endif
             </dl>
             @if ($project->notes)
@@ -102,7 +102,7 @@
 
         <footer class="report-footer">
             <span>{{ $workshop->name }}</span>
-            <span>Rapport från Bågspår · {{ now()->format('Y-m-d') }}</span>
+            <span>Rapport från Bågspår · {{ now()->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
         </footer>
     </div>
 @endsection

@@ -7,4 +7,4 @@
     <p><strong>Meddelande:</strong><br>{{ $lead->message }}</p>
 @endif
 
-<p>Anmäld: {{ $lead->created_at?->format('Y-m-d H:i:s') }}</p>
+<p>Anmäld: {{ $lead->created_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i:s') }}</p>

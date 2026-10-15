@@ -28,14 +28,14 @@
 
             <div class="job-card__split">
             <div class="job-card__primary">
-            <p class="job-card__status" data-status-label>Kittning</p>
+            <p class="job-card__status" data-status-label>Trälagning</p>
             <p class="job-card__sync" data-sync-status role="status" aria-live="polite">Exempel med testuppgifter. Kan öppnas utan täckning.</p>
 
             <ol class="job-steps">
                 <li>
                     <button type="button" data-step="inlämnad" class="is-done">
                         <span class="job-steps__mark" aria-hidden="true"></span>
-                        <span>Inlämnad</span>
+                        <span>Mottagen</span>
                     </button>
                 </li>
                 <li>
@@ -45,9 +45,15 @@
                     </button>
                 </li>
                 <li>
-                    <button type="button" data-step="kittning" aria-current="step">
+                    <button type="button" data-step="repair" aria-current="step">
                         <span class="job-steps__mark" aria-hidden="true"></span>
-                        <span>Kittning</span>
+                        <span>Trälagning</span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" data-step="kittning">
+                        <span class="job-steps__mark" aria-hidden="true"></span>
+                        <span>Glasning</span>
                     </button>
                 </li>
                 <li>
@@ -120,7 +126,7 @@
                 <h3 id="job-notes-title">Anteckningar</h3>
                 <ul class="job-notes" data-notes>
                     <li data-note="ex-1">
-                        <p data-note-text>Undre vänstra hörnet är mjukt. Ska lagas innan kittning.</p>
+                        <p data-note-text>Undre vänstra hörnet är mjukt. Ska lagas innan glasning.</p>
                         <p class="job-notes__meta" data-note-meta>Påhittad · 12 oktober</p>
                     </li>
                     <li data-note="ex-2">

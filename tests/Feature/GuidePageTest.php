@@ -67,11 +67,30 @@ class GuidePageTest extends TestCase
         $response->assertDontSee('planerat', false);
         $response->assertDontSee('tanken är', false);
 
+        if ($routeName === 'guides.documentation') {
+            $response->assertSee('Mottagen betyder', false);
+            $response->assertDontSee('Inlämnad betyder', false);
+        }
+
         if (in_array($routeName, ['guides.work-card', 'guides.marking'], true)) {
             $response->assertSee('QR-etikett', false);
             $response->assertSee('Skanning kräver inloggning till verkstadskontot.', false);
             $response->assertDontSee('QR-koden skapas separat', false);
         }
+    }
+
+    public function test_work_card_guide_lists_all_six_workshop_stages_in_order(): void
+    {
+        $this->get(route('guides.work-card'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                '<h3>1. Mottagen</h3>',
+                '<h3>2. Skrapning</h3>',
+                '<h3>3. Trälagning</h3>',
+                '<h3>4. Glasning</h3>',
+                '<h3>5. Målning</h3>',
+                '<h3>6. Klar</h3>',
+            ], false);
     }
 
     #[TestWith(['guides.documentation'])]

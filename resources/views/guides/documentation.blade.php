@@ -32,7 +32,7 @@
         <p>Ta en bild av öppningen och en närbild på skadan innan skrapning. Numret ska synas, eller så ska bilden ligga på den bågens kort. En gemensam mapp utan nummer går inte att använda sedan.</p>
 
         <h3>7. Sätt det första steget</h3>
-        <p>När kortet är ifyllt sätter du steget som säger var bågen är. Inlämnad betyder att den är ur öppningen och inne i verkstaden. Nästa person ska se det utan att fråga. Steget, anteckningen och bilden hör ihop. Hur stegen sedan flyttas beskrivs på sidan om <a href="{{ route('guides.work-card') }}">arbetskort för fönsterbågar</a>.</p>
+        <p>När kortet är ifyllt sätter du steget som säger var bågen är. Mottagen betyder att den är ur öppningen och inne i verkstaden. Nästa person ska se det utan att fråga. Steget, anteckningen och bilden hör ihop. Hur stegen sedan flyttas beskrivs på sidan om <a href="{{ route('guides.work-card') }}">arbetskort för fönsterbågar</a>.</p>
 
         <h3>8. Läs kortet när bågen ska tillbaka</h3>
         <p>Vid återmontering läser du plats, par och glas. Ytterbåge ut, innerbåge in, och en urtagen ruta tillbaka i samma fals. Jämför lapp och kort. Stämmer de inte, stanna. Det är <a href="{{ route('guides.marking') }}">märkningen av fönsterbågen</a> som gör att kortet går att lita på.</p>

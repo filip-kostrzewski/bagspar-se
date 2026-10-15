@@ -19,12 +19,16 @@ class DemoPageTest extends TestCase
         $response->assertSee('2-KÖK-F1-B2', false);
         $response->assertSee('vänster innerbåge', false);
         $response->assertSeeInOrder([
-            'Inlämnad',
+            'Mottagen',
             'Skrapning',
-            'Kittning',
+            'Trälagning',
+            'Glasning',
             'Målning',
             'Klar',
         ], false);
+        $response->assertSee('data-step="inlämnad"', false);
+        $response->assertSee('data-step="repair"', false);
+        $response->assertSee('data-step="kittning"', false);
         $response->assertSee('demo-qr.svg', false);
         $response->assertSee('QR-kod · exempel', false);
         $response->assertSee('utskrivbar QR-etikett som öppnar det privata kortet efter inloggning.', false);
@@ -107,6 +111,17 @@ class DemoPageTest extends TestCase
         ])->assertUnprocessable()->assertJsonValidationErrors(['step']);
 
         $this->assertNull(Cache::get('bagspar.demo-card.'.$demoId));
+    }
+
+    public function test_demo_sync_accepts_the_repair_step_and_existing_step_identifiers(): void
+    {
+        foreach (['inlämnad', 'skrapning', 'repair', 'kittning', 'målning', 'klar'] as $step) {
+            $this->postJson(route('demo.sync.store'), [
+                'demo_id' => (string) Str::uuid(),
+                'step' => $step,
+                'notes' => [],
+            ])->assertOk()->assertJsonPath('card.step', $step);
+        }
     }
 
     public function test_unknown_demo_card_has_no_saved_state(): void
