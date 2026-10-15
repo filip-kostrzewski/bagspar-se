@@ -814,6 +814,11 @@ textarea {
     background: var(--white);
 }
 
+.form-result--info {
+    border-left-color: var(--ink);
+    background: #e4ecee;
+}
+
 .form-result h3 {
     margin: 0;
     font-family: var(--serif);

@@ -42,6 +42,8 @@ class PilotLeadControllerTest extends TestCase
             'inom några vardagar',
             route('demo'),
         ], false);
+        $thankYou->assertSee('class="form-result"', false);
+        $thankYou->assertDontSee('form-result--info', false);
 
         Mail::assertSent(PilotLeadNotification::class, function (PilotLeadNotification $mail): bool {
             return $mail->hasTo('pilot-team@example.test')
@@ -86,6 +88,7 @@ class PilotLeadControllerTest extends TestCase
 
         $page = $this->get(route('home'));
         $page->assertSee('Den här e-postadressen är redan anmäld.', false);
+        $page->assertSee('class="form-result form-result--info"', false);
         $page->assertSee('ingen ny sparades', false);
         Mail::assertNothingSent();
     }

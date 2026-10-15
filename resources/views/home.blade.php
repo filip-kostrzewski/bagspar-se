@@ -175,7 +175,7 @@
 
             <div class="interest__form-wrap">
                 @if (session('pilot_lead_duplicate'))
-                    <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
+                    <div id="form-result" class="form-result form-result--info" role="status" aria-live="polite" tabindex="-1">
                         <h3>Den här e-postadressen är redan anmäld.</h3>
                         <p>Vi har redan en anmälan från den adressen, så ingen ny sparades. {{ config('bagspar.pilot_follow_up') }} Du behöver inte skicka formuläret igen.</p>
                         <a class="button" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
