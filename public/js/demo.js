@@ -344,13 +344,13 @@ if (root) {
         if (!navigator.onLine && current.phase === 'pending') {
             setStatus('Sparat i kortet. Synkas när anslutningen kommer tillbaka.', 'waiting');
         } else if (!navigator.onLine) {
-            setStatus('Ingen täckning. Kortet går att läsa och uppdatera.', 'offline');
+            setStatus('Ingen täckning. Exempeluppgifterna går att läsa och uppdatera.', 'offline');
         } else if (current.phase === 'synced') {
             setStatus('Synkat.', 'synced');
         } else if (current.phase === 'pending') {
             setStatus('Sparat i kortet. Synkas när anslutningen kommer tillbaka.', 'waiting');
         } else {
-            setStatus('Påhittat kort. Det går att öppna utan täckning.', 'idle');
+            setStatus('Exempel med testuppgifter. Kan öppnas utan täckning.', 'idle');
         }
     }
 

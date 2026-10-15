@@ -1,10 +1,20 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DemoSyncController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Workshop\DashboardController;
+use App\Http\Controllers\Workshop\ProjectController;
+use App\Http\Controllers\Workshop\SashPhotoController;
+use App\Http\Controllers\Workshop\SashQrCodeController;
+use App\Http\Controllers\Workshop\WindowSashController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -29,3 +39,43 @@ Route::middleware(['admin', 'throttle:30,1'])->group(function (): void {
 Route::post('/intresse', PilotLeadController::class)
     ->middleware('throttle:5,1')
     ->name('pilot-leads.store');
+
+Route::middleware('guest')->group(function (): void {
+    Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/registrera', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1')->name('auth.register.store');
+
+    Route::get('/logga-in', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/logga-in', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:10,1')->name('auth.login.store');
+
+    Route::get('/losenord/glomt', [PasswordResetLinkController::class, 'create'])->name('auth.password.request');
+    Route::post('/losenord/glomt', [PasswordResetLinkController::class, 'store'])->middleware('throttle:5,1')->name('auth.password.email');
+    Route::get('/losenord/aterstall/{token}', [NewPasswordController::class, 'create'])->name('auth.password.reset');
+    Route::post('/losenord/aterstall', [NewPasswordController::class, 'store'])->middleware('throttle:10,1')->name('auth.password.update');
+});
+
+Route::middleware('auth')->group(function (): void {
+    Route::post('/logga-ut', [AuthenticatedSessionController::class, 'destroy'])->name('auth.logout');
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verifiera/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+});
+
+Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app')->name('app.')->group(function (): void {
+    Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');
+    Route::get('/projekt/{project}', [ProjectController::class, 'show'])->whereNumber('project')->name('projects.show');
+    Route::patch('/projekt/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('projects.update');
+    Route::post('/projekt/{project}/bagar', [WindowSashController::class, 'store'])->whereNumber('project')->name('sashes.store');
+    Route::get('/projekt/{project}/bagar/{sash}/qr', SashQrCodeController::class)->whereNumber(['project', 'sash'])->name('sashes.qr');
+    Route::get('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.show');
+    Route::patch('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'update'])->whereNumber(['project', 'sash'])->name('sashes.update');
+    Route::post('/projekt/{project}/bagar/{sash}/bilder', [SashPhotoController::class, 'store'])->middleware('throttle:10,1')->whereNumber(['project', 'sash'])->name('sashes.photos.store');
+    Route::get('/projekt/{project}/bagar/{sash}/bilder/{photo}', [SashPhotoController::class, 'show'])->whereNumber(['project', 'sash', 'photo'])->name('sashes.photos.show');
+});

@@ -11,16 +11,24 @@ class HomePageTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('Se hur ett arbetskort ser ut', false);
+        $response->assertSee('Prova exempel', false);
         $response->assertSee('href="'.route('demo').'"', false);
-        $response->assertSee('Reservera pilotplats', false);
+        $response->assertSee('Starta gratis pilot', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('Logga in', false);
+        $response->assertSee('href="'.route('login').'"', false);
         $response->assertSee('Gratis pilot i 3 månader', false);
-        $response->assertSee('790 kr/mån exkl. moms efter piloten. Ingen bindningstid.', false);
+        $response->assertSee('790 kr/mån per verkstad exkl. moms', false);
+        $response->assertSee('En inloggning, utan medarbetarinbjudningar.', false);
+        $response->assertSee('Utskrivbar QR-etikett', false);
+        $response->assertSee('Öppnar det privata arbetskortet efter inloggning.', false);
+        $response->assertSee('Upp till 20 per båge · högst 5 MB per foto.', false);
+        $response->assertSee('Skriv ut eller spara som PDF i webbläsaren.', false);
+        $response->assertSee('Fortsättning avtalas separat. Inget debiteras automatiskt.', false);
         $response->assertSee('2-KÖK-F1-B2', false);
-        $response->assertSee('Exempelarbetskortet kan ni använda redan nu, utan att anmäla er.', false);
-        $response->assertSee('Ett eget konto ingår i piloten.', false);
-        $response->assertSee('Bågspår är byggt offline-först', false);
-        $response->assertSee('Fungerar i svag täckning', false);
+        $response->assertSee('Ett exempel med testuppgifter är öppet utan konto.', false);
+        $response->assertSee('Det här formuläret skapar inget konto.', false);
+        $response->assertSee('Verkstadskontot behöver internetanslutning.', false);
         $response->assertSee('Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta', false);
         $response->assertSee('name="company"', false);
         $response->assertSee('name="email"', false);
@@ -28,6 +36,8 @@ class HomePageTest extends TestCase
         $response->assertSee('href="'.route('guides.documentation').'"', false);
         $response->assertSee('href="'.route('guides.work-card').'"', false);
         $response->assertSee('href="'.route('guides.marking').'"', false);
+        $response->assertSee('href="https://wisegent.se/se"', false);
+        $response->assertSee('Wisegent – system för städföretag', false);
         $response->assertSee('<link rel="manifest" href="'.route('manifest').'">', false);
         $response->assertSee('rel="apple-touch-icon"', false);
         $response->assertDontSee('name="message"', false);
@@ -50,7 +60,7 @@ class HomePageTest extends TestCase
         $response->assertDontSee('tel:', false);
         $response->assertDontSee('bekräftelse', false);
         $response->assertDontSee('skickar en bekräftelse', false);
-        $response->assertSee('Vi hör av oss inom några vardagar.', false);
+        $response->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
     }
 
     public function test_homepage_promises_an_email_confirmation_only_when_mail_can_be_sent(): void
@@ -63,7 +73,7 @@ class HomePageTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertSee('Du får en bekräftelse via e-post.', false);
-        $response->assertSee('Vi hör av oss inom några vardagar.', false);
+        $response->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
         $response->assertDontSee('skickar en bekräftelse', false);
     }
 
@@ -76,7 +86,7 @@ class HomePageTest extends TestCase
         $response->assertOk();
         $response->assertSee('Eget erbjudande för testet', false);
         $response->assertDontSee('Gratis pilot i 3 månader', false);
-        $response->assertSee('790 kr/mån exkl. moms efter piloten. Ingen bindningstid.', false);
+        $response->assertSee('790 kr/mån per verkstad exkl. moms', false);
     }
 
     public function test_contact_email_is_shown_in_the_footer(): void

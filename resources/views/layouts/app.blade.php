@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#F7F6F1">
     @php
         $pageTitle = trim($__env->yieldContent('title', 'Bågspår — arbetskort för fönsterrenovering'));
-        $pageDescription = trim($__env->yieldContent('meta_description', 'Arbetskort för fönsterverkstäder. Märkning, bilder, anteckningar och arbetssteg på varje båge, även när täckningen är svag.'));
+        $pageDescription = trim($__env->yieldContent('meta_description', 'Arbetskort för fönsterverkstäder. Märkning, bilder, anteckningar och arbetssteg på varje båge.'));
         $configuredAppUrl = rtrim((string) config('app.url'), '/');
         $canonicalHost = parse_url($configuredAppUrl, PHP_URL_HOST);
         $canonicalUrl = $configuredAppUrl.'/'.ltrim(request()->getPathInfo(), '/');
@@ -114,15 +114,13 @@
                 <span class="brand__name">Bågspår</span>
             </a>
 
-            @if (request()->routeIs('home'))
-                <nav class="site-nav" aria-label="Huvudmeny">
-                    <a class="site-nav__link" href="{{ route('demo') }}">Arbetskortet</a>
-                    <a class="site-nav__link" href="#pilot">Piloten</a>
-                    <a class="button button--small" href="#intresse">Reservera plats</a>
-                </nav>
-            @else
-                <a class="button button--small" href="{{ route('home') }}#intresse">Reservera plats</a>
-            @endif
+            <nav class="site-nav" aria-label="Huvudmeny">
+                @if (request()->routeIs('home'))
+                    <a class="site-nav__link site-nav__example" href="{{ route('demo') }}">Prova exempel</a>
+                @endif
+                <a class="site-nav__link site-nav__login" href="{{ route('login') }}">Logga in</a>
+                <a class="button button--small site-nav__cta" href="{{ route('register') }}">Starta gratis pilot</a>
+            </nav>
         </div>
     </header>
 
@@ -146,6 +144,7 @@
                 <a href="{{ route('guides.work-card') }}">Arbetskort</a>
                 <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
+                <a href="https://wisegent.se/se">Wisegent – system för städföretag</a>
                 @if ($showGoogleAnalytics)
                     <button type="button" data-cookie-settings>Cookie-inställningar</button>
                 @endif

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Märkning av fönsterbågar — Bågspår')
-@section('meta_description', 'Så märker du bågen så att den kommer tillbaka till samma öppning: ett nummer, en fysisk lapp som tål färg, och en QR-kod till arbetskortet.')
+@section('meta_description', 'Märk fönsterbågen med ett nummer och skriv ut en QR-etikett från arbetskortet. Skanningen öppnar kortet efter inloggning.')
 
 @section('content')
 <main id="main" class="guide-page page-shell">
@@ -57,8 +57,8 @@
         <p>Någon skriver om numret på kortet men inte på brickan, eller tvärtom. Läs dem mot varandra när bågen lämnar verkstaden. Ett av dem ska inte vara en äldre version.</p>
 
         <h2>Lappen och QR-koden</h2>
-        <p>Lappen säger vilket nummer bågen har, även med färg på händerna och utan täckning. QR-koden öppnar kortet, där plats, bilder, anteckningar och steg ligger. Den som inte minns om 2-KÖK-F1-B2 var vänster innerbåge skannar, i stället för att gissa.</p>
-        <p>Koden ersätter inte lappen. En kod på en lapp som skrapas bort försvinner med numret. Fäst båda där de överlever arbetet. Kortet håller det som inte får plats på brickan.</p>
+        <p>Lappen visar bågens nummer även med färg på händerna och utan täckning. I Bågspår skriver du ut en QR-etikett direkt från arbetskortet. När koden skannas öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot.</p>
+        <p>Koden ersätter inte lappen. Etiketten visar också numret, så att bågen går att identifiera utan mobil eller täckning. Fäst märkningen där den överlever arbetet; kortet håller det som inte får plats på brickan.</p>
 
         @include('partials.guide-faq', ['faqs' => [
             [
@@ -79,7 +79,7 @@
             ],
             [
                 'question' => 'Vad gör QR-koden som lappen inte gör?',
-                'answer' => 'Lappen bär numret. Koden öppnar arbetskortet för just den bågen, med plats i klartext, bilder, anteckningar och steg. Använd båda. Koden hjälper inte om lappen är borta och bågarna ligger omärkta, och lappen rymmer inte skicket och glaset.',
+                'answer' => 'Bågspårs QR-etikett öppnar det privata arbetskortet för bågen med plats, bilder, anteckningar och steg efter inloggning till verkstadskontot. Etiketten visar även numret, så att bågen går att identifiera när mobilen inte är till hands.',
             ],
             [
                 'question' => 'Vad gör jag med en nytillverkad båge?',

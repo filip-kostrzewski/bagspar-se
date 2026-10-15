@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'Exempel på arbetskort — Bågspår')
-@section('meta_description', 'Exempel på ett arbetskort i Bågspår: en påhittad båge med QR-kod, arbetssteg, anteckningar och illustrationer.')
+@section('meta_description', 'Prova Bågspårs exempel med testuppgifter: ett arbetskort med steg, anteckningar, bilder och en illustrativ QR-kod.')
 
 @section('content')
 <main id="main" class="demo-page page-shell">
     <div class="demo-page__layout">
         <div class="demo-page__intro-wrap">
             <h1 class="section-heading">Ett arbetskort.</h1>
-            <p class="demo-page__intro">Påhittat från början till slut. Ingen riktig verkstad och inget riktigt fönster. Bågspår är byggt offline-först: kortet går att läsa och uppdatera när täckningen är svag, och ändringarna synkas när anslutningen kommer tillbaka.</p>
+            <p class="demo-page__intro">Allt här är påhittat. Prova stegen, anteckningarna och bilderna med testuppgifter, även utan täckning. Ditt verkstadskonto kräver internetanslutning och sparar uppgifterna på servern. Där får varje arbetskort en utskrivbar QR-etikett som öppnar det privata kortet efter inloggning.</p>
         </div>
 
         <article class="job-card job-card--wide" data-demo-card data-sync-url="{{ route('demo.sync.store', absolute: false) }}" aria-labelledby="job-card-title">
@@ -21,15 +21,15 @@
                     <p>6 rutor · 68 × 124 cm</p>
                 </div>
                 <a class="job-card__qr" href="{{ route('demo') }}">
-                    <img src="{{ asset('images/demo-qr.svg') }}" width="96" height="96" alt="QR-kod för båge 2-KÖK-F1-B2. Öppnar det här arbetskortet.">
-                    <span>QR-kod</span>
+                    <img src="{{ asset('images/demo-qr.svg') }}" width="96" height="96" alt="Illustrativ QR-kod för 2-KÖK-F1-B2. Öppnar det här exemplet med testuppgifter.">
+                    <span>QR-kod · exempel</span>
                 </a>
             </header>
 
             <div class="job-card__split">
             <div class="job-card__primary">
             <p class="job-card__status" data-status-label>Kittning</p>
-            <p class="job-card__sync" data-sync-status role="status" aria-live="polite">Påhittat kort. Det går att öppna utan täckning.</p>
+            <p class="job-card__sync" data-sync-status role="status" aria-live="polite">Exempel med testuppgifter. Kan öppnas utan täckning.</p>
 
             <ol class="job-steps">
                 <li>
@@ -141,10 +141,11 @@
 
     <aside class="demo-next" aria-labelledby="demo-next-title">
         <div>
-            <h2 id="demo-next-title">Reservera en pilotplats</h2>
-            <p>Kortet ovan är påhittat och öppet för alla. Anmälan reserverar en pilotplats. Ett eget konto ingår i piloten. {{ config('bagspar.pilot_follow_up') }}</p>
+            <h2 id="demo-next-title">Börja med ett eget konto</h2>
+            <p>Kortet ovan är öppet för alla. Starta en kostnadsfri pilot för din verkstad; arbetskort sparas på servern med internetanslutning.</p>
         </div>
-        <a class="button" href="{{ route('home') }}#intresse">Reservera pilotplats</a>
+        <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
+        <p><a href="{{ route('home') }}#intresse">Vill du stämma av piloten? Kontakta oss</a></p>
     </aside>
 </main>
 @endsection

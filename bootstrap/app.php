@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AuthenticateAdmin;
+use App\Http\Middleware\EnsureVerifiedEmailInProduction;
 use App\Http\Middleware\ForceProductionHttps;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,7 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(ForceProductionHttps::class);
         $middleware->alias([
             'admin' => AuthenticateAdmin::class,
+            'verified.production' => EnsureVerifiedEmailInProduction::class,
         ]);
+        $middleware->redirectGuestsTo(fn (Request $request): string => route('login'));
+        $middleware->redirectUsersTo(fn (Request $request): string => route('app.dashboard'));
         // The demo page is cached for offline use, so a later visit may not
         // have a fresh session token. The endpoint stores example steps and notes only.
         $middleware->preventRequestForgery(except: [

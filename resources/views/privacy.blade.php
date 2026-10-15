@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Integritetspolicy — Bågspår')
-@section('meta_description', 'Integritetspolicy för Bågspår. Prodi Digital AB beskriver vilka uppgifter som sparas när en verkstad anmäler sig.')
+@section('meta_description', 'Integritetspolicy för Bågspår, med information om intresseanmälan och uppgifter som behandlas i verkstadens konto.')
 
 @section('content')
 @php
@@ -32,7 +32,7 @@
         <p>Uppgifterna används för att ta emot anmälan och kontakta dig om pilotplatsen. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal om piloten. Vi säljer inte uppgifterna.</p>
 
         <h2>Hur länge uppgifterna sparas</h2>
-        <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Om du inte går vidare raderar vi dem senast 24 månader efter anmälan. Ber du oss radera dem tidigare gör vi det.</p>
+        <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Du kan när som helst kontakta oss och be att uppgifterna raderas.</p>
 
         <h2>Vilka som tar del av uppgifterna</h2>
         <p>Uppgifterna sparas i Bågspårs databas och i ett internt e-postmeddelande till oss när en anmälan kommer in. Webbserverns vanliga tekniska loggar kan innehålla IP-adress och tidpunkt. De används för drift och säkerhet.</p>
@@ -48,8 +48,19 @@
         @endif
 
         <h2>Exempelarbetskortet</h2>
-        <p>Exempelarbetskortet är påhittat. Om du ändrar steg eller skriver en anteckning där sparas det i din webbläsare. När det finns en anslutning skickas steget och anteckningarna till en tillfällig cache kopplad till en slumpad nyckel i samma webbläsare, så att ändringen finns kvar om du laddar om sidan. Bilder du lägger till stannar i webbläsaren. Cachen raderas senast efter {{ config('bagspar.demo_sync_days') }} dagar. Vi använder inte de uppgifterna för att kontakta dig, och de kopplas inte till anmälan.</p>
+        <p>Exemplet med testuppgifter är påhittat. Om du ändrar steg eller skriver en anteckning där sparas det i din webbläsare. När det finns en anslutning skickas steget och anteckningarna till en tillfällig cache kopplad till en slumpad nyckel i samma webbläsare, så att ändringen finns kvar om du laddar om sidan. Bilder du lägger till stannar i webbläsaren. Cachen raderas senast efter {{ config('bagspar.demo_sync_days') }} dagar. Vi använder inte de uppgifterna för att kontakta dig, och de kopplas inte till anmälan.</p>
         <p>Kortet kan också lagras i webbläsarens cache så att det går att öppna igen utan täckning. Det är ingen spårning.</p>
+
+        <h2>Uppgifter i verkstadens konto</h2>
+        <p>När en verkstad använder kontot behandlar vi uppgifter som behövs för att hålla ordning på arbetet:</p>
+        <ul>
+            <li>kontots namn, e-postadress och verkstadens namn</li>
+            <li>projektets namn, kund eller beställare, plats och anteckningar</li>
+            <li>varje båges kod, rum, placering, aktuella arbetssteg och anteckningar</li>
+            <li>bilder som laddas upp till en båge, med originalfilnamn, filtyp och filstorlek</li>
+        </ul>
+        <p>Uppgifterna används för att visa och hantera projekt, arbetskort, bilder och projektrapporter i Bågspår. Kontots uppgifter och bilder hör till verkstaden. De visas efter inloggning för användare med åtkomst till verkstadens konto. Bildfilerna är privata och visas via en skyddad appfunktion, inte som publika bildlänkar.</p>
+        <p>Om du vill få uppgifter i ett konto raderade, kontakta oss via e-postadressen nedan. Appen har för närvarande ingen egen funktion för att radera konto eller enskilda arbetskort.</p>
 
         <h2>Dina rättigheter</h2>
         <p>Du har rätt att:</p>

@@ -23,8 +23,10 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('verkstadens eller företagets namn', false);
         $response->assertSee('e-postadress', false);
         $response->assertSee('tidpunkten då anmälan skickades', false);
-        $response->assertSee('24 månader', false);
+        $response->assertSee('så länge de behövs för att följa upp anmälan och piloten', false);
         $response->assertSee('14 dagar', false);
+        $response->assertSee('Uppgifter i verkstadens konto', false);
+        $response->assertSee('Bildfilerna är privata och visas via en skyddad appfunktion', false);
         $response->assertSee('artikel 6.1 b', false);
         $response->assertSee('Integritetsskyddsmyndigheten', false);
         $response->assertSee('mailto:kontakt@bagspar.se', false);

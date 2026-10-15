@@ -41,11 +41,11 @@ class PilotLeadControllerTest extends TestCase
         $thankYou = $this->get(route('home'));
         $thankYou->assertOk();
         $thankYou->assertSeeInOrder([
-            'Pilotplatsen är reserverad.',
-            'Du får en bekräftelse via e-post.',
-            'inom några vardagar',
+            'Tack, vi har fått din förfrågan.',
+            'Frågor?',
             route('demo'),
         ], false);
+        $thankYou->assertSee('Du får en bekräftelse via e-post.', false);
         $thankYou->assertSee('class="form-result"', false);
         $thankYou->assertDontSee('form-result--info', false);
 
@@ -54,9 +54,10 @@ class PilotLeadControllerTest extends TestCase
                 && $mail->lead->company === 'Båghantverket';
         });
         Mail::assertSent(PilotLeadConfirmation::class, function (PilotLeadConfirmation $mail): bool {
-            $mail->assertSeeInHtml('inom några vardagar', false);
-            $mail->assertSeeInHtml('eget konto ingår i piloten', false);
-            $mail->assertSeeInText('inom några vardagar');
+            $mail->assertSeeInHtml('Det här formuläret skapar inget konto', false);
+            $mail->assertSeeInHtml('Inget debiteras automatiskt', false);
+            $mail->assertSeeInText('Det här formuläret skapar inget konto');
+            $mail->assertDontSeeInHtml('eget konto ingår i piloten');
             $mail->assertDontSeeInHtml('prototyp');
 
             return $mail->hasTo('verkstad@example.test')
@@ -91,9 +92,9 @@ class PilotLeadControllerTest extends TestCase
         ]);
 
         $page = $this->get(route('home'));
-        $page->assertSee('Den här e-postadressen är redan anmäld.', false);
+        $page->assertSee('Adressen finns redan i listan.', false);
         $page->assertSee('class="form-result form-result--info"', false);
-        $page->assertSee('ingen ny sparades', false);
+        $page->assertSee('Vi har redan en förfrågan från den adressen.', false);
         Mail::assertNothingSent();
     }
 
@@ -236,8 +237,8 @@ class PilotLeadControllerTest extends TestCase
         $this->assertSame('Båghantverket', $lead->company);
 
         $page = $this->get(route('home'));
-        $page->assertSee('Pilotplatsen är reserverad.', false);
-        $page->assertSee('Vi har sparat verkstadens namn och din e-post. Vi hör av oss inom några vardagar.', false);
+        $page->assertSee('Tack, vi har fått din förfrågan.', false);
+        $page->assertSee('Verkstadens namn och din e-post är sparade. Frågor?', false);
         $page->assertDontSee('Vi har sparat verkstadens namn och din e-post. Du får en bekräftelse via e-post.', false);
     }
 
@@ -266,7 +267,7 @@ class PilotLeadControllerTest extends TestCase
         Mail::assertNotSent(PilotLeadConfirmation::class);
 
         $page = $this->get(route('home'));
-        $page->assertSee('inom några vardagar', false);
+        $page->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
         $page->assertDontSee('bekräftelse', false);
     }
 

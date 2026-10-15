@@ -22,7 +22,7 @@ class GuidePageTest extends TestCase
     #[TestWith([
         'guides.work-card',
         'Arbetskort för fönsterbågar — Bågspår',
-        'Ett arbetskort per båge, med nummer, plats, QR-kod, arbetssteg, anteckningar och bilder. Kortet öppnas i mobilen.',
+        'Arbetskort per fönsterbåge med plats, arbetssteg, anteckningar, bilder och en utskrivbar QR-etikett som öppnar kortet efter inloggning.',
         'Ett kort per båge',
         'guides.documentation',
         'dokumentationen av fönsterrenoveringen',
@@ -32,7 +32,7 @@ class GuidePageTest extends TestCase
     #[TestWith([
         'guides.marking',
         'Märkning av fönsterbågar — Bågspår',
-        'Så märker du bågen så att den kommer tillbaka till samma öppning: ett nummer, en fysisk lapp som tål färg, och en QR-kod till arbetskortet.',
+        'Märk fönsterbågen med ett nummer och skriv ut en QR-etikett från arbetskortet. Skanningen öppnar kortet efter inloggning.',
         'Samma båge, samma öppning',
         'guides.work-card',
         'arbetskortet',
@@ -60,12 +60,18 @@ class GuidePageTest extends TestCase
         $response->assertSee('href="'.route($secondRelatedRoute).'"', false);
         $response->assertSee($secondRelatedLabel, false);
         $response->assertSee('href="'.route('demo').'"', false);
-        $response->assertSee('Se hur ett arbetskort ser ut', false);
+        $response->assertSee('Se exempel med testuppgifter', false);
         $response->assertSee('href="'.route('home').'#intresse"', false);
-        $response->assertSee('Reservera pilotplats', false);
+        $response->assertSee('Starta gratis pilot', false);
         $response->assertDontSee('tänkt', false);
         $response->assertDontSee('planerat', false);
         $response->assertDontSee('tanken är', false);
+
+        if (in_array($routeName, ['guides.work-card', 'guides.marking'], true)) {
+            $response->assertSee('QR-etikett', false);
+            $response->assertSee('Skanning kräver inloggning till verkstadskontot.', false);
+            $response->assertDontSee('QR-koden skapas separat', false);
+        }
     }
 
     #[TestWith(['guides.documentation'])]

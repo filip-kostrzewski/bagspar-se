@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Arbetskort för fönsterbågar — Bågspår')
-@section('meta_description', 'Ett arbetskort per båge, med nummer, plats, QR-kod, arbetssteg, anteckningar och bilder. Kortet öppnas i mobilen.')
+@section('meta_description', 'Arbetskort per fönsterbåge med plats, arbetssteg, anteckningar, bilder och en utskrivbar QR-etikett som öppnar kortet efter inloggning.')
 
 @section('content')
 <main id="main" class="guide-page page-shell">
@@ -32,10 +32,10 @@
 
         <h2>Det som ligger på kortet</h2>
         <h3>Nummer och plats</h3>
-        <p>Rubriken är bågens nummer, till exempel 2-KÖK-F1-B2, och platsen i klartext: våning 2, kök, vänster innerbåge. Den som skannar ska se båda. Numret räcker när lappen sitter kvar. Klartexten räcker när någon läser listan i verkstaden utan att ha bågen framför sig.</p>
+        <p>Rubriken är bågens nummer, till exempel 2-KÖK-F1-B2, och platsen i klartext: våning 2, kök, vänster innerbåge. Efter inloggning ser den som öppnar kortet båda. Numret räcker när lappen sitter kvar. Klartexten räcker när någon läser listan i verkstaden utan att ha bågen framför sig.</p>
 
         <h3>QR-kod</h3>
-        <p>QR-koden öppnar just det här kortet. Den fästs tillsammans med märkningen, så att den som står vid bänken inte letar i en lista. Koden pekar på en båge, inte på ett rum.</p>
+        <p>Skriv ut en QR-etikett direkt från arbetskortet. När någon skannar den öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot. Etiketten visar också bågens nummer, så att den går att identifiera utan att skanna.</p>
 
         <h3>Anteckningar</h3>
         <p>Skriv korta rader: glaset tas ur, gångjärn saknas, kulör inte vald, kitt lagt så måla inte idag. Den som läser ska kunna handla på meningen utan era interna förkortningar.</p>
@@ -68,7 +68,7 @@
         <p>Klar är bågen som kan lämna verkstaden mot sin öppning. Grundstruket, kitt som fortfarande torkar eller en saknad skruv är inte klar. Skriv det som återstår och låt steget stå kvar på det arbete som pågår.</p>
 
         <h2>När täckningen är svag</h2>
-        <p>Bågspår är byggt offline-först. Arbetskortet går att öppna och uppdatera när signalen är svag. Ändringen synkas när anslutningen kommer tillbaka, så steget och anteckningen inte blir kvar bara i en telefon.</p>
+        <p>Verkstadskontot kräver internetanslutning. Arbetskort och ändringar sparas på servern, så att verkstaden kan öppna samma uppgifter från sitt konto. Exemplet med testuppgifter är separat och går att prova utan täckning.</p>
 
         @include('partials.guide-faq', ['faqs' => [
             [
@@ -80,8 +80,8 @@
                 'answer' => 'Inlämnad betyder att bågen är inne och ännu inte påbörjad. Skrapning, kittning och målning är det arbete som pågår. Klar betyder att bågen kan lämna verkstaden mot sin öppning. Flytta steget när arbetet börjar, och lämna en anteckning om något återstår innan nästa steg.',
             ],
             [
-                'question' => 'Hur används kortet när mobilen saknar täckning?',
-                'answer' => 'Kortet går att öppna och steget går att flytta även när signalen är svag. Ändringen sparas i telefonen och synkas när anslutningen kommer tillbaka. Skriv anteckningen där du står. Vänta inte tills du är tillbaka i ett rum med bättre mottagning, för då är bågen redan ur händerna.',
+                'question' => 'Fungerar verkstadskontot utan internet?',
+                'answer' => 'Nej. Verkstadskontot behöver internetanslutning för att öppna och uppdatera arbetskort. Uppgifterna sparas på servern. Exemplet med testuppgifter kan provas utan täckning.',
             ],
             [
                 'question' => 'Ska bilden ligga på kortet eller i en egen mapp?',

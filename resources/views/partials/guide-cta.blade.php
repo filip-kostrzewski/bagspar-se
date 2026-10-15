@@ -1,5 +1,5 @@
 <aside class="guide-cta">
-    <p>Se ett exempel på hur kortet ser ut i mobilen, med steg, bilder och anteckningar på en båge.</p>
-    <a class="button" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
-    <p><a href="{{ route('home') }}#intresse">Reservera pilotplats</a></p>
+    <p>Skapa ett konto för verkstaden och samla bågens arbetskort på samma ställe.</p>
+    <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
+    <p><a href="{{ route('demo') }}">Se exempel med testuppgifter</a> · <a href="{{ route('home') }}#intresse">Vill du ha hjälp? Kontakta oss</a></p>
 </aside>

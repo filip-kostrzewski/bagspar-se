@@ -26,7 +26,8 @@ class DemoPageTest extends TestCase
             'Klar',
         ], false);
         $response->assertSee('demo-qr.svg', false);
-        $response->assertSee('QR-kod', false);
+        $response->assertSee('QR-kod · exempel', false);
+        $response->assertSee('utskrivbar QR-etikett som öppnar det privata kortet efter inloggning.', false);
         $response->assertSee('Illustrationer', false);
         $response->assertSee('job-photo__badge', false);
         $response->assertSee('job-photo__caption">Illustration<', false);
@@ -38,12 +39,14 @@ class DemoPageTest extends TestCase
         $response->assertDontSee('>EXEMPEL<', false);
         $response->assertSee('>Stäng<', false);
         $response->assertSee('data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort."', false);
-        $response->assertSee('Reservera pilotplats', false);
+        $response->assertSee('Börja med ett eget konto', false);
+        $response->assertSee('Starta gratis pilot', false);
+        $response->assertSee('Ditt verkstadskonto kräver internetanslutning', false);
         $response->assertSee('demo-page__layout', false);
         $response->assertSee('data-sync-url="/demo/synk"', false);
         $response->assertSee('js/demo.js?v='.config('bagspar.asset_version'), false);
         $response->assertSee('data-sw-url="'.asset('sw.js').'?v='.config('bagspar.asset_version').'"', false);
-        $response->assertSee('offline-först', false);
+        $response->assertSee('Exempel med testuppgifter. Kan öppnas utan täckning.', false);
         $response->assertDontSee('B-04', false);
         $response->assertDontSee('Bilder, exempel', false);
         $response->assertDontSee('Före, exempel', false);

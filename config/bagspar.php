@@ -48,9 +48,7 @@ return [
         ? trim($pilotOffer)
         : 'Gratis pilot i 3 månader',
 
-    'pilot_price_line' => '790 kr/mån exkl. moms efter piloten. Ingen bindningstid.',
-
-    'pilot_follow_up' => 'Vi hör av oss inom några vardagar.',
+    'pilot_price_line' => '790 kr/mån per verkstad, exkl. moms. Fortsättning avtalas separat. Inget debiteras automatiskt.',
 
     'demo_sync_days' => 14,
 
