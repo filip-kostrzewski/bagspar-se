@@ -39,7 +39,7 @@ html {
 }
 
 body {
-    min-width: 320px;
+    min-width: 0;
     margin: 0;
     color: var(--ink);
     background: var(--paper);
@@ -77,6 +77,8 @@ textarea {
 
 .page-shell {
     width: min(100%, 1240px);
+    max-width: 100%;
+    min-width: 0;
     margin-inline: auto;
     padding-inline: clamp(20px, 4.4vw, 64px);
 }
@@ -1102,6 +1104,16 @@ textarea {
 
     .site-header__inner {
         min-height: 70px;
+        min-width: 0;
+    }
+
+    .brand {
+        min-width: 0;
+    }
+
+    .site-header .button {
+        max-width: 100%;
+        white-space: normal;
     }
 
     .site-nav {
@@ -1510,8 +1522,10 @@ textarea {
 }
 
 .demo-page {
+    max-width: 100%;
     padding-top: clamp(36px, 6vw, 72px);
     padding-bottom: clamp(64px, 8vw, 112px);
+    overflow-wrap: break-word;
 }
 
 .demo-page__layout {
@@ -1523,9 +1537,11 @@ textarea {
 
 .demo-page__intro-wrap {
     display: grid;
-    grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
     gap: 12px 40px;
     align-items: end;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .demo-page .section-heading {
@@ -1542,6 +1558,8 @@ textarea {
 
 .demo-next {
     display: flex;
+    min-width: 0;
+    max-width: 100%;
     align-items: center;
     justify-content: space-between;
     gap: 24px 48px;
@@ -1567,12 +1585,19 @@ textarea {
     line-height: 1.6;
 }
 
+.demo-next > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .demo-next .button {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
 }
 
 .job-card {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     margin-top: 0;
     padding: 28px 32px 24px;
     border: 1px solid rgb(23 49 59 / 8%);
@@ -1589,9 +1614,11 @@ textarea {
 
 .job-card__split {
     display: grid;
-    grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     gap: 24px 40px;
     align-items: start;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .job-card__primary {
@@ -1605,6 +1632,9 @@ textarea {
 
 .job-card__header {
     display: flex;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
@@ -1741,6 +1771,8 @@ textarea {
 
 .job-photos,
 .job-notes-section {
+    min-width: 0;
+    max-width: 100%;
     margin-top: 22px;
 }
 
@@ -1762,6 +1794,8 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     margin-top: 12px;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .job-photo {
@@ -1787,6 +1821,8 @@ textarea {
     position: relative;
     display: flex;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 48px;
     flex-direction: column;
     align-items: stretch;
@@ -1802,10 +1838,9 @@ textarea {
 .job-photo__open svg,
 .job-photos__added img {
     display: block;
-    width: auto;
+    width: 100%;
     max-width: 100%;
     height: auto;
-    max-height: 220px;
     margin-inline: auto;
     border-radius: 4px;
 }
@@ -1868,18 +1903,24 @@ textarea {
 }
 
 .job-card__file {
+    position: relative;
     display: inline-flex;
+    max-width: 100%;
     margin-top: 12px;
+    overflow: hidden;
     cursor: pointer;
 }
 
 .job-card__file input {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    width: 0.1px;
+    height: 0.1px;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     clip-path: inset(50%);
+    font-size: 0;
 }
 
 .job-notes {
@@ -1963,6 +2004,11 @@ textarea {
 
     .job-card__split .job-photos {
         margin-top: 22px;
+    }
+
+    .job-photos__grid,
+    .job-photos__added {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .demo-next .button {

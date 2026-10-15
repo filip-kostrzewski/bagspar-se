@@ -72,7 +72,7 @@
                     <div class="job-photo" data-photo aria-expanded="false">
                         <button type="button" class="job-photo__open" data-photo-open>
                             <span class="job-photo__badge">Illustration</span>
-                            <svg viewBox="0 0 120 180" role="img" aria-labelledby="photo-before-title">
+                            <svg viewBox="0 0 120 180" width="120" height="180" role="img" aria-labelledby="photo-before-title">
                                 <title id="photo-before-title">Illustration, före</title>
                                 <rect x="6" y="6" width="108" height="168" rx="2" fill="#efe6d4" stroke="#17313b" stroke-width="8"/>
                                 <rect x="18" y="18" width="36" height="40" fill="#d5e2e4"/>
@@ -91,7 +91,7 @@
                     <div class="job-photo" data-photo aria-expanded="false">
                         <button type="button" class="job-photo__open" data-photo-open>
                             <span class="job-photo__badge">Illustration</span>
-                            <svg viewBox="0 0 120 180" role="img" aria-labelledby="photo-scraped-title">
+                            <svg viewBox="0 0 120 180" width="120" height="180" role="img" aria-labelledby="photo-scraped-title">
                                 <title id="photo-scraped-title">Illustration, efter skrapning</title>
                                 <rect x="6" y="6" width="108" height="168" rx="2" fill="#e7d3b0" stroke="#6b4e32" stroke-width="8"/>
                                 <rect x="18" y="18" width="36" height="40" fill="#d5e2e4"/>

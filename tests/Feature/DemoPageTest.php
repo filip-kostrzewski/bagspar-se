@@ -32,6 +32,7 @@ class DemoPageTest extends TestCase
         $response->assertSee('job-photo__caption">Illustration<', false);
         $response->assertSee('Före. Inte ett fotografi.', false);
         $response->assertSee('job-card__split', false);
+        $response->assertSee('width="120"', false);
         $response->assertSee('inte fotografier', false);
         $response->assertSee('job-card--wide', false);
         $response->assertDontSee('>EXEMPEL<', false);
