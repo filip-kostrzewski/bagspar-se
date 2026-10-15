@@ -48,6 +48,23 @@ class HomePageTest extends TestCase
         $response->assertSee('"price":"790"', false);
         $response->assertDontSee('aggregateRating', false);
         $response->assertDontSee('tel:', false);
+        $response->assertDontSee('bekräftelse', false);
+        $response->assertDontSee('skickar en bekräftelse', false);
+        $response->assertSee('Vi hör av oss inom några vardagar.', false);
+    }
+
+    public function test_homepage_promises_an_email_confirmation_only_when_mail_can_be_sent(): void
+    {
+        config([
+            'mail.default' => 'postmark',
+            'services.postmark.key' => 'server-token-test',
+        ]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertSee('Du får en bekräftelse via e-post.', false);
+        $response->assertSee('Vi hör av oss inom några vardagar.', false);
+        $response->assertDontSee('skickar en bekräftelse', false);
     }
 
     public function test_custom_pilot_offer_replaces_the_default_headline(): void

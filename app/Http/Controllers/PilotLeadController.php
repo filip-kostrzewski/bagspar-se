@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePilotLeadRequest;
+use App\Mail\OutboundMail;
 use App\Mail\PilotLeadConfirmation;
 use App\Mail\PilotLeadNotification;
 use App\Models\PilotLead;
@@ -54,19 +55,30 @@ class PilotLeadController extends Controller
             $this->sendMail($recipient, new PilotLeadNotification($lead), 'Bågspår lead notification could not be sent.');
         }
 
-        $this->sendMail($lead->email, new PilotLeadConfirmation($lead), 'Bågspår signup confirmation could not be sent.');
+        $confirmationSent = false;
 
-        return redirect()->to(route('home').'#form-result')->with('pilot_lead_received', true);
+        if (OutboundMail::isConfigured()) {
+            $confirmationSent = $this->sendMail($lead->email, new PilotLeadConfirmation($lead), 'Bågspår signup confirmation could not be sent.');
+        }
+
+        return redirect()
+            ->to(route('home').'#form-result')
+            ->with('pilot_lead_received', true)
+            ->with('pilot_lead_confirmation_sent', $confirmationSent);
     }
 
-    private function sendMail(string $recipient, Mailable $mail, string $logMessage): void
+    private function sendMail(string $recipient, Mailable $mail, string $logMessage): bool
     {
         try {
             Mail::to($recipient)->send($mail);
+
+            return true;
         } catch (Throwable $exception) {
             Log::warning($logMessage, [
                 'exception' => $exception::class,
             ]);
+
+            return false;
         }
     }
 }

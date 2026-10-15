@@ -7,6 +7,7 @@ use App\Mail\PilotLeadNotification;
 use App\Models\PilotLead;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -17,6 +18,7 @@ class PilotLeadControllerTest extends TestCase
     public function test_valid_interest_submission_is_saved_and_notifies_the_configured_recipient(): void
     {
         Mail::fake();
+        $this->configureDeliverableMail();
         config(['bagspar.lead_notification_email' => 'pilot-team@example.test']);
 
         $response = $this->from(route('home'))
@@ -26,7 +28,8 @@ class PilotLeadControllerTest extends TestCase
             ]);
 
         $response->assertRedirect(route('home').'#form-result')
-            ->assertSessionHas('pilot_lead_received', true);
+            ->assertSessionHas('pilot_lead_received', true)
+            ->assertSessionHas('pilot_lead_confirmation_sent', true);
 
         $lead = PilotLead::query()->where('email', 'verkstad@example.test')->first();
         $this->assertNotNull($lead);
@@ -39,6 +42,7 @@ class PilotLeadControllerTest extends TestCase
         $thankYou->assertOk();
         $thankYou->assertSeeInOrder([
             'Pilotplatsen är reserverad.',
+            'Du får en bekräftelse via e-post.',
             'inom några vardagar',
             route('demo'),
         ], false);
@@ -96,6 +100,7 @@ class PilotLeadControllerTest extends TestCase
     public function test_every_signup_is_saved_when_no_notification_address_is_configured(): void
     {
         Mail::fake();
+        $this->configureDeliverableMail();
         config(['bagspar.lead_notification_email' => null]);
 
         $this->from(route('home'))
@@ -186,6 +191,7 @@ class PilotLeadControllerTest extends TestCase
     public function test_requests_from_one_ip_are_limited_to_five_per_minute(): void
     {
         Mail::fake();
+        $this->configureDeliverableMail();
         config(['bagspar.lead_notification_email' => 'pilot-team@example.test']);
         $serverVariables = ['REMOTE_ADDR' => '192.0.2.18'];
 
@@ -212,6 +218,7 @@ class PilotLeadControllerTest extends TestCase
 
     public function test_mail_failure_does_not_undo_the_saved_lead_or_hide_confirmation(): void
     {
+        $this->configureDeliverableMail();
         config(['bagspar.lead_notification_email' => 'pilot-team@example.test']);
         Mail::shouldReceive('to')
             ->twice()
@@ -221,11 +228,46 @@ class PilotLeadControllerTest extends TestCase
             ->post(route('pilot-leads.store'), $this->validSubmission());
 
         $response->assertRedirect(route('home').'#form-result')
-            ->assertSessionHas('pilot_lead_received', true);
+            ->assertSessionHas('pilot_lead_received', true)
+            ->assertSessionHas('pilot_lead_confirmation_sent', false);
 
         $lead = PilotLead::query()->where('email', 'verkstad@example.test')->first();
         $this->assertNotNull($lead);
         $this->assertSame('Båghantverket', $lead->company);
+
+        $page = $this->get(route('home'));
+        $page->assertSee('Pilotplatsen är reserverad.', false);
+        $page->assertSee('Vi har sparat verkstadens namn och din e-post. Vi hör av oss inom några vardagar.', false);
+        $page->assertDontSee('Vi har sparat verkstadens namn och din e-post. Du får en bekräftelse via e-post.', false);
+    }
+
+    #[TestWith(['array', null])]
+    #[TestWith(['log', null])]
+    #[TestWith(['postmark', ''])]
+    #[TestWith(['postmark', '   '])]
+    public function test_signup_saves_the_lead_without_sending_a_confirmation_when_mail_is_not_configured(string $mailer, ?string $postmarkKey): void
+    {
+        Mail::fake();
+        config([
+            'mail.default' => $mailer,
+            'services.postmark.key' => $postmarkKey,
+            'bagspar.lead_notification_email' => 'pilot-team@example.test',
+        ]);
+
+        $response = $this->from(route('home'))
+            ->post(route('pilot-leads.store'), $this->validSubmission());
+
+        $response->assertRedirect(route('home').'#form-result')
+            ->assertSessionHas('pilot_lead_received', true)
+            ->assertSessionHas('pilot_lead_confirmation_sent', false);
+
+        $this->assertNotNull(PilotLead::query()->where('email', 'verkstad@example.test')->first());
+        Mail::assertSent(PilotLeadNotification::class);
+        Mail::assertNotSent(PilotLeadConfirmation::class);
+
+        $page = $this->get(route('home'));
+        $page->assertSee('inom några vardagar', false);
+        $page->assertDontSee('bekräftelse', false);
     }
 
     public function test_company_name_is_escaped_in_the_notification_mail(): void
@@ -244,6 +286,14 @@ class PilotLeadControllerTest extends TestCase
             return str_contains($html, 'Båge &lt;script&gt;alert(1)&lt;/script&gt;')
                 && ! str_contains($html, '<script>alert(1)</script>');
         });
+    }
+
+    private function configureDeliverableMail(): void
+    {
+        config([
+            'mail.default' => 'postmark',
+            'services.postmark.key' => 'server-token-test',
+        ]);
     }
 
     /**

@@ -21,7 +21,9 @@
         ],
         [
             'question' => 'Vad händer när jag anmäler verkstaden?',
-            'answer' => 'Vi sparar verkstadens namn och din e-postadress och skickar en bekräftelse till dig. Anmälan reserverar en pilotplats. Vi hör av oss inom några vardagar. Anmälan innebär ingen betalning.',
+            'answer' => 'Vi sparar verkstadens namn och din e-postadress.'
+                .(\App\Mail\OutboundMail::isConfigured() ? ' Du får en bekräftelse via e-post.' : '')
+                .' Anmälan reserverar en pilotplats. Vi hör av oss inom några vardagar. Anmälan innebär ingen betalning.',
         ],
     ];
     $faqSchema = [
@@ -183,7 +185,7 @@
                 @elseif (session('pilot_lead_received'))
                     <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
                         <h3>Pilotplatsen är reserverad.</h3>
-                        <p>Vi har sparat verkstadens namn och din e-post och skickat en bekräftelse. {{ config('bagspar.pilot_follow_up') }} Under tiden kan du se exempelarbetskortet. Ett eget konto ingår i piloten.</p>
+                        <p>Vi har sparat verkstadens namn och din e-post.@if (session('pilot_lead_confirmation_sent')) Du får en bekräftelse via e-post.@endif {{ config('bagspar.pilot_follow_up') }} Under tiden kan du se exempelarbetskortet. Ett eget konto ingår i piloten.</p>
                         <a class="button" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
                     </div>
                 @else
