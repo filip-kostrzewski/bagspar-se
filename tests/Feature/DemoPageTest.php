@@ -29,7 +29,9 @@ class DemoPageTest extends TestCase
         $response->assertSee('QR-kod', false);
         $response->assertSee('Illustrationer', false);
         $response->assertSee('job-photo__badge', false);
-        $response->assertSee('Illustration, före. Inte ett fotografi.', false);
+        $response->assertSee('job-photo__caption">Illustration<', false);
+        $response->assertSee('Före. Inte ett fotografi.', false);
+        $response->assertSee('job-card__split', false);
         $response->assertSee('inte fotografier', false);
         $response->assertSee('job-card--wide', false);
         $response->assertDontSee('>EXEMPEL<', false);

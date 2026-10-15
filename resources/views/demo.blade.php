@@ -12,7 +12,6 @@
         </div>
 
         <article class="job-card job-card--wide" data-demo-card data-sync-url="{{ route('demo.sync.store', absolute: false) }}" aria-labelledby="job-card-title">
-            <div class="job-card__primary">
             <header class="job-card__header">
                 <div>
                     <h2 id="job-card-title">2-KÖK-F1-B2</h2>
@@ -27,6 +26,8 @@
                 </a>
             </header>
 
+            <div class="job-card__split">
+            <div class="job-card__primary">
             <p class="job-card__status" data-status-label>Kittning</p>
             <p class="job-card__sync" data-sync-status role="status" aria-live="polite">Påhittat kort. Det går att öppna utan täckning.</p>
 
@@ -64,7 +65,6 @@
             </ol>
             </div>
 
-            <div class="job-card__secondary">
             <section class="job-photos" aria-labelledby="job-photos-title">
                 <h3 id="job-photos-title">Illustrationer</h3>
                 <p class="job-photos__note">Teckningarna är illustrationer, inte fotografier.</p>
@@ -83,7 +83,8 @@
                                 <rect x="66" y="122" width="36" height="40" fill="#d5e2e4"/>
                                 <path d="M22 148c8 6 18 4 28-2" fill="none" stroke="#8a6a45" stroke-width="2"/>
                             </svg>
-                            <span class="job-photo__label">Illustration, före. Inte ett fotografi.</span>
+                            <span class="job-photo__caption">Illustration</span>
+                            <span class="job-photo__label">Före. Inte ett fotografi.</span>
                         </button>
                         <button type="button" class="job-photo__close button button--small" data-photo-close>Stäng</button>
                     </div>
@@ -101,7 +102,8 @@
                                 <rect x="66" y="122" width="36" height="40" fill="#d7e4e3"/>
                                 <path d="M16 40c20 8 30-6 48 2" fill="none" stroke="#a98456" stroke-width="3"/>
                             </svg>
-                            <span class="job-photo__label">Illustration, efter skrapning. Inte ett fotografi.</span>
+                            <span class="job-photo__caption">Illustration</span>
+                            <span class="job-photo__label">Efter skrapning. Inte ett fotografi.</span>
                         </button>
                         <button type="button" class="job-photo__close button button--small" data-photo-close>Stäng</button>
                     </div>
@@ -112,6 +114,7 @@
                     <span class="button button--small">Lägg till bild</span>
                 </label>
             </section>
+            </div>
 
             <section class="job-notes-section" aria-labelledby="job-notes-title">
                 <h3 id="job-notes-title">Anteckningar</h3>
@@ -131,7 +134,6 @@
                     <button class="button button--small" type="submit">Spara på kortet</button>
                 </form>
             </section>
-            </div>
 
             <button class="job-card__reset" type="button" data-reset data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort.">Återställ exemplet</button>
         </article>
