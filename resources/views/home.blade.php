@@ -78,6 +78,11 @@
                 <h2 id="workflow-title" class="section-heading section-heading--light">En båge. Ett arbetskort. Hela vägen.</h2>
                 <p>Ett kort per båge. Öppna det i mobilen, flytta steget och samla bilder och anteckningar på samma ställe.</p>
                 <p><a class="text-link" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a></p>
+                <nav class="workflow__guides" aria-label="Guider">
+                    <a href="{{ route('guides.documentation') }}">Dokumentation</a>
+                    <a href="{{ route('guides.work-card') }}">Arbetskort</a>
+                    <a href="{{ route('guides.marking') }}">Märkning</a>
+                </nav>
             </div>
             <ol class="workflow-list">
                 <li class="workflow-step">

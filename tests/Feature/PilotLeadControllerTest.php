@@ -43,6 +43,43 @@ class PilotLeadControllerTest extends TestCase
         });
     }
 
+    public function test_every_signup_is_saved_when_no_notification_address_is_configured(): void
+    {
+        Mail::fake();
+        config(['bagspar.lead_notification_email' => null]);
+
+        $this->from(route('home'))
+            ->post(route('pilot-leads.store'), [
+                'company' => 'Snickeriet Lind',
+                'email' => 'lind@example.test',
+            ])
+            ->assertRedirect(route('home').'#form-result')
+            ->assertSessionHas('pilot_lead_received', true);
+
+        $this->from(route('home'))
+            ->post(route('pilot-leads.store'), [
+                'company' => 'Båghantverket',
+                'email' => 'verkstad@example.test',
+            ])
+            ->assertRedirect(route('home').'#form-result')
+            ->assertSessionHas('pilot_lead_received', true);
+
+        $this->assertDatabaseCount('pilot_leads', 2);
+        $this->assertDatabaseHas('pilot_leads', [
+            'company' => 'Snickeriet Lind',
+            'email' => 'lind@example.test',
+            'message' => null,
+        ]);
+        $this->assertDatabaseHas('pilot_leads', [
+            'company' => 'Båghantverket',
+            'email' => 'verkstad@example.test',
+            'message' => null,
+        ]);
+        $this->assertNotNull(PilotLead::query()->where('email', 'lind@example.test')->first()?->consented_at);
+        $this->assertNotNull(PilotLead::query()->where('email', 'verkstad@example.test')->first()?->consented_at);
+        Mail::assertNothingSent();
+    }
+
     public function test_missing_required_fields_return_swedish_errors_without_saving_or_sending_mail(): void
     {
         Mail::fake();

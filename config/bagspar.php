@@ -2,6 +2,7 @@
 
 $contactEmail = env('BAGSPAR_CONTACT_EMAIL');
 $pilotOffer = env('BAGSPAR_PILOT_OFFER');
+$adminToken = env('BAGSPAR_ADMIN_TOKEN');
 
 return [
     'lead_notification_email' => env('LEAD_NOTIFICATION_EMAIL'),
@@ -27,4 +28,13 @@ return [
     'pilot_start_line' => 'Piloten startar när tre verkstäder anmält sig – du får tillgång till prototypen direkt.',
 
     'demo_sync_days' => 14,
+
+    /*
+     * Password for /admin/anmalningar. HTTP basic auth accepts any username.
+     * The same value is accepted as an Authorization Bearer token.
+     * The route responds with 404 when BAGSPAR_ADMIN_TOKEN is empty.
+     */
+    'admin_token' => is_string($adminToken) && trim($adminToken) !== ''
+        ? trim($adminToken)
+        : null,
 ];

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="@yield('meta_description', 'Arbetskort för fönsterverkstäder. Märkning, bilder, anteckningar och arbetssteg på varje båge, även när täckningen är svag.')">
-    <meta name="robots" content="{{ app()->isProduction() ? 'index, follow' : 'noindex, nofollow' }}">
+    <meta name="robots" content="@yield('robots', app()->isProduction() ? 'index, follow' : 'noindex, nofollow')">
     <meta name="theme-color" content="#F7F6F1">
     <title>@yield('title', 'Bågspår — arbetskort för fönsterrenovering')</title>
     @php
@@ -16,6 +16,8 @@
         <link rel="canonical" href="{{ $canonicalUrl }}">
     @endif
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ route('manifest') }}">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <script src="{{ asset('js/site.js') }}" defer></script>
 </head>
@@ -54,6 +56,9 @@
                 <p class="site-footer__company">Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta</p>
             </div>
             <nav class="site-footer__links" aria-label="Sidfot">
+                <a href="{{ route('guides.documentation') }}">Dokumentation</a>
+                <a href="{{ route('guides.work-card') }}">Arbetskort</a>
+                <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
                 @if (filled(config('bagspar.contact_email')))
                     <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakt</a>

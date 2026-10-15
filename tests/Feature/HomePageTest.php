@@ -22,6 +22,11 @@ class HomePageTest extends TestCase
         $response->assertSee('name="company"', false);
         $response->assertSee('name="email"', false);
         $response->assertSee('href="'.route('privacy').'"', false);
+        $response->assertSee('href="'.route('guides.documentation').'"', false);
+        $response->assertSee('href="'.route('guides.work-card').'"', false);
+        $response->assertSee('href="'.route('guides.marking').'"', false);
+        $response->assertSee('<link rel="manifest" href="'.route('manifest').'">', false);
+        $response->assertSee('rel="apple-touch-icon"', false);
         $response->assertDontSee('name="message"', false);
         $response->assertDontSee('name="contact_consent"', false);
         $response->assertDontSee('tänkt', false);

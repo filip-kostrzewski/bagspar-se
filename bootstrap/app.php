@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\ForceProductionHttps;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_AWS_ELB,
         );
         $middleware->append(ForceProductionHttps::class);
+        $middleware->alias([
+            'admin' => AuthenticateAdmin::class,
+        ]);
         // The demo page is cached for offline use, so a later visit may not
         // have a fresh session token. The endpoint stores example steps and notes only.
         $middleware->preventRequestForgery(except: [

@@ -21,6 +21,9 @@ class SitemapControllerTest extends TestCase
         $this->assertSitemapLists($response->getContent(), [
             'https://example.test/',
             'https://example.test/demo',
+            'https://example.test/fonsterrenovering-dokumentation',
+            'https://example.test/arbetskort-fonsterbagar',
+            'https://example.test/markning-av-fonsterbagar',
             'https://example.test/integritetspolicy',
         ]);
     }
@@ -39,6 +42,9 @@ class SitemapControllerTest extends TestCase
         $this->assertSitemapLists($response->getContent(), [
             'https://bagspar.se/',
             'https://bagspar.se/demo',
+            'https://bagspar.se/fonsterrenovering-dokumentation',
+            'https://bagspar.se/arbetskort-fonsterbagar',
+            'https://bagspar.se/markning-av-fonsterbagar',
             'https://bagspar.se/integritetspolicy',
         ]);
     }
@@ -56,6 +62,9 @@ class SitemapControllerTest extends TestCase
         $this->assertSitemapLists($response->getContent(), [
             'https://bagspar.se/',
             'https://bagspar.se/demo',
+            'https://bagspar.se/fonsterrenovering-dokumentation',
+            'https://bagspar.se/arbetskort-fonsterbagar',
+            'https://bagspar.se/markning-av-fonsterbagar',
             'https://bagspar.se/integritetspolicy',
         ]);
     }
@@ -70,6 +79,9 @@ class SitemapControllerTest extends TestCase
         $response->assertSee('href="https://bagspar.se/css/site.css"', false);
         $response->assertSee('action="https://bagspar.se/intresse"', false);
         $response->assertSee('href="https://bagspar.se/demo"', false);
+        $response->assertSee('href="https://bagspar.se/fonsterrenovering-dokumentation"', false);
+        $response->assertSee('href="https://bagspar.se/arbetskort-fonsterbagar"', false);
+        $response->assertSee('href="https://bagspar.se/markning-av-fonsterbagar"', false);
         $response->assertSee('href="https://bagspar.se/integritetspolicy"', false);
         $response->assertDontSee('http://bagspar.se', false);
         $this->assertSame('https://bagspar.se/integritetspolicy', route('privacy'));
@@ -89,6 +101,9 @@ class SitemapControllerTest extends TestCase
         $this->assertSitemapLists($response->getContent(), [
             $appUrl.'/',
             $appUrl.'/demo',
+            $appUrl.'/fonsterrenovering-dokumentation',
+            $appUrl.'/arbetskort-fonsterbagar',
+            $appUrl.'/markning-av-fonsterbagar',
             $appUrl.'/integritetspolicy',
         ]);
     }
