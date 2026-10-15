@@ -87,6 +87,7 @@ Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit
 | `BAGSPAR_ADMIN_TOKEN` | Secret for the signup list. Empty hides those routes with 404 |
 | `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Empty uses `kontakt@bagspar.se`. That domain had no MX record when this was written, so the mailbox has to exist or the variable has to point at an address that already receives mail |
 | `BAGSPAR_PILOT_OFFER` | Optional pilot headline. Empty keeps the default offer |
+| `GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID (`G-XXXXXXXX`). Empty skips the tag, the cookie banner, and the analytics text on the privacy policy. Set it on the server before a deploy so a cached config picks it up |
 
 ## Tests and build
 

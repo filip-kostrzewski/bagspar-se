@@ -19,6 +19,7 @@ $assetVersion = substr(sha1(implode('|', array_map(
     [
         'css/site.css',
         'js/site.js',
+        'js/cookies.js',
         'js/demo.js',
         'sw.js',
     ],

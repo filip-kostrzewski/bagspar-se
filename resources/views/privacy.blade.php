@@ -4,6 +4,11 @@
 @section('meta_description', 'Integritetspolicy för Bågspår. Prodi Digital AB beskriver vilka uppgifter som sparas när en verkstad anmäler sig.')
 
 @section('content')
+@php
+    $googleAnalyticsMeasurementId = \App\Support\GoogleAnalyticsMeasurementId::normalize(
+        config('services.google_analytics.measurement_id'),
+    );
+@endphp
 <main id="main" class="privacy-page page-shell">
     <a class="text-link privacy-page__back" href="{{ route('home') }}">← Tillbaka till Bågspår</a>
     <p class="eyebrow">INTEGRITET</p>
@@ -30,7 +35,17 @@
         <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Om du inte går vidare raderar vi dem senast 24 månader efter anmälan. Ber du oss radera dem tidigare gör vi det.</p>
 
         <h2>Vilka som tar del av uppgifterna</h2>
-        <p>Uppgifterna sparas i Bågspårs databas och i ett internt e-postmeddelande till oss när en anmälan kommer in. Webbplatsen använder inga analysverktyg och inga spårningscookies. Webbserverns vanliga tekniska loggar kan innehålla IP-adress och tidpunkt. De används för drift och säkerhet.</p>
+        <p>Uppgifterna sparas i Bågspårs databas och i ett internt e-postmeddelande till oss när en anmälan kommer in. Webbserverns vanliga tekniska loggar kan innehålla IP-adress och tidpunkt. De används för drift och säkerhet.</p>
+
+        <h2>Cookies</h2>
+        <p>Formuläret använder en teknisk sessionscookie som behövs för att skicka anmälan. Den kräver inte samtycke.</p>
+        @if ($googleAnalyticsMeasurementId !== null)
+            <p>Om du godkänner det använder vi Google Analytics 4 för att se hur webbplatsen används, till exempel vilka sidor som besöks. Google Ireland Limited tar emot mätningen. Den kan föras vidare till Google LLC i USA. Vi använder den inte till annonser.</p>
+            <p>Innan du väljer är lagringen nekad: analytics_storage, ad_storage, ad_user_data och ad_personalization. Inga analys- eller annonscookies sätts då. Taggen kan ändå skicka en begränsad teknisk signal utan cookies.</p>
+            <p>Väljer du Godkänn kan Google sätta cookies för besöksstatistik, bland annat _ga och en cookie som börjar med _ga_, i upp till två år. ad_storage, ad_user_data och ad_personalization förblir nekade. Väljer du Neka förblir även analysen nekad. Valet sparas i den här webbläsaren. Du kan ändra det när som helst via Cookie-inställningar i sidfoten. Den rättsliga grunden är samtycke, artikel 6.1 a i dataskyddsförordningen.</p>
+        @else
+            <p>Webbplatsen använder inga analysverktyg och inga spårningscookies.</p>
+        @endif
 
         <h2>Exempelarbetskortet</h2>
         <p>Exempelarbetskortet är påhittat. Om du ändrar steg eller skriver en anteckning där sparas det i din webbläsare. När det finns en anslutning skickas steget och anteckningarna till en tillfällig cache kopplad till en slumpad nyckel i samma webbläsare, så att ändringen finns kvar om du laddar om sidan. Bilder du lägger till stannar i webbläsaren. Cachen raderas senast efter {{ config('bagspar.demo_sync_days') }} dagar. Vi använder inte de uppgifterna för att kontakta dig, och de kopplas inte till anmälan.</p>

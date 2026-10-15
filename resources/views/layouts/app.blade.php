@@ -1,5 +1,8 @@
+@php
+    $pageLanguage = 'sv';
+@endphp
 <!doctype html>
-<html lang="sv">
+<html lang="{{ $pageLanguage }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -89,6 +92,19 @@
     <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ route('manifest') }}">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ config('bagspar.asset_version') }}">
+    @php
+        $googleAnalyticsId = \App\Support\GoogleAnalyticsMeasurementId::normalize(
+            config('services.google_analytics.measurement_id'),
+        );
+        $isPublicPage = ! request()->routeIs('admin.*');
+        $showGoogleAnalytics = $googleAnalyticsId !== null && $isPublicPage;
+    @endphp
+    @if ($isPublicPage)
+        @include('partials.google-consent')
+    @endif
+    @if ($showGoogleAnalytics)
+        @include('partials.google-analytics', ['googleAnalyticsId' => $googleAnalyticsId])
+    @endif
     <script src="{{ asset('js/site.js') }}?v={{ config('bagspar.asset_version') }}" data-sw-url="{{ asset('sw.js') }}?v={{ config('bagspar.asset_version') }}" defer></script>
 </head>
 <body>
@@ -133,6 +149,9 @@
                 <a href="{{ route('guides.work-card') }}">Arbetskort</a>
                 <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
+                @if ($showGoogleAnalytics)
+                    <button type="button" data-cookie-settings>Cookie-inställningar</button>
+                @endif
                 @if (filled(config('bagspar.contact_email')))
                     <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakt</a>
                 @endif
@@ -140,6 +159,9 @@
             <p class="site-footer__copyright">© {{ now()->year }} Bågspår</p>
         </div>
     </footer>
+    @if ($showGoogleAnalytics)
+        @include('partials.cookie-banner')
+    @endif
     @stack('scripts')
 </body>
 </html>

@@ -1,9 +1,10 @@
-const CACHE = 'bagspar-demo-v4';
+const CACHE = 'bagspar-demo-v5';
 
 const PRECACHE = [
     '/demo',
     '/css/site.css',
     '/js/site.js',
+    '/js/cookies.js',
     '/js/demo.js',
     '/favicon.svg',
     '/images/bagspar-mark.svg',

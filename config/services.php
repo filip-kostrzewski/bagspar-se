@@ -1,5 +1,7 @@
 <?php
 
+use App\Support\GoogleAnalyticsMeasurementId;
+
 return [
 
     /*
@@ -33,6 +35,14 @@ return [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    /*
+    | Google Analytics 4. An empty or invalid GA_MEASUREMENT_ID disables the
+    | tag, the cookie banner, and the analytics section of the privacy policy.
+    */
+    'google_analytics' => [
+        'measurement_id' => GoogleAnalyticsMeasurementId::normalize(env('GA_MEASUREMENT_ID')),
     ],
 
 ];
