@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CurrentUserEmailVerificationRequest;
 use App\Models\User;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,15 +18,19 @@ class EmailVerificationController extends Controller
         $user = $request->user();
 
         abort_unless($user instanceof User, 401);
+        $emailVerified = $user->hasVerifiedEmail();
 
-        if ($user->hasVerifiedEmail()) {
+        if ($emailVerified && ! $request->session()->has('verification_issue')) {
             return redirect()->route('app.dashboard');
         }
 
-        return view('auth.verify-email', ['email' => $user->email]);
+        return view('auth.verify-email', [
+            'email' => $user->email,
+            'emailVerified' => $emailVerified,
+        ]);
     }
 
-    public function verify(EmailVerificationRequest $request): RedirectResponse
+    public function verify(CurrentUserEmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
             return redirect()->route('app.dashboard');

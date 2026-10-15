@@ -238,6 +238,136 @@ class AuthAccountTest extends TestCase
             ->assertSessionHas('status', 'E-postadressen har verifierats.');
 
         $this->assertNotNull($user->fresh()->email_verified_at);
+
+        $this->get($verificationUrl)
+            ->assertRedirect(route('app.dashboard'));
+
+        $this->assertNotNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_guest_can_log_in_from_the_verification_link_and_verify_the_intended_account(): void
+    {
+        $user = User::factory()->unverified()->create([
+            'email' => 'owner@example.test',
+            'password' => Hash::make('correct-secure-pass-8'),
+        ]);
+        $verificationUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+            'id' => $user->getKey(),
+            'hash' => sha1($user->getEmailForVerification()),
+        ]);
+
+        $this->get($verificationUrl)->assertRedirect(route('login'));
+
+        $this->post(route('auth.login.store'), [
+            'email' => $user->email,
+            'password' => 'correct-secure-pass-8',
+        ])->assertRedirect($verificationUrl);
+
+        $this->get($verificationUrl)
+            ->assertRedirect(route('app.dashboard'))
+            ->assertSessionHas('status', 'E-postadressen har verifierats.');
+
+        $this->assertNotNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_verification_link_for_another_account_shows_resend_recovery_for_the_current_user(): void
+    {
+        Notification::fake();
+        $linkOwner = User::factory()->unverified()->create(['email' => 'link-owner@example.test']);
+        $currentUser = User::factory()->unverified()->create(['email' => 'current-user@example.test']);
+        $verificationUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+            'id' => $linkOwner->getKey(),
+            'hash' => sha1($linkOwner->getEmailForVerification()),
+        ]);
+
+        $this->actingAs($currentUser)->get($verificationUrl)
+            ->assertRedirect(route('verification.notice'))
+            ->assertSessionHas('verification_issue', 'Den här länken kan inte verifiera kontot du är inloggad på. En ny verifieringslänk kan skickas till adressen nedan.');
+
+        $this->get(route('verification.notice'))
+            ->assertOk()
+            ->assertSee($currentUser->email)
+            ->assertSee('Den här länken kan inte verifiera kontot du är inloggad på.')
+            ->assertSee('Logga ut och byt konto')
+            ->assertDontSee($linkOwner->email);
+
+        $this->post(route('verification.send'))->assertRedirect(route('verification.notice'));
+
+        Notification::assertSentTo($currentUser, VerifyEmail::class);
+        Notification::assertNotSentTo($linkOwner, VerifyEmail::class);
+        $this->assertNull($currentUser->fresh()->email_verified_at);
+        $this->assertNull($linkOwner->fresh()->email_verified_at);
+    }
+
+    public function test_verification_link_for_another_account_offers_dashboard_when_current_user_is_verified(): void
+    {
+        Notification::fake();
+        $linkOwner = User::factory()->unverified()->create(['email' => 'link-owner@example.test']);
+        $currentUser = User::factory()->create(['email' => 'current-user@example.test']);
+        $verificationUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+            'id' => $linkOwner->getKey(),
+            'hash' => sha1($linkOwner->getEmailForVerification()),
+        ]);
+
+        $this->actingAs($currentUser)->get($verificationUrl)
+            ->assertRedirect(route('verification.notice'))
+            ->assertSessionHas('verification_issue', 'Den här länken kan inte verifiera kontot du är inloggad på. E-postadressen för det kontot är redan bekräftad.');
+
+        $this->get(route('verification.notice'))
+            ->assertOk()
+            ->assertSee($currentUser->email)
+            ->assertSee('Du är inloggad som')
+            ->assertSee('Till min verkstad')
+            ->assertDontSee('Skicka bekräftelselänk igen')
+            ->assertDontSee('Följ länken i e-postmeddelandet')
+            ->assertDontSee($linkOwner->email);
+
+        $this->post(route('verification.send'))->assertRedirect(route('app.dashboard'));
+
+        Notification::assertNotSentTo($currentUser, VerifyEmail::class);
+        Notification::assertNotSentTo($linkOwner, VerifyEmail::class);
+        $this->assertNull($linkOwner->fresh()->email_verified_at);
+    }
+
+    public function test_expired_and_tampered_verification_links_show_resend_recovery_without_verifying(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $routeParameters = [
+            'id' => $user->getKey(),
+            'hash' => sha1($user->getEmailForVerification()),
+        ];
+        $expiredUrl = URL::temporarySignedRoute('verification.verify', now()->subMinute(), $routeParameters);
+        $validUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), $routeParameters);
+        $tamperedUrl = $validUrl.'&tampered=1';
+
+        foreach ([$expiredUrl, $tamperedUrl] as $verificationUrl) {
+            $this->actingAs($user)->get($verificationUrl)
+                ->assertRedirect(route('verification.notice'))
+                ->assertSessionHas('verification_issue', 'Länken är ogiltig eller har gått ut. Den kan inte verifiera kontot du är inloggad på.');
+
+            $this->get(route('verification.notice'))
+                ->assertOk()
+                ->assertSee($user->email)
+                ->assertSee('Skicka bekräftelselänk igen');
+        }
+
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_json_verification_failures_remain_forbidden(): void
+    {
+        $linkOwner = User::factory()->unverified()->create();
+        $currentUser = User::factory()->unverified()->create();
+        $verificationUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+            'id' => $linkOwner->getKey(),
+            'hash' => sha1($linkOwner->getEmailForVerification()),
+        ]);
+
+        $this->actingAs($currentUser)->getJson($verificationUrl)->assertForbidden();
+        $this->getJson($verificationUrl.'&tampered=1')->assertForbidden();
+
+        $this->assertNull($currentUser->fresh()->email_verified_at);
+        $this->assertNull($linkOwner->fresh()->email_verified_at);
     }
 
     public function test_local_workshop_access_does_not_wait_for_email_delivery(): void
