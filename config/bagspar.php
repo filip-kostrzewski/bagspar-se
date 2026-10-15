@@ -5,6 +5,26 @@ $pilotOffer = env('BAGSPAR_PILOT_OFFER');
 $adminToken = env('BAGSPAR_ADMIN_TOKEN');
 
 /*
+ * Query-string version for the public CSS, scripts, and service worker.
+ * Cloudflare caches those files for hours. The hash changes when the file
+ * bytes change, so the next HTML response asks for a URL the edge has not stored.
+ */
+$assetVersion = substr(sha1(implode('|', array_map(
+    static function (string $relative): string {
+        $path = public_path($relative);
+        $contents = is_file($path) ? file_get_contents($path) : false;
+
+        return is_string($contents) ? hash('sha256', $contents) : 'missing';
+    },
+    [
+        'css/site.css',
+        'js/site.js',
+        'js/demo.js',
+        'sw.js',
+    ],
+))), 0, 12);
+
+/*
  * Public address in the footer and on the privacy policy.
  * .env.example sends mail from noreply@bagspar.se. That mailbox is not where
  * someone asks for deletion, so the public address is kontakt@bagspar.se.
@@ -32,6 +52,8 @@ return [
     'pilot_follow_up' => 'Vi hör av oss inom några vardagar.',
 
     'demo_sync_days' => 14,
+
+    'asset_version' => $assetVersion,
 
     /*
      * Password for /admin/anmalningar. HTTP basic auth accepts any username.

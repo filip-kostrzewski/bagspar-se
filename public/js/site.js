@@ -42,8 +42,14 @@ if (interestForm) {
     });
 }
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-    });
+const serviceWorkerScript = document.querySelector('script[data-sw-url]');
+
+if ('serviceWorker' in navigator && serviceWorkerScript instanceof HTMLScriptElement) {
+    const serviceWorkerUrl = serviceWorkerScript.dataset.swUrl;
+
+    if (serviceWorkerUrl) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register(serviceWorkerUrl).catch(() => {});
+        });
+    }
 }

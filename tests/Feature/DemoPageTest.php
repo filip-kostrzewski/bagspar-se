@@ -34,7 +34,8 @@ class DemoPageTest extends TestCase
         $response->assertSee('Reservera pilotplats', false);
         $response->assertSee('demo-page__layout', false);
         $response->assertSee('data-sync-url="/demo/synk"', false);
-        $response->assertSee('js/demo.js', false);
+        $response->assertSee('js/demo.js?v='.config('bagspar.asset_version'), false);
+        $response->assertSee('data-sw-url="'.asset('sw.js').'?v='.config('bagspar.asset_version').'"', false);
         $response->assertSee('offline-först', false);
         $response->assertDontSee('B-04', false);
         $response->assertDontSee('Bilder, exempel', false);
@@ -52,7 +53,9 @@ class DemoPageTest extends TestCase
         $this->assertStringContainsString("'/css/site.css'", $worker);
         $this->assertStringContainsString("'/js/demo.js'", $worker);
         $this->assertStringContainsString("'/images/demo-qr.svg'", $worker);
-        $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js')", $siteScript);
+        $this->assertStringContainsString("document.querySelector('script[data-sw-url]')", $siteScript);
+        $this->assertStringContainsString('serviceWorkerScript.dataset.swUrl', $siteScript);
+        $this->assertStringNotContainsString("register('/sw.js')", $siteScript);
     }
 
     public function test_demo_changes_sync_and_ignore_unexpected_fields(): void

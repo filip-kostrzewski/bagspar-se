@@ -84,8 +84,8 @@
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ route('manifest') }}">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
-    <script src="{{ asset('js/site.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ config('bagspar.asset_version') }}">
+    <script src="{{ asset('js/site.js') }}?v={{ config('bagspar.asset_version') }}" data-sw-url="{{ asset('sw.js') }}?v={{ config('bagspar.asset_version') }}" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main">Hoppa till innehållet</a>

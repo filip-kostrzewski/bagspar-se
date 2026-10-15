@@ -143,5 +143,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/demo.js') }}" defer></script>
+    <script src="{{ asset('js/demo.js') }}?v={{ config('bagspar.asset_version') }}" defer></script>
 @endpush

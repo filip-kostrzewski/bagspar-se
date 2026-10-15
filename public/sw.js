@@ -1,4 +1,4 @@
-const CACHE = 'bagspar-demo-v3';
+const CACHE = 'bagspar-demo-v4';
 
 const PRECACHE = [
     '/demo',
