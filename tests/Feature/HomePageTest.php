@@ -43,6 +43,7 @@ class HomePageTest extends TestCase
         $response->assertSee('mailto:'.config('bagspar.contact_email'), false);
         $response->assertSee('property="og:title"', false);
         $response->assertSee('property="og:image"', false);
+        $response->assertSee('name="twitter:card"', false);
         $response->assertSee('"@type":"Organization"', false);
         $response->assertSee('"price":"790"', false);
         $response->assertDontSee('aggregateRating', false);

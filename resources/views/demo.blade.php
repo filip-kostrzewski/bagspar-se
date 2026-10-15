@@ -7,12 +7,12 @@
 <main id="main" class="demo-page page-shell">
     <div class="demo-page__layout">
         <div class="demo-page__intro-wrap">
-            <p class="eyebrow">EXEMPEL</p>
             <h1 class="section-heading">Ett arbetskort.</h1>
             <p class="demo-page__intro">Påhittat från början till slut. Ingen riktig verkstad och inget riktigt fönster. Bågspår är byggt offline-först: kortet går att läsa och uppdatera när täckningen är svag, och ändringarna synkas när anslutningen kommer tillbaka.</p>
         </div>
 
-        <article class="job-card" data-demo-card data-sync-url="{{ route('demo.sync.store', absolute: false) }}" aria-labelledby="job-card-title">
+        <article class="job-card job-card--wide" data-demo-card data-sync-url="{{ route('demo.sync.store', absolute: false) }}" aria-labelledby="job-card-title">
+            <div class="job-card__primary">
             <header class="job-card__header">
                 <div>
                     <h2 id="job-card-title">2-KÖK-F1-B2</h2>
@@ -62,13 +62,16 @@
                     </button>
                 </li>
             </ol>
+            </div>
 
+            <div class="job-card__secondary">
             <section class="job-photos" aria-labelledby="job-photos-title">
-                <h3 id="job-photos-title">Bilder</h3>
+                <h3 id="job-photos-title">Illustrationer</h3>
                 <p class="job-photos__note">Teckningarna är illustrationer, inte fotografier.</p>
                 <div class="job-photos__grid">
                     <div class="job-photo" data-photo aria-expanded="false">
                         <button type="button" class="job-photo__open" data-photo-open>
+                            <span class="job-photo__badge">Illustration</span>
                             <svg viewBox="0 0 120 180" role="img" aria-labelledby="photo-before-title">
                                 <title id="photo-before-title">Illustration, före</title>
                                 <rect x="6" y="6" width="108" height="168" rx="2" fill="#efe6d4" stroke="#17313b" stroke-width="8"/>
@@ -80,12 +83,13 @@
                                 <rect x="66" y="122" width="36" height="40" fill="#d5e2e4"/>
                                 <path d="M22 148c8 6 18 4 28-2" fill="none" stroke="#8a6a45" stroke-width="2"/>
                             </svg>
-                            <span class="job-photo__label">Illustration, före</span>
+                            <span class="job-photo__label">Illustration, före. Inte ett fotografi.</span>
                         </button>
                         <button type="button" class="job-photo__close button button--small" data-photo-close>Stäng</button>
                     </div>
                     <div class="job-photo" data-photo aria-expanded="false">
                         <button type="button" class="job-photo__open" data-photo-open>
+                            <span class="job-photo__badge">Illustration</span>
                             <svg viewBox="0 0 120 180" role="img" aria-labelledby="photo-scraped-title">
                                 <title id="photo-scraped-title">Illustration, efter skrapning</title>
                                 <rect x="6" y="6" width="108" height="168" rx="2" fill="#e7d3b0" stroke="#6b4e32" stroke-width="8"/>
@@ -97,7 +101,7 @@
                                 <rect x="66" y="122" width="36" height="40" fill="#d7e4e3"/>
                                 <path d="M16 40c20 8 30-6 48 2" fill="none" stroke="#a98456" stroke-width="3"/>
                             </svg>
-                            <span class="job-photo__label">Illustration, efter skrapning</span>
+                            <span class="job-photo__label">Illustration, efter skrapning. Inte ett fotografi.</span>
                         </button>
                         <button type="button" class="job-photo__close button button--small" data-photo-close>Stäng</button>
                     </div>
@@ -127,6 +131,7 @@
                     <button class="button button--small" type="submit">Spara på kortet</button>
                 </form>
             </section>
+            </div>
 
             <button class="job-card__reset" type="button" data-reset data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort.">Återställ exemplet</button>
         </article>

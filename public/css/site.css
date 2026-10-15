@@ -100,10 +100,11 @@ textarea {
 
 .site-header {
     position: sticky;
-    z-index: 20;
+    position: -webkit-sticky;
+    z-index: 30;
     top: 0;
     border-bottom: 1px solid rgb(23 49 59 / 9%);
-    background: var(--paper);
+    background-color: #f7f6f1;
 }
 
 .site-header__inner {
@@ -264,9 +265,9 @@ textarea {
 
 .hero__disclosure {
     max-width: 36rem;
-    margin: 22px 0 0;
+    margin: 16px 0 0;
     color: var(--ink);
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1.45;
 }
@@ -304,7 +305,7 @@ textarea {
     color: var(--ink);
     background: var(--brass);
     box-shadow: 0 5px 16px rgb(23 49 59 / 12%);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     letter-spacing: 0;
     line-height: 1.2;
@@ -325,8 +326,8 @@ textarea {
     position: absolute;
     bottom: 58px;
     left: 16px;
-    width: min(420px, calc(100% - 32px));
-    padding: 22px 22px 20px;
+    width: min(520px, calc(100% - 24px));
+    padding: 24px 24px 22px;
     border: 1px solid rgb(23 49 59 / 8%);
     border-radius: 10px;
     background: var(--white);
@@ -336,7 +337,7 @@ textarea {
 .work-card__caption {
     margin: 0 0 12px;
     color: var(--ink-soft);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.025em;
 }
@@ -352,7 +353,7 @@ textarea {
 
 .work-card__heading h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.25;
@@ -361,7 +362,7 @@ textarea {
 .work-card__heading p {
     margin: 4px 0 0;
     color: var(--ink);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.4;
 }
 
@@ -371,7 +372,7 @@ textarea {
     border-radius: 99px;
     color: var(--green);
     background: #eef4ef;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     line-height: 1.35;
 }
@@ -382,7 +383,7 @@ textarea {
     margin: 16px 0 0;
     padding: 0;
     color: var(--ink);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.4;
     list-style: none;
 }
@@ -407,7 +408,7 @@ textarea {
 .step-check {
     color: var(--white);
     background: var(--green);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
 }
 
@@ -421,7 +422,7 @@ textarea {
     right: 0;
     bottom: 0;
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 14px;
     text-align: right;
 }
 
@@ -431,15 +432,16 @@ textarea {
 }
 
 .proposition {
-    display: grid;
-    grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
-    align-items: start;
-    gap: clamp(28px, 4vw, 48px);
+    display: block;
     border-top: 1px solid var(--rule);
 }
 
 .proposition__intro {
     max-width: none;
+}
+
+.proposition__intro .section-heading {
+    max-width: 18em;
 }
 
 .section-heading {
@@ -460,7 +462,8 @@ textarea {
 .proposition__items {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-self: stretch;
+    gap: 8px 32px;
+    margin-top: 48px;
 }
 
 .proposition-item {
@@ -566,11 +569,11 @@ textarea {
     width: 48px;
     height: 48px;
     place-items: center;
-    border: 1px solid #f3d48a;
+    border: 2px solid #fff6df;
     border-radius: 50%;
-    color: var(--ink);
-    background: #f3d48a;
-    font-size: 14px;
+    color: #17313b;
+    background: #fff6df;
+    font-size: 16px;
     font-weight: 800;
 }
 
@@ -1256,7 +1259,7 @@ textarea {
         right: 12px;
         max-width: calc(100% - 24px);
         padding: 14px 8px 8px;
-        font-size: 13px;
+        font-size: 15px;
     }
 
     .work-card {
@@ -1279,7 +1282,7 @@ textarea {
 
     .hero-visual__caption {
         max-width: 90%;
-        font-size: 11px;
+        font-size: 14px;
     }
 
     .section-heading {
@@ -1512,8 +1515,8 @@ textarea {
 
 .demo-page__layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 440px);
-    gap: clamp(28px, 4vw, 72px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
     align-items: start;
 }
 
@@ -1560,13 +1563,36 @@ textarea {
 }
 
 .job-card {
-    width: min(100%, 440px);
+    width: 100%;
     margin-top: 0;
-    padding: 18px 16px 20px;
+    padding: 28px 32px 24px;
     border: 1px solid rgb(23 49 59 / 8%);
     border-radius: 16px;
     background: var(--white);
     box-shadow: 0 12px 28px rgb(23 49 59 / 10%);
+}
+
+.job-card--wide {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+    column-gap: 48px;
+    align-items: start;
+}
+
+.job-card__primary {
+    min-width: 0;
+}
+
+.job-card__secondary {
+    min-width: 0;
+}
+
+.job-card__secondary .job-photos {
+    margin-top: 0;
+}
+
+.job-card--wide .job-card__reset {
+    grid-column: 1 / -1;
 }
 
 .job-card__header {
@@ -1735,7 +1761,22 @@ textarea {
     min-width: 0;
 }
 
+.job-photo__badge {
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #fff;
+    background: #17313b;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
 .job-photo__open {
+    position: relative;
     display: flex;
     width: 100%;
     min-height: 48px;
@@ -1761,9 +1802,9 @@ textarea {
 .job-photo__label,
 .job-photos__added figcaption,
 .job-notes__meta {
-    color: var(--ink-soft);
-    font-size: 12px;
-    font-weight: 700;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 800;
 }
 
 .job-photo__close {
@@ -1887,8 +1928,16 @@ textarea {
         display: block;
     }
 
-    .job-card {
+    .job-card,
+    .job-card--wide {
+        display: block;
+        width: 100%;
         margin-top: 28px;
+        padding: 18px 16px 20px;
+    }
+
+    .job-card__secondary .job-photos {
+        margin-top: 22px;
     }
 
     .demo-next .button {

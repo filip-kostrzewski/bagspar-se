@@ -27,8 +27,12 @@ class DemoPageTest extends TestCase
         ], false);
         $response->assertSee('demo-qr.svg', false);
         $response->assertSee('QR-kod', false);
-        $response->assertSee('Illustration, före', false);
+        $response->assertSee('Illustrationer', false);
+        $response->assertSee('job-photo__badge', false);
+        $response->assertSee('Illustration, före. Inte ett fotografi.', false);
         $response->assertSee('inte fotografier', false);
+        $response->assertSee('job-card--wide', false);
+        $response->assertDontSee('>EXEMPEL<', false);
         $response->assertSee('>Stäng<', false);
         $response->assertSee('data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort."', false);
         $response->assertSee('Reservera pilotplats', false);
