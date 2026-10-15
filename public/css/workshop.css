@@ -2345,12 +2345,16 @@ svg {
     }
 
     .report-project__title-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
         align-items: flex-start;
+        gap: 10px;
     }
 
     .report-project__title-row .project-card__status {
-        margin-top: 18px;
-        text-align: right;
+        justify-self: start;
+        margin-top: 0;
+        text-align: left;
     }
 
     .report-facts {
