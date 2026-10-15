@@ -4,6 +4,42 @@
 @section('meta_description', 'Arbetskort för fönsterverkstäder. Märkning, bilder, anteckningar och arbetssteg på varje båge, även när täckningen är svag.')
 
 @section('content')
+@php
+    /** @var list<array{question: string, answer: string}> $homeFaqs */
+    $homeFaqs = [
+        [
+            'question' => 'Kan vi använda Bågspår redan nu?',
+            'answer' => 'Exempelarbetskortet kan ni använda redan nu, utan att anmäla er. Ett eget konto ingår i piloten. Anmälan reserverar en pilotplats, och vi hör av oss inom några vardagar.',
+        ],
+        [
+            'question' => 'Behöver vi byta vårt nuvarande ekonomisystem?',
+            'answer' => 'Bågspår håller ordning på bågar och arbetsdokumentation. Ekonomisystemet är kvar.',
+        ],
+        [
+            'question' => 'Fungerar det på telefonen?',
+            'answer' => 'Ja. Arbetskortet öppnas i mobilens webbläsare och går att läsa och uppdatera när täckningen är svag.',
+        ],
+        [
+            'question' => 'Vad händer när jag anmäler verkstaden?',
+            'answer' => 'Vi sparar verkstadens namn och din e-postadress och skickar en bekräftelse till dig. Anmälan reserverar en pilotplats. Vi hör av oss inom några vardagar. Anmälan innebär ingen betalning.',
+        ],
+    ];
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => array_map(
+            fn (array $faq): array => [
+                '@type' => 'Question',
+                'name' => $faq['question'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $faq['answer'],
+                ],
+            ],
+            $homeFaqs,
+        ),
+    ];
+@endphp
 <main id="main">
     <section class="hero page-shell" aria-labelledby="hero-title">
         <div class="hero__copy">
@@ -11,22 +47,22 @@
             <h1 id="hero-title" class="display-heading">Ordning på varje båge.</h1>
             <p class="hero__intro">Varje båge får ett arbetskort med märkning, bilder, anteckningar och arbetssteg, från inlämning till återmontering.</p>
             <div class="hero__actions">
-                <a class="button" href="#intresse">Anmäl verkstaden</a>
+                <a class="button" href="#intresse">Reservera pilotplats</a>
                 <a class="text-link" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
             </div>
-            <p class="hero__disclosure">{{ config('bagspar.pilot_offer') }}<br>{{ config('bagspar.pilot_price_line') }}</p>
+            <p class="hero__disclosure">{{ config('bagspar.pilot_price_line') }}</p>
         </div>
 
         <figure class="hero-visual">
             <img class="hero-visual__photo" src="{{ asset('images/workshop-hero.webp') }}" alt="Äldre träbåge med små glasrutor på en verkstadsbänk" width="1122" height="1402" fetchpriority="high">
-            <span class="brass-tag" aria-label="Märkning B-04">B-04</span>
+            <span class="brass-tag" aria-label="Märkning 2-KÖK-F1-B2">2-KÖK-F1-B2</span>
 
-            <div class="work-card" aria-label="Exempel på arbetskort för båge B-04">
-                <p class="work-card__caption">Exempel på arbetskort</p>
+            <div class="work-card" aria-label="Arbetskort för båge 2-KÖK-F1-B2">
+                <p class="work-card__caption">Arbetskort</p>
                 <div class="work-card__heading">
                     <div>
-                        <h2>Båge B-04</h2>
-                        <p>Våning 2 · Kök</p>
+                        <h2>2-KÖK-F1-B2</h2>
+                        <p>Våning 2 · Kök · vänster innerbåge</p>
                     </div>
                     <span class="work-card__status">Kittning</span>
                 </div>
@@ -118,9 +154,8 @@
             @else
                 <h2 id="pilot-title" class="section-heading">Piloten</h2>
             @endif
-            <p class="body-copy">Varje båge får ett arbetskort i mobilen, med steg, bilder och anteckningar.</p>
+            <p class="body-copy">Anmälan reserverar en pilotplats. Exempelarbetskortet är öppet för alla, utan konto. Ett eget konto ingår i piloten.</p>
             <p class="pilot__disclosure">{{ config('bagspar.pilot_price_line') }}</p>
-            <p class="pilot__disclosure">{{ config('bagspar.pilot_start_line') }}</p>
         </div>
         <div class="pilot-price" aria-label="790 kronor per månad exklusive moms efter piloten">
             <p class="pilot-price__label">Efter piloten</p>
@@ -132,18 +167,23 @@
     <section id="intresse" class="interest" aria-labelledby="interest-title">
         <div class="interest__inner page-shell">
             <div class="interest__intro">
-                <p class="eyebrow">ANMÄL VERKSTADEN</p>
-                <h2 id="interest-title" class="section-heading">Anmäl verkstaden.</h2>
-                <p>E-post och verkstadens namn räcker. Du kommer direkt till exempelarbetskortet.</p>
-                @include('partials.pilot-offer')
+                <p class="eyebrow">PILOTPLATS</p>
+                <h2 id="interest-title" class="section-heading">Reservera en pilotplats.</h2>
+                <p>E-post och verkstadens namn räcker. {{ config('bagspar.pilot_follow_up') }} Exempelarbetskortet kan du öppna utan anmälan.</p>
                 <p class="interest__privacy-note">Vi sparar verkstadens namn, din e-postadress och tidpunkten för anmälan. Läs mer i <a href="{{ route('privacy') }}">integritetspolicyn</a>.</p>
             </div>
 
             <div class="interest__form-wrap">
-                @if (session('pilot_lead_received'))
+                @if (session('pilot_lead_duplicate'))
                     <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
-                        <h3>Tack, verkstaden är anmäld.</h3>
-                        <p>Vi har sparat namn och e-post. Öppna exempelarbetskortet och se hur en båge följs genom verkstaden.</p>
+                        <h3>Den här e-postadressen är redan anmäld.</h3>
+                        <p>Vi har redan en anmälan från den adressen, så ingen ny sparades. {{ config('bagspar.pilot_follow_up') }} Du behöver inte skicka formuläret igen.</p>
+                        <a class="button" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
+                    </div>
+                @elseif (session('pilot_lead_received'))
+                    <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
+                        <h3>Pilotplatsen är reserverad.</h3>
+                        <p>Vi har sparat verkstadens namn och din e-post och skickat en bekräftelse. {{ config('bagspar.pilot_follow_up') }} Under tiden kan du se exempelarbetskortet. Ett eget konto ingår i piloten.</p>
                         <a class="button" href="{{ route('demo') }}">Se hur ett arbetskort ser ut</a>
                     </div>
                 @else
@@ -167,7 +207,7 @@
                             @error('email')<p id="email-error" class="field-error" role="alert">{{ $message }}</p>@enderror
                         </div>
 
-                        <button class="button interest-form__submit" type="submit">Anmäl verkstaden</button>
+                        <button class="button interest-form__submit" type="submit">Reservera pilotplats</button>
                         <p class="interest-form__note">Ingen betalning nu. Ingen bindningstid. <a href="{{ route('privacy') }}">Integritetspolicy</a></p>
                     </form>
                 @endif
@@ -181,23 +221,17 @@
             <h2 id="faq-title" class="section-heading">Några saker att veta</h2>
         </div>
         <div class="faq-list">
-            <details>
-                <summary>Kan vi använda Bågspår redan nu?</summary>
-                <p>Ja. Anmäl verkstaden så öppnar du exempelarbetskortet direkt. Piloten startar när tre verkstäder anmält sig.</p>
-            </details>
-            <details>
-                <summary>Behöver vi byta vårt nuvarande ekonomisystem?</summary>
-                <p>Bågspår håller ordning på bågar och arbetsdokumentation. Ekonomisystemet är kvar.</p>
-            </details>
-            <details>
-                <summary>Fungerar det på telefonen?</summary>
-                <p>Ja. Arbetskortet öppnas i mobilens webbläsare och går att läsa och uppdatera när täckningen är svag.</p>
-            </details>
-            <details>
-                <summary>Vad händer när jag anmäler verkstaden?</summary>
-                <p>Vi sparar verkstadens namn och din e-postadress. Sedan öppnar du exempelarbetskortet. Anmälan innebär ingen betalning.</p>
-            </details>
+            @foreach ($homeFaqs as $faq)
+                <details>
+                    <summary>{{ $faq['question'] }}</summary>
+                    <p>{{ $faq['answer'] }}</p>
+                </details>
+            @endforeach
         </div>
     </section>
 </main>
 @endsection
+
+@push('scripts')
+    <script type="application/ld+json">{!! json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_THROW_ON_ERROR) !!}</script>
+@endpush

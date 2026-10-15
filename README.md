@@ -12,9 +12,9 @@ Workshops that take wooden sashes out, restore them, and put each sash back in t
 
 Copy on the homepage comes from `config/bagspar.php`:
 
-- Free 3-month pilot for the first 10 workshops. `BAGSPAR_PILOT_OFFER` replaces that headline when it is set.
+- Free 3-month pilot. `BAGSPAR_PILOT_OFFER` replaces that headline when it is set.
 - 790 kr/month excluding VAT after the pilot. No binding period.
-- The pilot starts when three workshops have signed up. The example card is available immediately.
+- Signing up reserves a pilot spot. The example card is public. A workshop account is part of the pilot. Someone follows up within a few working days.
 
 ## What this repository ships
 
@@ -23,7 +23,7 @@ This repository is the public site and the example card.
 | Path | Purpose |
 | --- | --- |
 | `/` | Homepage, pilot offer, and signup form |
-| `/demo` | Example work card for fictional sash B-04 |
+| `/demo` | Example work card for fictional sash 2-KÖK-F1-B2 |
 | `GET` and `POST /demo/synk` | Reads and stores that example’s step and notes |
 | `/fonsterrenovering-dokumentation` | Guide: what to record on each sash |
 | `/arbetskort-fonsterbagar` | Guide: one work card per sash |
@@ -38,7 +38,7 @@ This repository is the public site and the example card.
 
 The example card lives in the browser (`localStorage`). Changing the step or notes posts them to `/demo/synk`, which keeps them in cache for 14 days (`config('bagspar.demo_sync_days')`). Photos added on the example stay in the browser and are not uploaded. A service worker (`public/sw.js`) caches `/demo` and its assets so the example can be opened offline. `demo/synk` is exempt from CSRF because a later visit may not have a fresh session token.
 
-`POST /intresse` accepts workshop name (`company`) and email, rejects a `website` honeypot field, and is limited to 5 requests per minute. The signup stores `consented_at` as the time the form was sent. The visitor is redirected back to the homepage. When `LEAD_NOTIFICATION_EMAIL` is set, that address receives a message with the subject “Ny anmälan för Bågspår”. A mail failure is logged; the signup is still saved.
+`POST /intresse` accepts workshop name (`company`) and email, rejects a `website` honeypot field, and is limited to 5 requests per minute. The same email does not create a second lead. The signup stores `consented_at` as the time the form was sent. The visitor is redirected back to the homepage. When `LEAD_NOTIFICATION_EMAIL` is set, that address receives a message with the subject “Ny anmälan för Bågspår”. The workshop also receives a Swedish confirmation, sent synchronously. A mail failure is logged; the signup is still saved.
 
 `/admin/anmalningar` returns 404 when `BAGSPAR_ADMIN_TOKEN` is empty. Otherwise it accepts that value as an HTTP Basic password (any username) or as an `Authorization: Bearer` token. Rows are listed newest first, in Europe/Stockholm time. The CSV columns are Företag, E-post, and Datum.
 
@@ -52,7 +52,7 @@ The example card lives in the browser (`localStorage`). Changing the step or not
 - Vite ^8 and Tailwind CSS ^4 (`npm run build` compiles `resources/css/app.css` and `resources/js/app.js`; the public pages do not load that bundle)
 - Postmark via `symfony/postmark-mailer` when `MAIL_MAILER=postmark`
 
-Production sits behind Cloudflare. The app trusts the forwarded scheme and client IP, and forces HTTPS URLs when `APP_ENV=production`.
+Production sits behind Cloudflare. The app trusts the forwarded scheme and client IP, and forces HTTPS URLs when `APP_ENV=production`. A production request that still arrives as HTTP is redirected to HTTPS. Requests that already have `X-Forwarded-Proto: https`, and requests to localhost, are not redirected. Port 80 in front of Cloudflare is answered by Cloudflare, not by this app. Forge’s Nginx is what listens on the origin.
 
 ## Local setup
 
@@ -85,7 +85,7 @@ Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit
 | `MAIL_FROM_ADDRESS` | From address. `.env.example` uses `noreply@bagspar.se` |
 | `MAIL_FROM_NAME` | From name. Defaults to `APP_NAME` |
 | `BAGSPAR_ADMIN_TOKEN` | Secret for the signup list. Empty hides those routes with 404 |
-| `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Hidden when empty |
+| `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Empty uses `kontakt@bagspar.se`. That domain had no MX record when this was written, so the mailbox has to exist or the variable has to point at an address that already receives mail |
 | `BAGSPAR_PILOT_OFFER` | Optional pilot headline. Empty keeps the default offer |
 
 ## Tests and build

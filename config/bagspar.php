@@ -4,16 +4,20 @@ $contactEmail = env('BAGSPAR_CONTACT_EMAIL');
 $pilotOffer = env('BAGSPAR_PILOT_OFFER');
 $adminToken = env('BAGSPAR_ADMIN_TOKEN');
 
+/*
+ * Public address in the footer and on the privacy policy.
+ * .env.example sends mail from noreply@bagspar.se. That mailbox is not where
+ * someone asks for deletion, so the public address is kontakt@bagspar.se.
+ * Set BAGSPAR_CONTACT_EMAIL when a different bagspar.se mailbox should be shown.
+ */
+$defaultContactEmail = 'kontakt@bagspar.se';
+
 return [
     'lead_notification_email' => env('LEAD_NOTIFICATION_EMAIL'),
 
-    /*
-     * Public address on the privacy policy and in the footer.
-     * Hidden when BAGSPAR_CONTACT_EMAIL is empty.
-     */
     'contact_email' => is_string($contactEmail) && trim($contactEmail) !== ''
         ? trim($contactEmail)
-        : null,
+        : $defaultContactEmail,
 
     /*
      * Pilot offer headline. BAGSPAR_PILOT_OFFER replaces the default.
@@ -21,11 +25,11 @@ return [
      */
     'pilot_offer' => is_string($pilotOffer) && trim($pilotOffer) !== ''
         ? trim($pilotOffer)
-        : 'Gratis pilot i 3 månader för de första 10 verkstäderna',
+        : 'Gratis pilot i 3 månader',
 
     'pilot_price_line' => '790 kr/mån exkl. moms efter piloten. Ingen bindningstid.',
 
-    'pilot_start_line' => 'Piloten startar när tre verkstäder anmält sig – du får tillgång till prototypen direkt.',
+    'pilot_follow_up' => 'Vi hör av oss inom några vardagar.',
 
     'demo_sync_days' => 14,
 

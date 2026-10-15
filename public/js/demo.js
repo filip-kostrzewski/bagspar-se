@@ -58,7 +58,7 @@ if (root) {
         current.notes.push({
             id: createId(),
             text: text.slice(0, 280),
-            meta: 'Exempel · sparad i kortet',
+            meta: 'Sparad i kortet',
         });
         field.value = '';
         markPending();
@@ -87,7 +87,16 @@ if (root) {
             });
     });
 
-    root.querySelector('[data-reset]')?.addEventListener('click', () => {
+    root.querySelector('[data-reset]')?.addEventListener('click', (event) => {
+        const button = event.currentTarget;
+        const message = button instanceof HTMLElement
+            ? button.dataset.resetConfirm || 'Återställ exemplet? Ändringar du gjort på kortet tas bort.'
+            : 'Återställ exemplet? Ändringar du gjort på kortet tas bort.';
+
+        if (!window.confirm(message)) {
+            return;
+        }
+
         const demoId = readDemoId();
         current = clone(defaults);
         current.phase = demoId ? 'pending' : 'idle';
@@ -99,13 +108,27 @@ if (root) {
         }
     });
 
-    root.querySelectorAll('[data-photo-open]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const expanded = button.getAttribute('aria-expanded') === 'true';
+    root.querySelectorAll('[data-photo]').forEach((photo) => {
+        const open = photo.querySelector('[data-photo-open]');
+        const close = photo.querySelector('[data-photo-close]');
+
+        open?.addEventListener('click', () => {
+            const expanded = photo.getAttribute('aria-expanded') === 'true';
             closePhotos();
 
             if (!expanded) {
-                button.setAttribute('aria-expanded', 'true');
+                photo.setAttribute('aria-expanded', 'true');
+                if (close instanceof HTMLElement) {
+                    close.focus();
+                }
+            }
+        });
+
+        close?.addEventListener('click', () => {
+            photo.setAttribute('aria-expanded', 'false');
+
+            if (open instanceof HTMLElement) {
+                open.focus();
             }
         });
     });
@@ -136,7 +159,7 @@ if (root) {
             notes: [...root.querySelectorAll('[data-note]')].map((item) => ({
                 id: item.dataset.note,
                 text: item.querySelector('[data-note-text]')?.textContent?.trim() || '',
-                meta: item.querySelector('[data-note-meta]')?.textContent?.trim() || 'Exempel',
+                meta: item.querySelector('[data-note-meta]')?.textContent?.trim() || 'Påhittad',
             })),
             photos: [],
             phase: 'idle',
@@ -291,7 +314,7 @@ if (root) {
                 const text = document.createElement('p');
                 const meta = document.createElement('p');
                 text.textContent = note.text;
-                meta.textContent = note.meta || 'Exempel';
+                meta.textContent = note.meta || 'Påhittad';
                 meta.className = 'job-notes__meta';
                 item.append(text, meta);
                 list.append(item);
@@ -311,8 +334,8 @@ if (root) {
                 const image = document.createElement('img');
                 const caption = document.createElement('figcaption');
                 image.src = photo.src;
-                image.alt = 'Tillagd bild, exempel';
-                caption.textContent = 'Tillagd bild, exempel';
+                image.alt = 'Tillagd bild';
+                caption.textContent = 'Tillagd bild';
                 figure.append(image, caption);
                 photos.append(figure);
             });
@@ -327,7 +350,7 @@ if (root) {
         } else if (current.phase === 'pending') {
             setStatus('Sparat i kortet. Synkas när anslutningen kommer tillbaka.', 'waiting');
         } else {
-            setStatus('Exempel. Kortet går att öppna utan täckning.', 'idle');
+            setStatus('Påhittat kort. Det går att öppna utan täckning.', 'idle');
         }
     }
 
@@ -343,8 +366,8 @@ if (root) {
     }
 
     function closePhotos() {
-        root.querySelectorAll('[data-photo-open]').forEach((button) => {
-            button.setAttribute('aria-expanded', 'false');
+        root.querySelectorAll('[data-photo]').forEach((photo) => {
+            photo.setAttribute('aria-expanded', 'false');
         });
     }
 
@@ -378,7 +401,7 @@ if (root) {
                     .map((note) => ({
                         id: String(note.id || createId()).slice(0, 40),
                         text: note.text.slice(0, 280),
-                        meta: String(note.meta || 'Exempel').slice(0, 80),
+                        meta: String(note.meta || 'Påhittad').slice(0, 80),
                     })),
                 photos: Array.isArray(parsed.photos) ? parsed.photos.slice(0, 3) : [],
                 phase: parsed.phase === 'pending' || parsed.phase === 'synced' ? parsed.phase : 'idle',

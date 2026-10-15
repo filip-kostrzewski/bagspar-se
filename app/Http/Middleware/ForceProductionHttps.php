@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,37 @@ class ForceProductionHttps
     {
         $this->force();
 
+        if ($redirect = $this->redirectInsecureRequest($request)) {
+            return $redirect;
+        }
+
         return $next($request);
+    }
+
+    /**
+     * Send a production request that arrived as HTTP on to HTTPS.
+     *
+     * Cloudflare normally answers port 80 itself. This redirect covers a
+     * request that still reaches PHP, including one proxied without TLS.
+     * Local hosts are left alone so health checks on 127.0.0.1 keep working.
+     * A request that already has X-Forwarded-Proto: https is secure and stays.
+     */
+    private function redirectInsecureRequest(Request $request): ?RedirectResponse
+    {
+        if (! app()->isProduction() || $request->secure() || $this->keepsPlainHttp($request->getHost())) {
+            return null;
+        }
+
+        $status = $request->isMethod('GET') || $request->isMethod('HEAD') ? 301 : 308;
+
+        return redirect()->secure($request->getRequestUri(), $status);
+    }
+
+    private function keepsPlainHttp(string $host): bool
+    {
+        $host = strtolower($host);
+
+        return in_array($host, ['localhost', '127.0.0.1', '::1'], true) || str_ends_with($host, '.test');
     }
 
     /**

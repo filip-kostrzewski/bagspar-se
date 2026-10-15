@@ -62,7 +62,7 @@ class GuidePageTest extends TestCase
         $response->assertSee('href="'.route('demo').'"', false);
         $response->assertSee('Se hur ett arbetskort ser ut', false);
         $response->assertSee('href="'.route('home').'#intresse"', false);
-        $response->assertSee('Anmäl verkstaden', false);
+        $response->assertSee('Reservera pilotplats', false);
         $response->assertDontSee('tänkt', false);
         $response->assertDontSee('planerat', false);
         $response->assertDontSee('tanken är', false);
@@ -87,8 +87,18 @@ class GuidePageTest extends TestCase
         $response->assertSee('Vanliga misstag', false);
         $response->assertSee('Frågor och svar', false);
 
-        $this->assertSame(1, preg_match('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches));
-        $schema = json_decode($matches[1], true);
+        preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches);
+        $schema = null;
+
+        foreach ($matches[1] as $json) {
+            $decoded = json_decode($json, true);
+
+            if (is_array($decoded) && ($decoded['@type'] ?? null) === 'FAQPage') {
+                $schema = $decoded;
+                break;
+            }
+        }
+
         $this->assertIsArray($schema);
         $this->assertSame('https://schema.org', $schema['@context']);
         $this->assertSame('FAQPage', $schema['@type']);

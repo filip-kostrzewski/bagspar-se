@@ -16,7 +16,8 @@ class DemoPageTest extends TestCase
         $response->assertSee('Exempel', false);
         $response->assertSee('Exempelverkstaden', false);
         $response->assertSee('Exempelvägen 12', false);
-        $response->assertSee('Båge B-04', false);
+        $response->assertSee('2-KÖK-F1-B2', false);
+        $response->assertSee('vänster innerbåge', false);
         $response->assertSeeInOrder([
             'Inlämnad',
             'Skrapning',
@@ -25,12 +26,19 @@ class DemoPageTest extends TestCase
             'Klar',
         ], false);
         $response->assertSee('demo-qr.svg', false);
-        $response->assertSee('QR-kod, exempel', false);
-        $response->assertSee('Bilder, exempel', false);
-        $response->assertSee('Anteckningar, exempel', false);
+        $response->assertSee('QR-kod', false);
+        $response->assertSee('Illustration, före', false);
+        $response->assertSee('inte fotografier', false);
+        $response->assertSee('>Stäng<', false);
+        $response->assertSee('data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort."', false);
+        $response->assertSee('Reservera pilotplats', false);
+        $response->assertSee('demo-page__layout', false);
         $response->assertSee('data-sync-url="/demo/synk"', false);
         $response->assertSee('js/demo.js', false);
         $response->assertSee('offline-först', false);
+        $response->assertDontSee('B-04', false);
+        $response->assertDontSee('Bilder, exempel', false);
+        $response->assertDontSee('Före, exempel', false);
     }
 
     public function test_service_worker_precaches_the_demo_card(): void

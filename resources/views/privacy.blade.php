@@ -21,10 +21,10 @@
             <li>e-postadress</li>
             <li>tidpunkten då anmälan skickades</li>
         </ul>
-        <p>Formuläret har inga andra fält. Vi ber inte om telefonnummer, personnummer eller en beskrivning av ert arbetssätt. En tidigare anmälan kan innehålla en valfri text som verkstaden själv skrev. Den texten behandlas på samma sätt som övriga uppgifter och raderas när anmälan raderas.</p>
+        <p>Formuläret har inga andra fält. Vi ber inte om telefonnummer, personnummer eller en beskrivning av ert arbetssätt.</p>
 
         <h2>Varför vi behandlar uppgifterna</h2>
-        <p>Uppgifterna används för att ta emot anmälan, ge tillgång till prototypen och kontakta dig om piloten. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal om piloten. Vi säljer inte uppgifterna.</p>
+        <p>Uppgifterna används för att ta emot anmälan och kontakta dig om pilotplatsen. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal om piloten. Vi säljer inte uppgifterna.</p>
 
         <h2>Hur länge uppgifterna sparas</h2>
         <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Om du inte går vidare raderar vi dem senast 24 månader efter anmälan. Ber du oss radera dem tidigare gör vi det.</p>
@@ -49,8 +49,8 @@
         <p>Du kan också lämna ett klagomål till Integritetsskyddsmyndigheten, <a href="https://www.imy.se">imy.se</a>.</p>
 
         @if (filled(config('bagspar.contact_email')))
-            <h2>Kontakt</h2>
-            <p>Kontakta oss på <a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a> om du vill använda dina rättigheter eller har en fråga om uppgifterna.</p>
+            <h2>Kontakt och radering</h2>
+            <p>Skriv till <a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a> om du vill att vi raderar uppgifterna, om du vill använda någon annan av dina rättigheter, eller om du har en fråga om uppgifterna.</p>
         @endif
 
         <p class="privacy-page__updated">Senast uppdaterad 15 oktober 2026.</p>

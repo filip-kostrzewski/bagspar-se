@@ -13,9 +13,12 @@ class HomePageTest extends TestCase
         $response->assertOk();
         $response->assertSee('Se hur ett arbetskort ser ut', false);
         $response->assertSee('href="'.route('demo').'"', false);
-        $response->assertSee('Gratis pilot i 3 månader för de första 10 verkstäderna', false);
+        $response->assertSee('Reservera pilotplats', false);
+        $response->assertSee('Gratis pilot i 3 månader', false);
         $response->assertSee('790 kr/mån exkl. moms efter piloten. Ingen bindningstid.', false);
-        $response->assertSee('Piloten startar när tre verkstäder anmält sig – du får tillgång till prototypen direkt.', false);
+        $response->assertSee('2-KÖK-F1-B2', false);
+        $response->assertSee('Exempelarbetskortet kan ni använda redan nu, utan att anmäla er.', false);
+        $response->assertSee('Ett eget konto ingår i piloten.', false);
         $response->assertSee('Bågspår är byggt offline-först', false);
         $response->assertSee('Fungerar i svag täckning', false);
         $response->assertSee('Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta', false);
@@ -33,7 +36,17 @@ class HomePageTest extends TestCase
         $response->assertDontSee('planerat', false);
         $response->assertDontSee('tanken är', false);
         $response->assertDontSee('Så fungerar idén', false);
-        $response->assertDontSee('mailto:', false);
+        $response->assertDontSee('första 10', false);
+        $response->assertDontSee('tre verkstäder', false);
+        $response->assertDontSee('prototyp', false);
+        $response->assertDontSee('B-04', false);
+        $response->assertSee('mailto:'.config('bagspar.contact_email'), false);
+        $response->assertSee('property="og:title"', false);
+        $response->assertSee('property="og:image"', false);
+        $response->assertSee('"@type":"Organization"', false);
+        $response->assertSee('"price":"790"', false);
+        $response->assertDontSee('aggregateRating', false);
+        $response->assertDontSee('tel:', false);
     }
 
     public function test_custom_pilot_offer_replaces_the_default_headline(): void
@@ -44,11 +57,11 @@ class HomePageTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Eget erbjudande för testet', false);
-        $response->assertDontSee('Gratis pilot i 3 månader för de första 10 verkstäderna', false);
+        $response->assertDontSee('Gratis pilot i 3 månader', false);
         $response->assertSee('790 kr/mån exkl. moms efter piloten. Ingen bindningstid.', false);
     }
 
-    public function test_contact_email_is_shown_in_the_footer_only_when_configured(): void
+    public function test_contact_email_is_shown_in_the_footer(): void
     {
         config(['bagspar.contact_email' => 'kontakt@example.test']);
 

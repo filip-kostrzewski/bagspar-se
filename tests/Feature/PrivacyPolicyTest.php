@@ -9,7 +9,7 @@ class PrivacyPolicyTest extends TestCase
     public function test_privacy_policy_explains_the_controller_signup_data_and_rights(): void
     {
         config([
-            'bagspar.contact_email' => null,
+            'bagspar.contact_email' => 'kontakt@bagspar.se',
             'bagspar.lead_notification_email' => 'intern@example.test',
         ]);
 
@@ -27,8 +27,13 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('14 dagar', false);
         $response->assertSee('artikel 6.1 b', false);
         $response->assertSee('Integritetsskyddsmyndigheten', false);
+        $response->assertSee('mailto:kontakt@bagspar.se', false);
+        $response->assertSee('Kontakt och radering', false);
+        $response->assertSee('vill att vi raderar uppgifterna', false);
         $response->assertDontSee('intern@example.test', false);
-        $response->assertDontSee('mailto:', false);
+        $response->assertDontSee('valfri text', false);
+        $response->assertDontSee('prototyp', false);
+        $response->assertDontSee('tel:', false);
     }
 
     public function test_privacy_policy_shows_the_contact_email_only_when_configured(): void
