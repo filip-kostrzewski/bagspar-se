@@ -28,7 +28,7 @@ class PilotLeadControllerTest extends TestCase
         $this->assertNotNull($lead);
         $this->assertSame('Båghantverket', $lead->company);
         $this->assertNull($lead->message);
-        $this->assertNull($lead->consented_at);
+        $this->assertNotNull($lead->consented_at);
 
         $thankYou = $this->get(route('home'));
         $thankYou->assertOk();
