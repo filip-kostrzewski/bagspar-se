@@ -28,10 +28,15 @@ class AppServiceProvider extends ServiceProvider
 
         VerifyEmail::toMailUsing(fn (User $user, string $verificationUrl): MailMessage => (new MailMessage)
             ->subject('Verifiera din e-postadress för Bågspår')
-            ->greeting('Hej '.$user->name.'!')
-            ->line('Bekräfta e-postadressen för att säkra åtkomsten till verkstadens uppgifter.')
-            ->action('Verifiera e-postadress', $verificationUrl)
-            ->line('Om du inte skapade kontot kan du bortse från det här meddelandet.'));
+            ->view(['mail.auth.notification', 'mail.auth.notification-text'], [
+                'heading' => 'Verifiera din e-postadress',
+                'greeting' => 'Hej '.$user->name.'!',
+                'body' => 'Bekräfta e-postadressen för att säkra åtkomsten till verkstadens uppgifter.',
+                'actionText' => 'Verifiera e-postadress',
+                'url' => $verificationUrl,
+                'fallbackText' => 'Om knappen inte fungerar kan du kopiera länken nedan och klistra in den i webbläsaren:',
+                'notice' => 'Om du inte skapade kontot kan du bortse från det här meddelandet.',
+            ]));
 
         ResetPassword::createUrlUsing(fn (User $user, string $token): string => route('auth.password.reset', [
             'token' => $token,
@@ -40,12 +45,17 @@ class AppServiceProvider extends ServiceProvider
 
         ResetPassword::toMailUsing(fn (User $user, string $token): MailMessage => (new MailMessage)
             ->subject('Återställ lösenordet till Bågspår')
-            ->greeting('Hej '.$user->name.'!')
-            ->line('Vi fick en begäran om att återställa lösenordet för ditt konto.')
-            ->action('Välj nytt lösenord', route('auth.password.reset', [
-                'token' => $token,
-                'email' => $user->getEmailForPasswordReset(),
-            ]))
-            ->line('Länken gäller i 60 minuter. Om du inte bad om länken behöver du inte göra något.'));
+            ->view(['mail.auth.notification', 'mail.auth.notification-text'], [
+                'heading' => 'Återställ lösenordet',
+                'greeting' => 'Hej '.$user->name.'!',
+                'body' => 'Vi fick en begäran om att återställa lösenordet för ditt konto.',
+                'actionText' => 'Välj nytt lösenord',
+                'url' => route('auth.password.reset', [
+                    'token' => $token,
+                    'email' => $user->getEmailForPasswordReset(),
+                ]),
+                'fallbackText' => 'Om knappen inte fungerar kan du kopiera länken nedan och klistra in den i webbläsaren:',
+                'notice' => 'Länken gäller i 60 minuter. Om du inte bad om länken behöver du inte göra något.',
+            ]));
     }
 }

@@ -149,6 +149,33 @@ class AuthAccountTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
+    public function test_auth_notification_emails_render_swedish_fallback_and_footer_with_english_app_locale(): void
+    {
+        $user = User::factory()->create(['name' => 'Anna Andersson']);
+        $this->app->setLocale('en');
+
+        $messages = [
+            (new VerifyEmail)->toMail($user),
+            (new ResetPassword('test-reset-token'))->toMail($user),
+        ];
+
+        foreach ($messages as $message) {
+            $html = (string) $message->render();
+            $text = view($message->view[1], $message->viewData)->render();
+
+            $this->assertStringContainsString('<html lang="sv">', $html);
+            $this->assertStringContainsString('Om knappen inte fungerar kan du kopiera länken nedan', $html);
+            $this->assertStringContainsString('Med vänliga hälsningar,', $html);
+            $this->assertStringContainsString('Alla rättigheter förbehållna.', $html);
+            $this->assertStringContainsString('Om knappen inte fungerar kan du kopiera länken nedan', $text);
+            $this->assertStringContainsString($message->viewData['url'], $text);
+            $this->assertStringContainsString('Alla rättigheter förbehållna.', $text);
+            $this->assertStringNotContainsString('Regards,', $html);
+            $this->assertStringNotContainsString('All rights reserved.', $html);
+            $this->assertStringNotContainsString("If you're having trouble clicking", $html);
+        }
+    }
+
     public function test_a_valid_password_reset_token_updates_the_password(): void
     {
         $user = User::factory()->create();
