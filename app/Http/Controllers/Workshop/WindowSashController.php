@@ -32,11 +32,15 @@ class WindowSashController extends Controller
             'notes' => ['nullable', 'string', 'max:3000'],
         ], [
             'code.required' => 'Ange en kod för bågen.',
+            'code.string' => 'Ange bågens kod som text.',
             'code.max' => 'Koden får vara högst 120 tecken.',
             'code.unique' => 'Koden används redan i det här projektet.',
+            'room.string' => 'Ange rummet som text.',
             'room.max' => 'Rummet får vara högst 120 tecken.',
+            'location.string' => 'Ange placeringen som text.',
             'location.max' => 'Placeringen får vara högst 160 tecken.',
             'stage.in' => 'Välj ett giltigt arbetssteg.',
+            'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 3 000 tecken.',
         ]);
 
@@ -70,11 +74,15 @@ class WindowSashController extends Controller
             'notes' => ['sometimes', 'nullable', 'string', 'max:3000'],
         ], [
             'code.required' => 'Ange en kod för bågen.',
+            'code.string' => 'Ange bågens kod som text.',
             'code.max' => 'Koden får vara högst 120 tecken.',
             'code.unique' => 'Koden används redan i det här projektet.',
+            'room.string' => 'Ange rummet som text.',
             'room.max' => 'Rummet får vara högst 120 tecken.',
+            'location.string' => 'Ange placeringen som text.',
             'location.max' => 'Placeringen får vara högst 160 tecken.',
             'stage.in' => 'Välj ett giltigt arbetssteg.',
+            'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 3 000 tecken.',
         ]);
 

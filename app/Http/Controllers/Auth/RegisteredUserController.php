@@ -48,13 +48,18 @@ class RegisteredUserController extends Controller
             ],
         ], [
             'name.required' => 'Ange ditt namn.',
+            'name.string' => 'Ange ditt namn som text.',
             'name.max' => 'Namnet får vara högst 150 tecken.',
             'company.required' => 'Ange företagets eller verkstadens namn.',
+            'company.string' => 'Ange ett giltigt företagsnamn.',
             'company.max' => 'Företagsnamnet får vara högst 160 tecken.',
             'email.required' => 'Ange en e-postadress.',
+            'email.string' => 'Ange en giltig e-postadress.',
             'email.email' => 'Ange en giltig e-postadress.',
             'email.max' => 'E-postadressen får vara högst 254 tecken.',
             'email.unique' => 'E-postadressen är redan registrerad.',
+            'password.required' => 'Ange ett lösenord.',
+            'password.string' => 'Ange ett giltigt lösenord.',
             'password.confirmed' => 'Lösenorden stämmer inte överens.',
             'password.min' => 'Lösenordet måste innehålla minst 12 tecken.',
         ]);

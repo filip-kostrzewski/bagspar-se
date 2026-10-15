@@ -28,9 +28,13 @@ class ProjectController extends Controller
             'notes' => ['nullable', 'string', 'max:5000'],
         ], [
             'name.required' => 'Ange ett projektnamn.',
+            'name.string' => 'Ange projektnamnet som text.',
             'name.max' => 'Projektnamnet får vara högst 160 tecken.',
+            'customer_name.string' => 'Ange kundnamnet som text.',
             'customer_name.max' => 'Kundnamnet får vara högst 160 tecken.',
+            'location.string' => 'Ange platsen som text.',
             'location.max' => 'Platsen får vara högst 255 tecken.',
+            'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
         ]);
 
@@ -60,9 +64,13 @@ class ProjectController extends Controller
             'status' => ['sometimes', 'required', Rule::in(['active', 'completed'])],
         ], [
             'name.required' => 'Ange ett projektnamn.',
+            'name.string' => 'Ange projektnamnet som text.',
             'name.max' => 'Projektnamnet får vara högst 160 tecken.',
+            'customer_name.string' => 'Ange kundnamnet som text.',
             'customer_name.max' => 'Kundnamnet får vara högst 160 tecken.',
+            'location.string' => 'Ange platsen som text.',
             'location.max' => 'Platsen får vara högst 255 tecken.',
+            'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
             'status.in' => 'Välj en giltig projektstatus.',
         ]);

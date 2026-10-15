@@ -40,8 +40,10 @@ class AuthenticatedSessionController extends Controller
             'remember' => ['sometimes', 'accepted'],
         ], [
             'email.required' => 'Ange din e-postadress.',
+            'email.string' => 'Ange en giltig e-postadress.',
             'email.email' => 'Ange en giltig e-postadress.',
             'password.required' => 'Ange ditt lösenord.',
+            'password.string' => 'Ange ditt lösenord som text.',
         ]);
 
         $throttleKey = $validated['email'].'|'.$request->ip();

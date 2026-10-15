@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         VerifyEmail::toMailUsing(fn (User $user, string $verificationUrl): MailMessage => (new MailMessage)
             ->subject('Verifiera din e-postadress för Bågspår')
+            ->replyTo(config('bagspar.contact_email'), 'Bågspår')
             ->view(['mail.auth.notification', 'mail.auth.notification-text'], [
                 'heading' => 'Verifiera din e-postadress',
                 'greeting' => 'Hej '.$user->name.'!',
@@ -45,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
 
         ResetPassword::toMailUsing(fn (User $user, string $token): MailMessage => (new MailMessage)
             ->subject('Återställ lösenordet till Bågspår')
+            ->replyTo(config('bagspar.contact_email'), 'Bågspår')
             ->view(['mail.auth.notification', 'mail.auth.notification-text'], [
                 'heading' => 'Återställ lösenordet',
                 'greeting' => 'Hej '.$user->name.'!',

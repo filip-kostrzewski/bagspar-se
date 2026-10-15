@@ -31,6 +31,7 @@ class SashPhotoController extends Controller
             'photo' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:max_width=6000,max_height=6000'],
         ], [
             'photo.required' => 'Välj en bild att ladda upp.',
+            'photo.file' => 'Filen kunde inte läsas som en uppladdad bild.',
             'photo.image' => 'Filen måste vara en bild.',
             'photo.mimes' => 'Bilden måste vara i formatet JPG, PNG eller WebP.',
             'photo.max' => 'Bilden får vara högst 5 MB.',

@@ -49,8 +49,14 @@ class NewPasswordController extends Controller
                 },
             ],
         ], [
+            'token.required' => 'Återställningslänken saknas.',
+            'token.string' => 'Återställningslänken är ogiltig.',
+            'token.max' => 'Återställningslänken är ogiltig.',
             'email.required' => 'Ange e-postadressen för kontot.',
+            'email.string' => 'Ange en giltig e-postadress.',
             'email.email' => 'Ange en giltig e-postadress.',
+            'password.required' => 'Ange ett nytt lösenord.',
+            'password.string' => 'Ange ett giltigt lösenord.',
             'password.confirmed' => 'Lösenorden stämmer inte överens.',
             'password.min' => 'Lösenordet måste innehålla minst 12 tecken.',
         ]);

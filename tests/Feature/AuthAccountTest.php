@@ -88,6 +88,50 @@ class AuthAccountTest extends TestCase
         $this->assertDatabaseCount('workshops', 0);
     }
 
+    public function test_auth_form_validation_errors_stay_swedish_when_application_locale_is_english(): void
+    {
+        $this->app->setLocale('en');
+
+        $this->from(route('register'))->post(route('auth.register.store'), [
+            'name' => 'Anna Andersson',
+            'company' => 'Fönsterverkstan',
+            'email' => 'anna@example.test',
+            'password' => '',
+            'password_confirmation' => '',
+        ])->assertSessionHasErrors(['password' => 'Ange ett lösenord.']);
+
+        $this->from(route('register'))->post(route('auth.register.store'), [
+            'name' => 'Anna Andersson',
+            'company' => 'Fönsterverkstan',
+            'email' => ['anna@example.test'],
+            'password' => 'correct-horse-5',
+            'password_confirmation' => 'correct-horse-5',
+        ])->assertSessionHasErrors(['email' => 'Ange en giltig e-postadress.']);
+
+        $this->from(route('login'))->post(route('auth.login.store'), [
+            'email' => ['anna@example.test'],
+            'password' => ['correct-horse-5'],
+        ])->assertSessionHasErrors([
+            'email' => 'Ange en giltig e-postadress.',
+            'password' => 'Ange ditt lösenord som text.',
+        ]);
+
+        $this->from(route('auth.password.request'))->post(route('auth.password.email'), [
+            'email' => ['anna@example.test'],
+        ])->assertSessionHasErrors(['email' => 'Ange en giltig e-postadress.']);
+
+        $this->from(route('auth.password.reset', ['token' => 'test-token']))
+            ->post(route('auth.password.update'), [
+                'token' => 'test-token',
+                'email' => 'anna@example.test',
+                'password' => '',
+                'password_confirmation' => '',
+            ])->assertSessionHasErrors(['password' => 'Ange ett nytt lösenord.']);
+
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('workshops', 0);
+    }
+
     public function test_login_normalizes_email_and_throttles_failed_attempts(): void
     {
         $user = User::factory()->create([
@@ -153,6 +197,7 @@ class AuthAccountTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'Anna Andersson']);
         $this->app->setLocale('en');
+        config(['bagspar.contact_email' => 'kontakt@example.test']);
 
         $messages = [
             (new VerifyEmail)->toMail($user),
@@ -160,6 +205,8 @@ class AuthAccountTest extends TestCase
         ];
 
         foreach ($messages as $message) {
+            $this->assertSame([['kontakt@example.test', 'Bågspår']], $message->replyTo);
+
             $html = (string) $message->render();
             $text = view($message->view[1], $message->viewData)->render();
 

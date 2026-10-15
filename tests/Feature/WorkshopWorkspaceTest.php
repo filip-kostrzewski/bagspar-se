@@ -78,6 +78,23 @@ class WorkshopWorkspaceTest extends TestCase
         ])->assertSessionHasErrors('status');
     }
 
+    public function test_project_and_sash_array_inputs_receive_swedish_validation_errors(): void
+    {
+        $this->app->setLocale('en');
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+
+        $this->actingAs($owner)
+            ->patch(route('app.projects.update', $project), [
+                'name' => ['Ej giltigt'],
+            ])->assertSessionHasErrors(['name' => 'Ange projektnamnet som text.']);
+
+        $this->patch(route('app.sashes.update', [$project, $sash]), [
+            'notes' => ['Ej giltigt'],
+        ])->assertSessionHasErrors(['notes' => 'Ange anteckningarna som text.']);
+    }
+
     public function test_dashboard_only_lists_projects_for_the_signed_in_workshop(): void
     {
         $owner = User::factory()->create();

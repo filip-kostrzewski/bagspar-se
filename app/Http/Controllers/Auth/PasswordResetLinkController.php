@@ -29,6 +29,7 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'string', 'email:rfc', 'max:254'],
         ], [
             'email.required' => 'Ange e-postadressen för kontot.',
+            'email.string' => 'Ange en giltig e-postadress.',
             'email.email' => 'Ange en giltig e-postadress.',
             'email.max' => 'E-postadressen får vara högst 254 tecken.',
         ]);
