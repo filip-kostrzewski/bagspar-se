@@ -111,6 +111,6 @@ vendor/bin/pint --dirty
 
 If the live site fails after that deploy, revert the commit on `master`.
 
-A production `composer install` runs `scripts/cache-config.php`, which clears and rebuilds the config cache when `APP_ENV=production` or the deploy is on Forge. That picks up `GA_MEASUREMENT_ID`, including its public default.
+A production `composer install` runs `@php scripts/cache-config.php`. The command has no shell variables. The script rebuilds the config cache when `APP_ENV=production` or the deploy is on Forge, so `GA_MEASUREMENT_ID` and its public default are picked up.
 
 On the server, set `APP_URL` to `https://bagspar.se`, `MAIL_MAILER=postmark`, `POSTMARK_API_KEY`, `MAIL_FROM_ADDRESS`, `LEAD_NOTIFICATION_EMAIL`, and `BAGSPAR_ADMIN_TOKEN`. Leave the API key and the admin token out of git.
