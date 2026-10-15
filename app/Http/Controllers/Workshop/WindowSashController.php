@@ -12,6 +12,14 @@ use Illuminate\View\View;
 
 class WindowSashController extends Controller
 {
+    public function create(Request $request, Project $project): View
+    {
+        $workshop = $this->currentWorkshop($request);
+        $project = $this->projectForWorkshop($workshop, $project);
+
+        return view('app.sashes.create', compact('workshop', 'project'));
+    }
+
     public function store(Request $request, Project $project): RedirectResponse
     {
         $workshop = $this->currentWorkshop($request);
@@ -32,9 +40,9 @@ class WindowSashController extends Controller
             'notes.max' => 'Anteckningarna får vara högst 3 000 tecken.',
         ]);
 
-        $project->windowSashes()->create($validated + ['stage' => 'received']);
+        $sash = $project->windowSashes()->create($validated + ['stage' => 'received']);
 
-        return back()->with('status', 'Arbetskortet har skapats.');
+        return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Arbetskortet har skapats.');
     }
 
     public function show(Request $request, Project $project, WindowSash $sash): View

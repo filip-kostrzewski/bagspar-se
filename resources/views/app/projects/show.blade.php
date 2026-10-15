@@ -116,7 +116,7 @@
                     <p class="workshop-eyebrow">FÖNSTER FÖR FÖNSTER</p>
                     <h2 class="workshop-section-heading" id="sashes-title">Bågar <span>{{ $sashCount }}</span></h2>
                 </div>
-                <a class="workshop-button workshop-button--primary no-print" href="#new-sash">Lägg till båge</a>
+                <a class="workshop-button workshop-button--primary no-print" href="{{ route('app.sashes.create', $project) }}">Lägg till båge</a>
             </div>
 
             @if ($sashes->isEmpty())
@@ -152,56 +152,5 @@
             @endif
         </section>
 
-        <section class="add-sash-panel" id="new-sash" aria-labelledby="new-sash-title">
-            <div class="add-sash-panel__intro">
-                <p class="workshop-eyebrow">ETT NYTT ARBETSKORT</p>
-                <h2 class="workshop-section-heading" id="new-sash-title">Lägg till en båge</h2>
-                <p>Välj en kod som också fungerar på en fysisk etikett. Det första steget sätts till mottagen.</p>
-            </div>
-
-            <form class="workshop-form sash-create-form" method="POST" action="{{ route('app.sashes.store', $project) }}">
-                @csrf
-                <input type="hidden" name="form_context" value="new-sash">
-                <div class="form-field">
-                    <label for="code">Bågens kod <span class="form-required">Obligatoriskt</span></label>
-                    <input id="code" name="code" type="text" value="{{ old('form_context') === 'new-sash' && is_string(old('code')) ? old('code') : '' }}" autocomplete="off" maxlength="120" required @if ($errors->has('code') && old('form_context') === 'new-sash') aria-invalid="true" aria-describedby="code-error" @endif>
-                    @error('code')
-                        @if (old('form_context') === 'new-sash')
-                            <p class="form-field__error" id="code-error">{{ $message }}</p>
-                        @endif
-                    @enderror
-                </div>
-                <div class="form-field">
-                    <label for="room">Rum <span class="form-optional">Valfritt</span></label>
-                    <input id="room" name="room" type="text" value="{{ old('form_context') === 'new-sash' && is_string(old('room')) ? old('room') : '' }}" maxlength="120" @if ($errors->has('room') && old('form_context') === 'new-sash') aria-invalid="true" aria-describedby="room-error" @endif>
-                    @error('room')
-                        @if (old('form_context') === 'new-sash')
-                            <p class="form-field__error" id="room-error">{{ $message }}</p>
-                        @endif
-                    @enderror
-                </div>
-                <div class="form-field">
-                    <label for="location">Placering <span class="form-optional">Valfritt</span></label>
-                    <input id="location" name="location" type="text" value="{{ old('form_context') === 'new-sash' && is_string(old('location')) ? old('location') : '' }}" maxlength="160" @if ($errors->has('location') && old('form_context') === 'new-sash') aria-invalid="true" aria-describedby="location-error" @endif>
-                    @error('location')
-                        @if (old('form_context') === 'new-sash')
-                            <p class="form-field__error" id="location-error">{{ $message }}</p>
-                        @endif
-                    @enderror
-                </div>
-                <div class="form-field sash-create-form__notes">
-                    <label for="notes">Anteckningar <span class="form-optional">Valfritt</span></label>
-                    <textarea id="notes" name="notes" rows="3" maxlength="3000" @if ($errors->has('notes') && old('form_context') === 'new-sash') aria-invalid="true" aria-describedby="sash-notes-error" @endif>{{ old('form_context') === 'new-sash' && is_string(old('notes')) ? old('notes') : '' }}</textarea>
-                    @error('notes')
-                        @if (old('form_context') === 'new-sash')
-                            <p class="form-field__error" id="sash-notes-error">{{ $message }}</p>
-                        @endif
-                    @enderror
-                </div>
-                <div class="sash-create-form__submit">
-                    <button class="workshop-button workshop-button--primary" type="submit">Skapa arbetskort</button>
-                </div>
-            </form>
-        </section>
     </div>
 @endsection

@@ -103,7 +103,6 @@
                             @endif
                         @enderror
                     </div>
-                    <button class="workshop-button workshop-button--primary" type="submit">Spara arbetskort</button>
                     <details class="sash-form-details" @if (old('form_context') === 'sash' && ($errors->has('code') || $errors->has('room') || $errors->has('location'))) open @endif>
                         <summary>Ändra kod eller placering</summary>
                         <p>Rätta märkningen eller platsen för den här bågen.</p>
@@ -135,6 +134,7 @@
                             @enderror
                         </div>
                     </details>
+                    <button class="workshop-button workshop-button--primary" type="submit">Spara arbetskort</button>
                 </form>
             </section>
 
