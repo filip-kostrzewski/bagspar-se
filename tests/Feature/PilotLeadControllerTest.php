@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\PilotLeadNotification;
+use App\Models\PilotLead;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use RuntimeException;
@@ -23,11 +24,18 @@ class PilotLeadControllerTest extends TestCase
         $response->assertRedirect(route('home').'#form-result')
             ->assertSessionHas('pilot_lead_received', true);
 
-        $this->assertDatabaseHas('pilot_leads', [
-            'company' => 'Båghantverket',
-            'email' => 'verkstad@example.test',
-            'message' => 'Vi vill samla bilder och arbetssteg.',
-        ]);
+        $lead = PilotLead::query()->where('email', 'verkstad@example.test')->first();
+        $this->assertNotNull($lead);
+        $this->assertSame('Båghantverket', $lead->company);
+        $this->assertNull($lead->message);
+        $this->assertNull($lead->consented_at);
+
+        $thankYou = $this->get(route('home'));
+        $thankYou->assertOk();
+        $thankYou->assertSeeInOrder([
+            'Tack, verkstaden är anmäld.',
+            route('demo'),
+        ], false);
 
         Mail::assertSent(PilotLeadNotification::class, function (PilotLeadNotification $mail): bool {
             return $mail->hasTo('pilot-team@example.test')
@@ -42,30 +50,29 @@ class PilotLeadControllerTest extends TestCase
         $response = $this->from(route('home'))
             ->post(route('pilot-leads.store'), []);
 
-        $response->assertRedirectBackWithErrors(['company', 'email', 'contact_consent'])
+        $response->assertRedirectBackWithErrors(['company', 'email'])
             ->assertInvalid([
                 'company' => 'Fyll i företag eller verkstad.',
                 'email' => 'Fyll i din e-postadress.',
-                'contact_consent' => 'Du behöver godkänna att vi kontaktar dig om Bågspår.',
             ]);
 
         $this->assertDatabaseCount('pilot_leads', 0);
         Mail::assertNothingSent();
     }
 
-    public function test_invalid_email_and_overlong_message_are_rejected_without_saving(): void
+    public function test_invalid_email_and_overlong_company_are_rejected_without_saving(): void
     {
         Mail::fake();
         $submission = $this->validSubmission();
         $submission['email'] = 'not-an-email';
-        $submission['message'] = str_repeat('a', 2001);
+        $submission['company'] = str_repeat('a', 161);
 
         $response = $this->from(route('home'))
             ->post(route('pilot-leads.store'), $submission);
 
         $response->assertInvalid([
             'email' => 'Ange en giltig e-postadress.',
-            'message' => 'Texten får vara högst 2 000 tecken.',
+            'company' => 'Företagsnamnet får vara högst 160 tecken.',
         ]);
 
         $this->assertDatabaseCount('pilot_leads', 0);
@@ -121,10 +128,27 @@ class PilotLeadControllerTest extends TestCase
         $response->assertRedirect(route('home').'#form-result')
             ->assertSessionHas('pilot_lead_received', true);
 
-        $this->assertDatabaseHas('pilot_leads', [
-            'company' => 'Båghantverket',
+        $lead = PilotLead::query()->where('email', 'verkstad@example.test')->first();
+        $this->assertNotNull($lead);
+        $this->assertSame('Båghantverket', $lead->company);
+    }
+
+    public function test_company_name_is_escaped_in_the_notification_mail(): void
+    {
+        Mail::fake();
+        config(['bagspar.lead_notification_email' => 'pilot-team@example.test']);
+
+        $this->post(route('pilot-leads.store'), [
+            'company' => 'Båge <script>alert(1)</script>',
             'email' => 'verkstad@example.test',
         ]);
+
+        Mail::assertSent(PilotLeadNotification::class, function (PilotLeadNotification $mail): bool {
+            $html = $mail->render();
+
+            return str_contains($html, 'Båge &lt;script&gt;alert(1)&lt;/script&gt;')
+                && ! str_contains($html, '<script>alert(1)</script>');
+        });
     }
 
     /**
@@ -135,8 +159,7 @@ class PilotLeadControllerTest extends TestCase
         return [
             'company' => 'Båghantverket',
             'email' => 'verkstad@example.test',
-            'message' => 'Vi vill samla bilder och arbetssteg.',
-            'contact_consent' => 'yes',
+            'message' => 'Ska inte sparas',
         ];
     }
 }

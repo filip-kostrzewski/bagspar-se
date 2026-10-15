@@ -22,7 +22,7 @@ class PilotLeadNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ny intresseanmälan för Bågspår',
+            subject: 'Ny anmälan för Bågspår',
         );
     }
 

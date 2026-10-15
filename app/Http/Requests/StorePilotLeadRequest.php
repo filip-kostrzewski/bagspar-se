@@ -25,8 +25,6 @@ class StorePilotLeadRequest extends FormRequest
         return [
             'company' => ['required', 'string', 'max:160'],
             'email' => ['required', 'string', 'email:rfc', 'max:254'],
-            'message' => ['nullable', 'string', 'max:2000'],
-            'contact_consent' => ['accepted'],
             'website' => ['prohibited'],
         ];
     }
@@ -44,9 +42,6 @@ class StorePilotLeadRequest extends FormRequest
             'email.string' => 'Ange en giltig e-postadress.',
             'email.email' => 'Ange en giltig e-postadress.',
             'email.max' => 'E-postadressen får vara högst 254 tecken.',
-            'message.string' => 'Ange text i meddelandefältet.',
-            'message.max' => 'Texten får vara högst 2 000 tecken.',
-            'contact_consent.accepted' => 'Du behöver godkänna att vi kontaktar dig om Bågspår.',
             'website.prohibited' => 'Formuläret kunde inte skickas.',
         ];
     }
@@ -59,8 +54,6 @@ class StorePilotLeadRequest extends FormRequest
         return [
             'company' => 'företag eller verkstad',
             'email' => 'e-postadress',
-            'message' => 'meddelande',
-            'contact_consent' => 'samtycke',
         ];
     }
 }

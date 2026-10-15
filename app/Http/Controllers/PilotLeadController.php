@@ -17,10 +17,9 @@ class PilotLeadController extends Controller
      */
     public function __invoke(StorePilotLeadRequest $request): RedirectResponse
     {
-        $lead = PilotLead::create([
-            ...$request->safe()->only(['company', 'email', 'message']),
-            'consented_at' => now(),
-        ]);
+        $lead = PilotLead::create(
+            $request->safe()->only(['company', 'email']),
+        );
 
         $recipient = config('bagspar.lead_notification_email');
 

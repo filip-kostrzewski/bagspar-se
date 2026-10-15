@@ -20,7 +20,8 @@ class SitemapControllerTest extends TestCase
         $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
         $this->assertSitemapLists($response->getContent(), [
             'https://example.test/',
-            'https://example.test/integritet',
+            'https://example.test/demo',
+            'https://example.test/integritetspolicy',
         ]);
     }
 
@@ -37,7 +38,8 @@ class SitemapControllerTest extends TestCase
         $response->assertOk();
         $this->assertSitemapLists($response->getContent(), [
             'https://bagspar.se/',
-            'https://bagspar.se/integritet',
+            'https://bagspar.se/demo',
+            'https://bagspar.se/integritetspolicy',
         ]);
     }
 
@@ -53,7 +55,8 @@ class SitemapControllerTest extends TestCase
         $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
         $this->assertSitemapLists($response->getContent(), [
             'https://bagspar.se/',
-            'https://bagspar.se/integritet',
+            'https://bagspar.se/demo',
+            'https://bagspar.se/integritetspolicy',
         ]);
     }
 
@@ -66,9 +69,12 @@ class SitemapControllerTest extends TestCase
         $response->assertSee('<link rel="canonical" href="https://bagspar.se/">', false);
         $response->assertSee('href="https://bagspar.se/css/site.css"', false);
         $response->assertSee('action="https://bagspar.se/intresse"', false);
+        $response->assertSee('href="https://bagspar.se/demo"', false);
+        $response->assertSee('href="https://bagspar.se/integritetspolicy"', false);
         $response->assertDontSee('http://bagspar.se', false);
-        $this->assertSame('https://bagspar.se/integritet', route('privacy'));
-        $this->assertSame('https://bagspar.se/integritet', redirect()->route('privacy')->getTargetUrl());
+        $this->assertSame('https://bagspar.se/integritetspolicy', route('privacy'));
+        $this->assertSame('https://bagspar.se/integritetspolicy', redirect()->route('privacy')->getTargetUrl());
+        $this->assertSame('https://bagspar.se/demo', route('demo'));
     }
 
     #[TestWith(['http://bagspar.test'])]
@@ -82,7 +88,8 @@ class SitemapControllerTest extends TestCase
         $response->assertOk();
         $this->assertSitemapLists($response->getContent(), [
             $appUrl.'/',
-            $appUrl.'/integritet',
+            $appUrl.'/demo',
+            $appUrl.'/integritetspolicy',
         ]);
     }
 

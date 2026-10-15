@@ -16,6 +16,7 @@ class SitemapController extends Controller
      */
     private const PUBLIC_PAGES = [
         'home',
+        'demo',
         'privacy',
     ];
 

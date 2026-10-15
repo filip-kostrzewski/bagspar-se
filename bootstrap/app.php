@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_AWS_ELB,
         );
         $middleware->append(ForceProductionHttps::class);
+        // The demo page is cached for offline use, so a later visit may not
+        // have a fresh session token. The endpoint stores example steps and notes only.
+        $middleware->preventRequestForgery(except: [
+            'demo/synk',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

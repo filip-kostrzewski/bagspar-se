@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="@yield('meta_description', 'Ett planerat verktyg för fönsterverkstäder: märkning, bilder, arbetssteg och dokumentation på ett ställe. Anmäl intresse för Bågspårs pilotprojekt.')">
+    <meta name="description" content="@yield('meta_description', 'Arbetskort för fönsterverkstäder. Märkning, bilder, anteckningar och arbetssteg på varje båge, även när täckningen är svag.')">
     <meta name="robots" content="{{ app()->isProduction() ? 'index, follow' : 'noindex, nofollow' }}">
     <meta name="theme-color" content="#F7F6F1">
     <title>@yield('title', 'Bågspår — arbetskort för fönsterrenovering')</title>
@@ -31,12 +31,12 @@
 
             @if (request()->routeIs('home'))
                 <nav class="site-nav" aria-label="Huvudmeny">
-                    <a class="site-nav__link" href="#arbetsflode">Så fungerar idén</a>
-                    <a class="site-nav__link" href="#pilot">Pilotprojektet</a>
-                    <a class="button button--small" href="#intresse">Anmäl intresse</a>
+                    <a class="site-nav__link" href="{{ route('demo') }}">Arbetskortet</a>
+                    <a class="site-nav__link" href="#pilot">Piloten</a>
+                    <a class="button button--small" href="#intresse">Anmäl verkstad</a>
                 </nav>
             @else
-                <a class="button button--small" href="{{ route('home') }}#intresse">Anmäl intresse</a>
+                <a class="button button--small" href="{{ route('home') }}#intresse">Anmäl verkstad</a>
             @endif
         </div>
     </header>
@@ -51,14 +51,17 @@
                     <span class="brand__name">Bågspår</span>
                 </a>
                 <p class="site-footer__tagline">Ett enklare arbetsflöde för fönsterrenovering.</p>
-                <p class="site-footer__origin">En idé med utgångspunkt i Märsta.</p>
+                <p class="site-footer__company">Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta</p>
             </div>
             <nav class="site-footer__links" aria-label="Sidfot">
-                <a href="{{ route('privacy') }}">Integritet</a>
-                <a href="mailto:{{ config('bagspar.lead_notification_email') }}">Kontakt</a>
+                <a href="{{ route('privacy') }}">Integritetspolicy</a>
+                @if (filled(config('bagspar.contact_email')))
+                    <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakt</a>
+                @endif
             </nav>
             <p class="site-footer__copyright">© {{ now()->year }} Bågspår</p>
         </div>
     </footer>
+    @stack('scripts')
 </body>
 </html>
