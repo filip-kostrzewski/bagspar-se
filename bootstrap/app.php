@@ -6,8 +6,8 @@ use App\Http\Middleware\ForceProductionHttps;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -40,12 +40,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (InvalidSignatureException $exception, Request $request): ?RedirectResponse {
+        $exceptions->render(function (InvalidSignatureException $exception, Request $request): ?Response {
             if ($request->routeIs('verification.verify') && ! $request->expectsJson()) {
-                return redirect()->route('verification.notice')->with(
-                    'verification_issue',
-                    'Länken är ogiltig eller har gått ut. Den kan inte verifiera kontot du är inloggad på.',
-                );
+                return response()->view('auth.verification-invalid', status: 403);
             }
 
             return null;

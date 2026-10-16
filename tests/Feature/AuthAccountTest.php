@@ -292,7 +292,7 @@ class AuthAccountTest extends TestCase
         $this->assertNotNull($user->fresh()->email_verified_at);
     }
 
-    public function test_guest_can_log_in_from_the_verification_link_and_verify_the_intended_account(): void
+    public function test_guest_signed_verification_marks_the_email_and_returns_to_the_link_after_login(): void
     {
         $user = User::factory()->unverified()->create([
             'email' => 'owner@example.test',
@@ -303,18 +303,27 @@ class AuthAccountTest extends TestCase
             'hash' => sha1($user->getEmailForVerification()),
         ]);
 
-        $this->get($verificationUrl)->assertRedirect(route('login'));
+        $this->get($verificationUrl)
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'Din e-post är verifierad – logga in')
+            ->assertSessionHas('url.intended', $verificationUrl);
+
+        $this->assertGuest();
+        $this->assertNotNull($user->fresh()->email_verified_at);
+
+        $this->get($verificationUrl)
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'Din e-post är verifierad – logga in');
+
+        $this->get(route('login'))->assertSee('Din e-post är verifierad – logga in');
 
         $this->post(route('auth.login.store'), [
             'email' => $user->email,
             'password' => 'correct-secure-pass-8',
         ])->assertRedirect($verificationUrl);
 
-        $this->get($verificationUrl)
-            ->assertRedirect(route('app.dashboard'))
-            ->assertSessionHas('status', 'E-postadressen har verifierats.');
-
-        $this->assertNotNull($user->fresh()->email_verified_at);
+        $this->get($verificationUrl)->assertRedirect(route('app.dashboard'));
+        $this->get(route('app.dashboard'))->assertOk();
     }
 
     public function test_verification_link_for_another_account_shows_resend_recovery_for_the_current_user(): void
@@ -376,7 +385,7 @@ class AuthAccountTest extends TestCase
         $this->assertNull($linkOwner->fresh()->email_verified_at);
     }
 
-    public function test_expired_and_tampered_verification_links_show_resend_recovery_without_verifying(): void
+    public function test_expired_and_tampered_verification_links_show_a_forbidden_page_without_verifying(): void
     {
         $user = User::factory()->unverified()->create();
         $routeParameters = [
@@ -388,16 +397,37 @@ class AuthAccountTest extends TestCase
         $tamperedUrl = $validUrl.'&tampered=1';
 
         foreach ([$expiredUrl, $tamperedUrl] as $verificationUrl) {
-            $this->actingAs($user)->get($verificationUrl)
-                ->assertRedirect(route('verification.notice'))
-                ->assertSessionHas('verification_issue', 'Länken är ogiltig eller har gått ut. Den kan inte verifiera kontot du är inloggad på.');
+            $this->actingAsGuest()->get($verificationUrl)
+                ->assertForbidden()
+                ->assertSee('Länken är ogiltig eller har gått ut')
+                ->assertSee(route('login'));
 
-            $this->get(route('verification.notice'))
-                ->assertOk()
-                ->assertSee($user->email)
-                ->assertSee('Skicka bekräftelselänk igen');
+            $this->actingAs($user)->get($verificationUrl)
+                ->assertForbidden()
+                ->assertSee('Länken är ogiltig eller har gått ut')
+                ->assertSee(route('verification.notice'));
         }
 
+        $this->assertNull($user->fresh()->email_verified_at);
+        $this->get(route('verification.notice'))
+            ->assertOk()
+            ->assertSee($user->email)
+            ->assertSee('Skicka bekräftelselänk igen');
+    }
+
+    public function test_signed_verification_with_the_wrong_hash_returns_a_forbidden_page_without_verifying(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $verificationUrl = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+            'id' => $user->getKey(),
+            'hash' => sha1('other@example.test'),
+        ]);
+
+        $this->get($verificationUrl)
+            ->assertForbidden()
+            ->assertSee('Länken är ogiltig eller har gått ut');
+
+        $this->assertGuest();
         $this->assertNull($user->fresh()->email_verified_at);
     }
 
@@ -412,6 +442,7 @@ class AuthAccountTest extends TestCase
 
         $this->actingAs($currentUser)->getJson($verificationUrl)->assertForbidden();
         $this->getJson($verificationUrl.'&tampered=1')->assertForbidden();
+        $this->actingAsGuest()->getJson($verificationUrl.'&tampered=1')->assertForbidden();
 
         $this->assertNull($currentUser->fresh()->email_verified_at);
         $this->assertNull($linkOwner->fresh()->email_verified_at);

@@ -32,13 +32,24 @@ class EmailVerificationController extends Controller
 
     public function verify(CurrentUserEmailVerificationRequest $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->route('app.dashboard');
+        $actor = $request->user();
+        $target = $request->targetUser();
+
+        if ($actor instanceof User && $target instanceof User && $actor->is($target)) {
+            if ($actor->hasVerifiedEmail()) {
+                return redirect()->route('app.dashboard');
+            }
+
+            $request->fulfill();
+
+            return redirect()->route('app.dashboard')->with('status', 'E-postadressen har verifierats.');
         }
 
         $request->fulfill();
 
-        return redirect()->route('app.dashboard')->with('status', 'E-postadressen har verifierats.');
+        // The signed URL is stored as url.intended, the same way auth middleware does,
+        // so the next login returns the visitor to this link and then the workshop.
+        return redirect()->guest(route('login'))->with('status', 'Din e-post är verifierad – logga in');
     }
 
     public function send(Request $request): RedirectResponse

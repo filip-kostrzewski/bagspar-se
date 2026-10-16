@@ -53,13 +53,14 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/losenord/aterstall', [NewPasswordController::class, 'store'])->middleware('throttle:10,1')->name('auth.password.update');
 });
 
+Route::get('/email/verifiera/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
 Route::middleware('auth')->group(function (): void {
     Route::post('/logga-ut', [AuthenticatedSessionController::class, 'destroy'])->name('auth.logout');
 
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
-    Route::get('/email/verifiera/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
