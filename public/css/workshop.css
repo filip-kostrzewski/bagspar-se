@@ -1634,6 +1634,37 @@ svg {
     font-size: 14px;
 }
 
+.auth-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: -8px 0 24px;
+    padding: 14px 16px;
+    border: 1px solid #b3c9ba;
+    border-left: 4px solid #2f6b4f;
+    border-radius: 5px;
+    background: #edf4ef;
+    color: #214734;
+}
+
+.auth-notice p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.auth-notice__icon {
+    display: grid;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    place-items: center;
+    border-radius: 50%;
+    background: #d8e8dd;
+    font-size: 14px;
+}
+
 .auth-form {
     gap: 17px;
 }

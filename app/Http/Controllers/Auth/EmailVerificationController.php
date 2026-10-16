@@ -49,7 +49,10 @@ class EmailVerificationController extends Controller
 
         // The signed URL is stored as url.intended, the same way auth middleware does,
         // so the next login returns the visitor to this link and then the workshop.
-        return redirect()->guest(route('login'))->with('status', 'Din e-post är verifierad – logga in');
+        return redirect()->guest(route('login'))->with(
+            'email_verified_notice',
+            'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.',
+        );
     }
 
     public function send(Request $request): RedirectResponse

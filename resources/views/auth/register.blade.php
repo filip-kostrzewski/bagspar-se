@@ -10,7 +10,7 @@
 
         <aside class="registration-terms" aria-label="Provperiod och pris">
             <strong>3 månaders kostnadsfri provperiod</strong>
-            <p>Därefter 790 kr/mån per verkstad, exkl. moms. Betalning kan börja först när den aktiveras manuellt — inget dras automatiskt.</p>
+            <p>Därefter 790 kr/mån per verkstad, exkl. moms. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
         </aside>
 
         @if ($errors->any())

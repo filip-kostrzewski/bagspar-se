@@ -16,6 +16,22 @@ class AuthAccountTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_login_page_omits_the_verification_notice_on_a_direct_visit(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertDontSee('Din e-post är verifierad.', false)
+            ->assertDontSee('auth-notice', false);
+    }
+
+    public function test_registration_page_says_payment_waits_for_a_chosen_subscription(): void
+    {
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.', false)
+            ->assertDontSee('Betalning kan börja först när den aktiveras manuellt', false);
+    }
+
     public function test_registration_creates_a_company_account_and_starts_a_session(): void
     {
         Notification::fake();
@@ -305,7 +321,7 @@ class AuthAccountTest extends TestCase
 
         $this->get($verificationUrl)
             ->assertRedirect(route('login'))
-            ->assertSessionHas('status', 'Din e-post är verifierad – logga in')
+            ->assertSessionHas('email_verified_notice', 'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.')
             ->assertSessionHas('url.intended', $verificationUrl);
 
         $this->assertGuest();
@@ -313,9 +329,11 @@ class AuthAccountTest extends TestCase
 
         $this->get($verificationUrl)
             ->assertRedirect(route('login'))
-            ->assertSessionHas('status', 'Din e-post är verifierad – logga in');
+            ->assertSessionHas('email_verified_notice', 'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.');
 
-        $this->get(route('login'))->assertSee('Din e-post är verifierad – logga in');
+        $this->get(route('login'))
+            ->assertSee('Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.', false)
+            ->assertSee('auth-notice', false);
 
         $this->post(route('auth.login.store'), [
             'email' => $user->email,

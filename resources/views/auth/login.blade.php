@@ -8,6 +8,13 @@
         <h1 id="page-title" class="workshop-heading">Logga in</h1>
         <p class="auth-page__intro">Fortsätt där verkstadens arbete väntar.</p>
 
+        @if (is_string(session('email_verified_notice')))
+            <div class="auth-notice" role="status">
+                <span class="auth-notice__icon" aria-hidden="true">✓</span>
+                <p>{{ session('email_verified_notice') }}</p>
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="workshop-error-summary" role="alert" tabindex="-1" data-workshop-focus>
                 <strong>Kontrollera uppgifterna och försök igen.</strong>
