@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectEvent;
 use App\Models\SashEvent;
 use App\Models\User;
 use App\Models\WindowSash;
 use App\Support\ReadyCustomerNotifier;
+use App\Support\StoredSashPhoto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -123,5 +127,35 @@ class WindowSashController extends Controller
             : 'Arbetskortet har uppdaterats.';
 
         return back()->with('status', $message);
+    }
+
+    public function destroy(Request $request, Project $project, WindowSash $sash): RedirectResponse
+    {
+        $workshop = $this->currentWorkshop($request);
+        $project = $this->projectForWorkshop($workshop, $project);
+        $sash = $this->sashForProject($project, $sash);
+        Gate::authorize('delete', $project);
+
+        $paths = $sash->photos()->pluck('path');
+        $actor = $request->user();
+        $code = $sash->code;
+
+        DB::transaction(function () use ($actor, $project, $sash, $code): void {
+            if ($actor instanceof User) {
+                $project->recordEvent($actor, ProjectEvent::KIND_SASH_REMOVED, 'Bågen '.$code.' togs bort.');
+            }
+
+            $sash->delete();
+        });
+
+        foreach ($paths as $path) {
+            StoredSashPhoto::delete($path);
+        }
+
+        app(ReadyCustomerNotifier::class)->sync($project);
+
+        return redirect()
+            ->route('app.projects.show', $project)
+            ->with('status', 'Bågen och bildfilerna har tagits bort.');
     }
 }

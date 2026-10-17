@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\SashEvent;
 use App\Models\SashPhoto;
+use App\Models\User;
 use App\Models\WindowSash;
+use App\Support\StoredSashPhoto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -109,6 +112,37 @@ class SashPhotoController extends Controller
         $photo->update(['moment' => $validated['moment']]);
 
         return back()->with('status', 'Bildens tillfälle har sparats.');
+    }
+
+    public function destroy(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): RedirectResponse
+    {
+        $workshop = $this->currentWorkshop($request);
+        $project = $this->projectForWorkshop($workshop, $project);
+        $sash = $this->sashForProject($project, $sash);
+        $photo = $sash->photos()->whereKey($photo->getKey())->firstOrFail();
+        $actor = $request->user();
+        $path = $photo->path;
+        $filename = is_string($photo->original_filename) && $photo->original_filename !== ''
+            ? $photo->original_filename
+            : 'bild';
+        $moment = $photo->documentMomentLabel() ?? 'Foto';
+
+        DB::transaction(function () use ($actor, $photo, $sash, $filename, $moment): void {
+            if ($actor instanceof User) {
+                $sash->recordEvent(
+                    $actor,
+                    SashEvent::KIND_PHOTO,
+                    null,
+                    'Bilden togs bort: '.$filename.' ('.$moment.').',
+                );
+            }
+
+            $photo->delete();
+        });
+
+        StoredSashPhoto::delete($path);
+
+        return back()->with('status', 'Bilden har tagits bort.');
     }
 
     public function show(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): BinaryFileResponse

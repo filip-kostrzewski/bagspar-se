@@ -226,6 +226,11 @@
                                     </select>
                                     <button class="workshop-button workshop-button--quiet" type="submit">Spara tillfälle</button>
                                 </form>
+                                <form method="POST" action="{{ route('app.sashes.photos.destroy', [$project, $sash, $photo]) }}" data-confirm="Ta bort bilden? Filen tas bort från lagringen.">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="workshop-button workshop-button--quiet" type="submit">Ta bort bild</button>
+                                </form>
                             </figcaption>
                         </figure>
                     @endforeach
@@ -291,6 +296,18 @@
             </div>
             @endif
             </section>
+
+            @if (auth()->user()?->isOwner())
+                <section class="project-danger-zone" aria-labelledby="sash-danger-title">
+                    <h2 class="workshop-section-heading" id="sash-danger-title">Ta bort båge</h2>
+                    <p>Borttagning raderar bågen och bildfilerna. Det går inte att ångra.</p>
+                    <form method="POST" action="{{ route('app.sashes.destroy', [$project, $sash]) }}" data-confirm="Ta bort bågen {{ $sash->code }}? Bildfilerna tas bort.">
+                        @csrf
+                        @method('DELETE')
+                        <button class="workshop-button workshop-button--danger" type="submit">Ta bort båge</button>
+                    </form>
+                </section>
+            @endif
         </div>
     </div>
 @endsection

@@ -214,6 +214,26 @@
             @endif
         </section>
 
+        @if ($projectEvents->isNotEmpty())
+            <section class="sash-history" aria-labelledby="project-history-title">
+                <p class="workshop-eyebrow">VAD SOM HÄNT</p>
+                <h2 class="workshop-section-heading" id="project-history-title">Historik</h2>
+                <ol class="sash-history__list">
+                    @foreach ($projectEvents as $event)
+                        <li class="sash-history__item">
+                            <p class="sash-history__meta">
+                                <time datetime="{{ $event->created_at?->toAtomString() }}">{{ $event->created_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</time>
+                                <span>{{ $event->user_name }}</span>
+                            </p>
+                            @if (is_string($event->body) && $event->body !== '')
+                                <p>{{ $event->body }}</p>
+                            @endif
+                        </li>
+                    @endforeach
+                </ol>
+            </section>
+        @endif
+
         @if (auth()->user()?->isOwner())
             <section class="project-danger-zone" aria-labelledby="danger-title">
                 <h2 class="workshop-section-heading" id="danger-title">Ta bort projekt</h2>

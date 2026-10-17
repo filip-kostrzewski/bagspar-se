@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\StoredSashPhoto;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,33 @@ class Project extends Model
     public function windowSashes(): HasMany
     {
         return $this->hasMany(WindowSash::class);
+    }
+
+    /** @return HasMany<ProjectEvent, $this> */
+    public function events(): HasMany
+    {
+        return $this->hasMany(ProjectEvent::class);
+    }
+
+    public function recordEvent(User $user, string $kind, ?string $body = null): ProjectEvent
+    {
+        return $this->events()->create([
+            'user_id' => $user->getKey(),
+            'user_name' => $user->name,
+            'kind' => $kind,
+            'body' => $body,
+        ]);
+    }
+
+    public function deleteStoredPhotoFiles(): void
+    {
+        $paths = SashPhoto::query()
+            ->whereIn('sash_id', $this->windowSashes()->select('window_sashes.id'))
+            ->pluck('path');
+
+        foreach ($paths as $path) {
+            StoredSashPhoto::delete($path);
+        }
     }
 
     /**
