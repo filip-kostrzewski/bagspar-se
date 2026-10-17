@@ -1,3 +1,42 @@
+const trapDialogFocus = (dialog) => {
+    dialog.addEventListener('keydown', (event) => {
+        if (event.key !== 'Tab' || !dialog.open) {
+            return;
+        }
+
+        const focusable = [...dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')]
+            .filter((element) => element instanceof HTMLElement && element.getClientRects().length > 0);
+
+        if (focusable.length === 0) {
+            event.preventDefault();
+
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (event.shiftKey && (active === first || active === dialog)) {
+            event.preventDefault();
+            last.focus();
+
+            return;
+        }
+
+        if (!event.shiftKey && (active === last || active === dialog)) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+};
+
+const confirmDialog = document.querySelector('[data-confirm-dialog]');
+
+if (confirmDialog instanceof HTMLDialogElement) {
+    trapDialogFocus(confirmDialog);
+}
+
 const root = document.querySelector('[data-demo-card]');
 
 if (root) {

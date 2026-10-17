@@ -236,6 +236,17 @@ svg {
     color: #214734;
     font-size: 14px;
     font-weight: 650;
+    transition: opacity 280ms ease;
+}
+
+.workshop-flash.is-hiding {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .workshop-flash {
+        transition: none;
+    }
 }
 
 .workshop-flash__icon {
@@ -1693,12 +1704,16 @@ svg {
     gap: 17px;
 }
 
+.form-field > label.workshop-checkbox,
 .workshop-checkbox {
     display: flex;
+    flex-wrap: nowrap;
     align-items: flex-start;
+    justify-content: flex-start;
     gap: 10px;
     color: var(--ink-soft);
     font-size: 13px;
+    font-weight: 650;
     line-height: 1.45;
 }
 
@@ -1706,8 +1721,13 @@ svg {
     width: 20px;
     height: 20px;
     flex: 0 0 20px;
-    margin: 0;
+    margin: 1px 0 0;
     accent-color: var(--ink);
+}
+
+.workshop-checkbox > span {
+    min-width: 0;
+    flex: 1 1 auto;
 }
 
 .auth-page__links {
@@ -3089,6 +3109,13 @@ body.label-print-sheet {
     font-size: 22px;
     font-weight: 560;
     line-height: 1.35;
+}
+
+.workshop-dialog__text {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.45;
 }
 
 .workshop-dialog__actions {

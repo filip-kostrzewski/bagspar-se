@@ -2,6 +2,70 @@ document.querySelectorAll('[data-workshop-focus]').forEach((message) => {
     message.focus({ preventScroll: true });
 });
 
+document.querySelectorAll('.workshop-flash').forEach((flash) => {
+    window.setTimeout(() => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        flash.classList.add('is-hiding');
+
+        const hideFlash = () => {
+            if (flash.contains(document.activeElement)) {
+                const main = document.getElementById('main');
+
+                if (main) {
+                    if (! main.hasAttribute('tabindex')) {
+                        main.tabIndex = -1;
+                    }
+
+                    main.focus();
+                }
+            }
+
+            flash.hidden = true;
+        };
+
+        if (reduceMotion) {
+            hideFlash();
+
+            return;
+        }
+
+        window.setTimeout(hideFlash, 280);
+    }, 3000);
+});
+
+const trapDialogFocus = (dialog) => {
+    dialog.addEventListener('keydown', (event) => {
+        if (event.key !== 'Tab' || ! dialog.open) {
+            return;
+        }
+
+        const focusable = [...dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')]
+            .filter((element) => element instanceof HTMLElement && element.getClientRects().length > 0);
+
+        if (focusable.length === 0) {
+            event.preventDefault();
+
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (event.shiftKey && (active === first || active === dialog)) {
+            event.preventDefault();
+            last.focus();
+
+            return;
+        }
+
+        if (! event.shiftKey && (active === last || active === dialog)) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+};
+
 document.querySelectorAll('[data-password-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
         const input = document.getElementById(button.dataset.passwordToggle ?? '');
@@ -143,6 +207,7 @@ const confirmDialog = document.querySelector('[data-confirm-dialog]');
 let pendingConfirmForm = null;
 
 if (confirmDialog instanceof HTMLDialogElement) {
+    trapDialogFocus(confirmDialog);
     confirmDialog.addEventListener('close', () => {
         const form = pendingConfirmForm;
         pendingConfirmForm = null;

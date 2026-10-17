@@ -44,9 +44,13 @@ class DemoPageTest extends TestCase
         $response->assertSee('>Stäng<', false);
         $response->assertSee('data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort."', false);
         $response->assertSee('data-confirm-dialog', false);
+        $response->assertSee('aria-labelledby="demo-confirm-title"', false);
+        $response->assertSee('aria-describedby="demo-confirm-text"', false);
+        $response->assertSee('id="demo-confirm-title" class="site-dialog__title">Bekräfta</h2>', false);
         $response->assertSee('data-confirm-cancel', false);
         $demoScript = file_get_contents(public_path('js/demo.js'));
         $this->assertIsString($demoScript);
+        $this->assertStringContainsString("event.key !== 'Tab'", $demoScript);
         $this->assertStringNotContainsString('window.confirm', $demoScript);
         $response->assertSee('Börja med ett eget konto', false);
         $response->assertSee('Starta gratis pilot', false);

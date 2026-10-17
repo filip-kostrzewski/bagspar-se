@@ -55,14 +55,22 @@ class ProjectArchiveTest extends TestCase
         $this->get(route('app.projects.confirm-destroy', $project))->assertNotFound();
 
         $script = file_get_contents(public_path('js/workshop.js'));
+        $css = file_get_contents(public_path('css/workshop.css'));
         $this->assertIsString($script);
+        $this->assertIsString($css);
         $this->assertStringNotContainsString('window.confirm', $script);
+        $this->assertStringContainsString("event.key !== 'Tab'", $script);
+        $this->assertStringContainsString('is-hiding', $script);
+        $this->assertStringContainsString('.form-field > label.workshop-checkbox', $css);
 
         $this->actingAs($owner)->get(route('app.projects.show', $project))
             ->assertOk()
             ->assertSee('data-confirm="Arkivera projektet? Det döljs i den vanliga listan."', false)
-            ->assertSee('data-confirm-dialog', false)
-            ->assertSee('data-confirm-cancel', false)
+            ->assertSee('aria-labelledby="workshop-confirm-title"', false)
+            ->assertSee('aria-describedby="workshop-confirm-text"', false)
+            ->assertSee('id="workshop-confirm-title" class="workshop-dialog__title">Bekräfta</h2>', false)
+            ->assertSee('workshop-button--quiet" type="submit" value="cancel" data-confirm-cancel', false)
+            ->assertSee('workshop-button--primary" type="submit" value="confirm" data-confirm-accept', false)
             ->assertSee('project-danger-zone', false)
             ->assertSee('Pågående projekt', false);
 
@@ -73,6 +81,7 @@ class ProjectArchiveTest extends TestCase
         $this->assertNotNull($project->fresh()?->archived_at);
         $this->get(route('app.dashboard'))
             ->assertOk()
+            ->assertSee('role="status" aria-live="polite"', false)
             ->assertSee('Projektet har arkiverats.', false)
             ->assertSeeInOrder(['Pågående projekt', '0'], false)
             ->assertDontSee('Villa Ek', false)
