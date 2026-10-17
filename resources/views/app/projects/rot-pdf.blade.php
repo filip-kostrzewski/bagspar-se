@@ -28,12 +28,17 @@
             Timpris {{ \App\Support\Kronor::format($basis['hourly_rate_ore']) }}. Varje tidsrad är avrundad till öre.
         @endif
     </p>
+    @include('partials.workshop.rot-amounts')
     <h2>Arbetskostnad</h2>
-    <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}@if ($basis['labor_ore'] !== null), {{ \App\Support\Kronor::format($basis['labor_ore']) }}@endif.</p>
+    @if ($basis['labor_ore'] !== null)
+        <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}, {{ \App\Support\Kronor::format($basis['labor_ore']) }} exkl. moms.</p>
+    @else
+        <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}.</p>
+    @endif
     @if ($basis['labor_rows'] !== [])
         <table>
             <thead>
-                <tr><th>Datum</th><th>Båge</th><th>Person</th><th>Tid</th><th>Anteckning</th><th>Belopp</th></tr>
+                <tr><th>Datum</th><th>Båge</th><th>Person</th><th>Tid</th><th>Anteckning</th><th>Belopp exkl. moms</th></tr>
             </thead>
             <tbody>
                 @foreach ($basis['labor_rows'] as $row)
@@ -50,14 +55,14 @@
         </table>
     @endif
     <h2>Material</h2>
-    <p>Material {{ \App\Support\Kronor::format($basis['material_ore']) }}.</p>
+    <p>Material {{ \App\Support\Kronor::format($basis['material_ore']) }} exkl. moms.</p>
     @if ($basis['unpriced_material_count'] > 0)
         <p>Rader utan pris ingår inte i materialsumman.</p>
     @endif
     @if ($basis['material_rows'] !== [])
         <table>
             <thead>
-                <tr><th>Båge</th><th>Material</th><th>Mängd</th><th>À-pris</th><th>Belopp</th></tr>
+                <tr><th>Båge</th><th>Material</th><th>Mängd</th><th>À-pris exkl. moms</th><th>Belopp exkl. moms</th></tr>
             </thead>
             <tbody>
                 @foreach ($basis['material_rows'] as $row)

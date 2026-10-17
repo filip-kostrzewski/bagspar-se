@@ -64,7 +64,7 @@ class WindowSashController extends Controller
 
         app(ReadyCustomerNotifier::class)->sync($project);
 
-        return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Arbetskortet har skapats.');
+        return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Sparat');
     }
 
     public function show(Request $request, Project $project, WindowSash $sash): View
@@ -125,8 +125,8 @@ class WindowSashController extends Controller
 
         $sent = app(ReadyCustomerNotifier::class)->sync($project);
         $message = $sent
-            ? 'Arbetskortet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.'
-            : 'Arbetskortet har uppdaterats.';
+            ? 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.'
+            : 'Sparat';
 
         return back()->with('status', $message);
     }

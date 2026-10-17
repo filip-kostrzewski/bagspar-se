@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\WindowSash;
 use App\Models\WorkshopInvitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -226,6 +227,23 @@ class WorkshopInvitationTest extends TestCase
 
         Mail::assertNothingSent();
         $this->assertDatabaseHas('workshop_invitations', ['email' => 'ny@example.test']);
+    }
+
+    public function test_an_open_invitation_shows_the_swedish_expiry(): void
+    {
+        Mail::fake();
+        $this->travelTo(Carbon::parse('2026-10-17 10:00:00', 'UTC'));
+        $owner = User::factory()->create();
+
+        $this->actingAs($owner)
+            ->post(route('app.invitations.store'), ['email' => 'mede@example.test'])
+            ->assertRedirect();
+
+        $this->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('Gäller till 24 okt 2026 12:00', false)
+            ->assertDontSee('Gäller till 2026-10-24', false)
+            ->assertDontSee('kl. 12:00', false);
     }
 
     private function sentInvitationUrl(): string

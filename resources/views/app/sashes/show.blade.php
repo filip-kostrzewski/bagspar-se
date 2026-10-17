@@ -468,11 +468,17 @@
                                 <form method="POST" action="{{ route('app.sashes.photos.update', [$project, $sash, $photo]) }}">
                                     @csrf
                                     @method('PATCH')
-                                    <label class="visually-hidden" for="moment-{{ $photo->getKey() }}">Tillfälle för bilden</label>
-                                    <select id="moment-{{ $photo->getKey() }}" name="moment" required>
-                                        <option value="before" @selected($photo->moment !== 'after')>Före</option>
-                                        <option value="after" @selected($photo->moment === 'after')>Efter</option>
-                                    </select>
+                                    <fieldset class="moment-choice">
+                                        <legend class="visually-hidden">Tillfälle för bilden</legend>
+                                        <label for="moment-{{ $photo->getKey() }}-before">
+                                            <input type="radio" id="moment-{{ $photo->getKey() }}-before" value="before" name="moment" @checked($photo->moment !== 'after') required>
+                                            <span>Före</span>
+                                        </label>
+                                        <label for="moment-{{ $photo->getKey() }}-after">
+                                            <input type="radio" id="moment-{{ $photo->getKey() }}-after" value="after" name="moment" @checked($photo->moment === 'after')>
+                                            <span>Efter</span>
+                                        </label>
+                                    </fieldset>
                                     <button class="workshop-button workshop-button--quiet" type="submit">Spara tillfälle</button>
                                 </form>
                                 <form method="POST" action="{{ route('app.sashes.photos.destroy', [$project, $sash, $photo]) }}" data-confirm="Filen tas bort från lagringen." data-confirm-title="Ta bort bilden?">

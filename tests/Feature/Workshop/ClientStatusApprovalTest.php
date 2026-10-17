@@ -4,6 +4,7 @@ namespace Tests\Feature\Workshop;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Models\WindowSash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -25,6 +26,10 @@ class ClientStatusApprovalTest extends TestCase
             'client_status_enabled' => true,
             'client_status_token' => str_repeat('a', 48),
         ])->save();
+        WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'stage' => 'ready',
+        ]);
         $status = route('client-status.show', ['token' => $project->client_status_token]);
 
         $this->get($status)
@@ -119,5 +124,70 @@ class ClientStatusApprovalTest extends TestCase
             'name' => 'Kiko',
             'confirm' => '1',
         ])->assertNotFound();
+    }
+
+    public function test_approval_stays_closed_until_every_sash_is_ready(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+        ]);
+        $project->forceFill([
+            'client_status_enabled' => true,
+            'client_status_token' => str_repeat('d', 48),
+        ])->save();
+        $status = route('client-status.show', ['token' => $project->client_status_token]);
+        $payload = [
+            'name' => 'Kiko',
+            'confirm' => '1',
+        ];
+
+        $this->get($status)
+            ->assertOk()
+            ->assertSee('Du kan godkänna leveransen när alla bågar är klara.', false)
+            ->assertDontSee('name="confirm"', false);
+
+        $this->post(route('client-status.approve', ['token' => $project->client_status_token]), $payload)
+            ->assertRedirect($status)
+            ->assertSessionHas('status', 'Du kan godkänna leveransen när alla bågar är klara.');
+        $this->assertNull($project->fresh()->delivery_approved_at);
+
+        $glazing = WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'stage' => 'glazing',
+        ]);
+        WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'stage' => 'ready',
+        ]);
+
+        $this->get($status)
+            ->assertOk()
+            ->assertSee('Du kan godkänna leveransen när alla bågar är klara.', false)
+            ->assertDontSee('name="confirm"', false);
+
+        $this->post(route('client-status.approve', ['token' => $project->client_status_token]), $payload)
+            ->assertRedirect($status)
+            ->assertSessionHas('status', 'Du kan godkänna leveransen när alla bågar är klara.');
+        $this->assertNull($project->fresh()->delivery_approved_at);
+
+        $glazing->update(['stage' => 'ready']);
+
+        $this->get($status)
+            ->assertOk()
+            ->assertSee('name="confirm"', false)
+            ->assertDontSee('Du kan godkänna leveransen när alla bågar är klara.', false);
+
+        $this->post(route('client-status.approve', ['token' => $project->client_status_token]), $payload)
+            ->assertRedirect($status)
+            ->assertSessionHas('status', 'Leveransen är godkänd.');
+        $this->assertNotNull($project->fresh()->delivery_approved_at);
+
+        $glazing->update(['stage' => 'painting']);
+
+        $this->get($status)
+            ->assertOk()
+            ->assertSee('Leveransen godkändes', false)
+            ->assertDontSee('name="confirm"', false);
     }
 }

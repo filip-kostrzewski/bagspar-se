@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 
 final class RotUnderlag
 {
+    public const VAT_PERCENT = 25;
+
     public const HEADING = 'Underlag, inte skatterådgivning';
 
     public const BODY = 'Beloppen kommer från verkstadens egen tid och egna materialpriser. Bågspår räknar inte rotavdrag, skatt eller vad som får dras av. Kontrollera timpris, priser och regler själv innan underlaget används. Det här är inte en offert och inte en faktura.';
@@ -23,7 +25,10 @@ final class RotUnderlag
      *     labor_rows: list<array{date: mixed, sash: string, person: string, minutes: int, note: string, ore: ?int}>,
      *     material_rows: list<array{sash: string, label: string, description: string, quantity: string, unit: string, unit_price_ore: ?int, ore: ?int}>,
      *     material_ore: int,
-     *     unpriced_material_count: int
+     *     unpriced_material_count: int,
+     *     labor_amounts: array{net: ?int, vat: ?int, gross: ?int},
+     *     material_amounts: array{net: int, vat: int, gross: int},
+     *     total_amounts: array{net: ?int, vat: ?int, gross: ?int}
      * }
      */
     public static function make(Collection $entries, Collection $materials, ?int $hourlyRateOre): array
@@ -91,6 +96,10 @@ final class RotUnderlag
             }
         }
 
+        $laborAmounts = self::amounts($laborOre);
+        $materialAmounts = self::amounts($materialOre);
+        $totalAmounts = self::amounts($laborOre === null ? null : $laborOre + $materialOre);
+
         return [
             'hourly_rate_ore' => $hourlyRateOre,
             'labor_minutes' => (int) $entries->sum('minutes'),
@@ -100,7 +109,33 @@ final class RotUnderlag
             'material_rows' => $materialRows,
             'material_ore' => $materialOre,
             'unpriced_material_count' => $unpriced,
+            'labor_amounts' => $laborAmounts,
+            'material_amounts' => $materialAmounts,
+            'total_amounts' => $totalAmounts,
         ];
+    }
+
+    /**
+     * @return array{net: ?int, vat: ?int, gross: ?int}
+     */
+    public static function amounts(?int $netOre): array
+    {
+        if ($netOre === null) {
+            return ['net' => null, 'vat' => null, 'gross' => null];
+        }
+
+        $vat = self::vatOre($netOre);
+
+        return [
+            'net' => $netOre,
+            'vat' => $vat,
+            'gross' => $netOre + $vat,
+        ];
+    }
+
+    public static function vatOre(int $netOre): int
+    {
+        return (int) round($netOre * self::VAT_PERCENT / 100);
     }
 
     public static function laborOre(int $minutes, int $hourlyRateOre): int

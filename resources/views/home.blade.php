@@ -136,7 +136,7 @@
                         ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'height' => 1402, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
                         ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-scraping', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Färg skrapas av en äldre träbåge'],
                         ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-repair', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Trä lagas i en fönsterbåge'],
-                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-glazing', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Nytt kitt stryks mot glaset i en träbåge'],
+                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-glazing', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Kitt stryks mot glaset i en äldre träbåge', 'version' => substr(hash_file('sha256', public_path('images/workshop-glazing.webp')), 0, 12)],
                         ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-painting', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En träbåge målas med pensel'],
                         ['key' => 'ready', 'number' => '06', 'label' => 'Klar', 'description' => 'Bågen är klar i verkstaden. Rapporten samlar nummer, rum, steg och bilder.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
                     ];
@@ -150,8 +150,8 @@
                             data-step="{{ $workflowStep['key'] }}"
                             data-description="{{ $workflowStep['description'] }}"
                             data-status="{{ $workflowStep['label'] }}"
-                            data-image="{{ asset('images/'.$workflowStep['image'].'.webp') }}"
-                            data-image-small="{{ asset('images/'.$workflowStep['image'].'-small.webp') }}"
+                            data-image="{{ asset('images/'.$workflowStep['image'].'.webp') }}{{ isset($workflowStep['version']) ? '?v='.$workflowStep['version'] : '' }}"
+                            data-image-small="{{ asset('images/'.$workflowStep['image'].'-small.webp') }}{{ isset($workflowStep['version']) ? '?v='.$workflowStep['version'] : '' }}"
                             data-image-small-width="{{ $workflowStep['smallWidth'] }}"
                             data-image-width="{{ $workflowStep['width'] }}"
                             data-image-height="{{ $workflowStep['height'] }}"
@@ -209,6 +209,7 @@
     @php
         $labelShotVersion = substr(hash_file('sha256', public_path('images/product/qr-etikett.webp')), 0, 12);
         $reportShotVersion = substr(hash_file('sha256', public_path('images/product/projektrapport.webp')), 0, 12);
+        $glazingVersion = substr(hash_file('sha256', public_path('images/workshop-glazing.webp')), 0, 12);
     @endphp
     <section class="guide-ribbon section-space page-shell" aria-labelledby="guide-ribbon-title">
         <div class="guide-ribbon__heading" data-reveal>
@@ -224,7 +225,7 @@
                 <span class="guide-teaser__copy"><span>Märkning</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.work-card') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-glazing-small.webp') }}" srcset="{{ asset('images/workshop-glazing-small.webp') }} 600w, {{ asset('images/workshop-glazing.webp') }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Nytt kitt stryks mot glaset i en träbåge" width="1200" height="800" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-glazing-small.webp') }}?v={{ $glazingVersion }}" srcset="{{ asset('images/workshop-glazing-small.webp') }}?v={{ $glazingVersion }} 600w, {{ asset('images/workshop-glazing.webp') }}?v={{ $glazingVersion }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Kitt stryks mot glaset i en äldre träbåge" width="1200" height="800" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Arbetskort</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.documentation') }}" data-reveal>

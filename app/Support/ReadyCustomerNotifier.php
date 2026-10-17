@@ -14,10 +14,8 @@ class ReadyCustomerNotifier
     public function sync(Project $project): bool
     {
         $project->refresh();
-        $stages = $project->windowSashes()->pluck('stage');
-        $allReady = $stages->isNotEmpty() && $stages->every(fn (mixed $stage): bool => $stage === 'ready');
 
-        if (! $allReady) {
+        if (! $project->allSashesAreReady()) {
             if ($project->customer_ready_notified_at !== null) {
                 $project->customer_ready_notified_at = null;
                 $project->save();

@@ -40,6 +40,9 @@
             @if ($project->customerLabel())
                 <tr><th>Kund</th><td>{{ $project->customerLabel() }}</td></tr>
             @endif
+            @if ($project->customer?->phone)
+                <tr><th>Telefon</th><td>{{ $project->customer->phone }}</td></tr>
+            @endif
             @if ($project->location)
                 <tr><th>Plats</th><td>{{ $project->location }}</td></tr>
             @endif
@@ -121,6 +124,10 @@
 
     @if (is_string($clientStatusUrl))
         <h2>Status för kunden</h2>
+        @if (is_string($clientStatusQr) && $clientStatusQr !== '')
+            <p>Skanna koden för att se etapperna och bilderna före och efter. Anteckningar ingår inte.</p>
+            <div>{!! $clientStatusQr !!}</div>
+        @endif
         <p>{{ $clientStatusUrl }}</p>
     @endif
 

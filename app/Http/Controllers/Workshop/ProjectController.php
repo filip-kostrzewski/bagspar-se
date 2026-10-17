@@ -57,7 +57,7 @@ class ProjectController extends Controller
         $validated = $this->withCustomer($workshop, $request, $validated);
         $project = $workshop->projects()->create($validated);
 
-        return redirect()->route('app.projects.show', $project)->with('status', 'Projektet har sparats.');
+        return redirect()->route('app.projects.show', $project)->with('status', 'Sparat');
     }
 
     public function show(Request $request, Project $project): View
@@ -127,11 +127,9 @@ class ProjectController extends Controller
         $validated = $this->withCustomer($workshop, $request, $validated);
         $project->update($validated);
         $sent = app(ReadyCustomerNotifier::class)->sync($project);
-        $message = $request->input('form_context') === 'project'
-            ? ($sent
-                ? 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.'
-                : 'Sparat')
-            : 'Projektet har uppdaterats.';
+        $message = $sent && $request->input('form_context') === 'project'
+            ? 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.'
+            : 'Sparat';
 
         return back()->with('status', $message);
     }

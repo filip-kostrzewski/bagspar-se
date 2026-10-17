@@ -80,6 +80,8 @@
             <h2 id="approval-title">Godkänn leverans</h2>
             @if ($project->delivery_approved_at)
                 <p>Leveransen godkändes {{ \App\Support\SwedishDate::formatDateTime($project->delivery_approved_at) }}@if (is_string($project->delivery_approved_name) && $project->delivery_approved_name !== '') av {{ $project->delivery_approved_name }}@endif. Tidpunkten står på verkstadens projektrapport.</p>
+            @elseif (! $sashes->isNotEmpty() || ! $sashes->every(fn ($sash): bool => $sash->stage === 'ready'))
+                <p>Du kan godkänna leveransen när alla bågar är klara.</p>
             @else
                 <p>När du tar emot arbetet kan du lämna ditt namn. Tidpunkten sparas på verkstadens projektrapport.</p>
                 @if ($errors->any())

@@ -21,6 +21,10 @@ class ClientStatusApprovalController extends Controller
             return $back->with('status', 'Leveransen är redan godkänd.');
         }
 
+        if (! $project->allSashesAreReady()) {
+            return $back->with('status', 'Du kan godkänna leveransen när alla bågar är klara.');
+        }
+
         $name = $request->input('name');
 
         if (is_string($name)) {

@@ -447,7 +447,8 @@ class WorkshopWorkspaceTest extends TestCase
         $this->actingAs($owner)->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
             ->assertDontSee('Välj före eller efter', false)
-            ->assertSee('value="before" selected', false)
+            ->assertSee('id="moment-'.$untagged->getKey().'-before" value="before" name="moment" checked', false)
+            ->assertSee('id="moment-'.$after->getKey().'-after" value="after" name="moment" checked', false)
             ->assertSeeInOrder([
                 route('app.sashes.photos.show', [$project, $sash, $untagged]),
                 route('app.sashes.photos.show', [$project, $sash, $before]),

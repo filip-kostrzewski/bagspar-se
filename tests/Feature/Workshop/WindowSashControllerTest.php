@@ -72,7 +72,7 @@ class WindowSashControllerTest extends TestCase
         $sash = $project->windowSashes()->firstOrFail();
 
         $response->assertRedirect(route('app.sashes.show', [$project, $sash]))
-            ->assertSessionHas('status', 'Arbetskortet har skapats.');
+            ->assertSessionHas('status', 'Sparat');
 
         $this->assertDatabaseHas('window_sashes', [
             'id' => $sash->getKey(),
@@ -87,7 +87,7 @@ class WindowSashControllerTest extends TestCase
         $this->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
             ->assertSee('Båge B-24')
-            ->assertSee('Arbetskortet har skapats.');
+            ->assertSee('Sparat');
     }
 
     public function test_missing_sash_code_returns_to_form_with_validation_message(): void

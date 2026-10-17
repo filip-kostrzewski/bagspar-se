@@ -47,7 +47,7 @@ class ProjectRotController extends Controller
 
             fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, [RotUnderlag::HEADING.'. '.RotUnderlag::BODY], ';', '"', '\\');
-            fputcsv($handle, ['Radtyp', 'Datum', 'Båge', 'Person eller material', 'Tid eller mängd', 'Anteckning', 'Pris (kr)', 'Belopp (kr)'], ';', '"', '\\');
+            fputcsv($handle, ['Radtyp', 'Datum', 'Båge', 'Person eller material', 'Tid eller mängd', 'Anteckning', 'Pris exkl. moms (kr)', 'Belopp exkl. moms (kr)', 'Moms 25 % (kr)', 'Inkl. moms (kr)'], ';', '"', '\\');
 
             foreach ($basis['labor_rows'] as $row) {
                 fputcsv($handle, [
@@ -59,6 +59,8 @@ class ProjectRotController extends Controller
                     $row['note'],
                     $basis['hourly_rate_ore'] === null ? '' : Kronor::amount($basis['hourly_rate_ore']),
                     $row['ore'] === null ? '' : Kronor::amount($row['ore']),
+                    '',
+                    '',
                 ], ';', '"', '\\');
             }
 
@@ -72,18 +74,25 @@ class ProjectRotController extends Controller
                     $row['ore'] === null ? 'Pris saknas' : '',
                     $row['unit_price_ore'] === null ? '' : Kronor::amount($row['unit_price_ore']),
                     $row['ore'] === null ? '' : Kronor::amount($row['ore']),
+                    '',
+                    '',
                 ], ';', '"', '\\');
             }
 
+            $labor = $basis['labor_amounts'];
+            $material = $basis['material_amounts'];
+            $total = $basis['total_amounts'];
             fputcsv($handle, [
                 'Summering',
                 '',
                 '',
                 'Arbetskostnad',
                 WorkDuration::label($basis['labor_minutes']),
-                $basis['labor_ore'] === null ? 'Timpris saknas' : '',
+                $labor['net'] === null ? 'Timpris saknas' : '',
                 '',
-                $basis['labor_ore'] === null ? '' : Kronor::amount($basis['labor_ore']),
+                $labor['net'] === null ? '' : Kronor::amount($labor['net']),
+                $labor['vat'] === null ? '' : Kronor::amount($labor['vat']),
+                $labor['gross'] === null ? '' : Kronor::amount($labor['gross']),
             ], ';', '"', '\\');
             fputcsv($handle, [
                 'Summering',
@@ -93,7 +102,21 @@ class ProjectRotController extends Controller
                 '',
                 $basis['unpriced_material_count'] > 0 ? 'Rader utan pris ingår inte' : '',
                 '',
-                Kronor::amount($basis['material_ore']),
+                Kronor::amount($material['net']),
+                Kronor::amount($material['vat']),
+                Kronor::amount($material['gross']),
+            ], ';', '"', '\\');
+            fputcsv($handle, [
+                'Summering',
+                '',
+                '',
+                'Totalt (arbetskostnad + material)',
+                '',
+                $total['net'] === null ? 'Kan inte räknas' : '',
+                '',
+                $total['net'] === null ? '' : Kronor::amount($total['net']),
+                $total['vat'] === null ? '' : Kronor::amount($total['vat']),
+                $total['gross'] === null ? '' : Kronor::amount($total['gross']),
             ], ';', '"', '\\');
 
             fclose($handle);

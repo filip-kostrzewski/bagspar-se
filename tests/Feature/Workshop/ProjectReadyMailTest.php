@@ -38,7 +38,7 @@ class ProjectReadyMailTest extends TestCase
         $this->actingAs($member)
             ->patch(route('app.sashes.update', [$project, $first]), ['stage' => 'ready'])
             ->assertRedirect()
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats.');
+            ->assertSessionHas('status', 'Sparat');
 
         Mail::assertNothingSent();
         $this->assertNull($project->fresh()?->customer_ready_notified_at);
@@ -46,7 +46,7 @@ class ProjectReadyMailTest extends TestCase
 
         $this->patch(route('app.sashes.update', [$project, $second]), ['stage' => 'ready'])
             ->assertRedirect()
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.');
+            ->assertSessionHas('status', 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.');
 
         $project->refresh();
         $this->assertNotNull($project->customer_ready_notified_at);
@@ -66,7 +66,7 @@ class ProjectReadyMailTest extends TestCase
         });
 
         $this->patch(route('app.sashes.update', [$project, $second]), ['notes' => 'HEMLIG BÅGANTECKNING'])
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats.');
+            ->assertSessionHas('status', 'Sparat');
         Mail::assertSent(ProjectReadyMail::class, 1);
 
         $this->patch(route('app.sashes.update', [$project, $second]), ['stage' => 'painting']);
@@ -74,11 +74,11 @@ class ProjectReadyMailTest extends TestCase
         Mail::assertSent(ProjectReadyMail::class, 1);
 
         $this->patch(route('app.sashes.update', [$project, $second]), ['stage' => 'ready'])
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.');
+            ->assertSessionHas('status', 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.');
         Mail::assertSent(ProjectReadyMail::class, 2);
 
         $this->post(route('app.sashes.store', $project), ['code' => 'V3'])
-            ->assertSessionHas('status', 'Arbetskortet har skapats.');
+            ->assertSessionHas('status', 'Sparat');
         $this->assertNull($project->fresh()?->customer_ready_notified_at);
 
         $third = WindowSash::query()->where('code', 'V3')->firstOrFail();
@@ -108,7 +108,7 @@ class ProjectReadyMailTest extends TestCase
 
         $this->actingAs($owner)
             ->patch(route('app.sashes.update', [$project, $sash]), ['stage' => 'ready'])
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats.');
+            ->assertSessionHas('status', 'Sparat');
 
         Mail::assertNothingSent();
         $this->assertNull($project->fresh()?->customer_ready_notified_at);
@@ -128,7 +128,7 @@ class ProjectReadyMailTest extends TestCase
         $this->assertTrue((bool) $project->fresh()?->notify_customer_when_ready);
 
         $this->patch(route('app.projects.update', $project), ['status' => 'completed'])
-            ->assertSessionHas('status', 'Projektet har uppdaterats.');
+            ->assertSessionHas('status', 'Sparat');
         $this->assertTrue((bool) $project->fresh()?->notify_customer_when_ready);
         Mail::assertSent(ProjectReadyMail::class, 1);
     }
@@ -155,7 +155,7 @@ class ProjectReadyMailTest extends TestCase
         $this->actingAs($owner)
             ->patch(route('app.sashes.update', [$project, $sash]), ['stage' => 'ready'])
             ->assertRedirect()
-            ->assertSessionHas('status', 'Arbetskortet har uppdaterats.');
+            ->assertSessionHas('status', 'Sparat');
 
         $this->assertSame('ready', $sash->fresh()?->stage);
         $this->assertNull($project->fresh()?->customer_ready_notified_at);

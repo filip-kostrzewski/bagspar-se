@@ -2508,6 +2508,10 @@ svg {
         font-size: 11px;
     }
 
+    .photo-card figcaption .moment-choice {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     .photo-upload-panel {
         padding: 18px 16px;
     }
@@ -3296,26 +3300,57 @@ body.label-print-sheet {
 }
 
 .moment-choice {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
     margin: 0;
     padding: 0;
     border: 0;
+    min-width: 0;
 }
 
 .moment-choice legend {
-    margin-bottom: 8px;
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0;
     font-size: 14px;
     font-weight: 800;
 }
 
 .moment-choice label {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    min-height: 44px;
-    margin: 0 8px 8px 0;
-    padding: 8px 14px;
+    min-height: 48px;
+    margin: 0;
+    padding: 8px 12px;
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.moment-choice input {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    accent-color: var(--ink);
+}
+
+.moment-choice label:has(input:checked) {
+    border-color: var(--ink);
+    background: var(--paper-deep);
+}
+
+.moment-choice .form-field__error {
+    grid-column: 1 / -1;
+}
+
+.photo-upload-form > .moment-choice {
+    grid-column: 1 / -1;
 }
 
 .photo-card figcaption form {
@@ -3326,8 +3361,9 @@ body.label-print-sheet {
     margin-top: 8px;
 }
 
-.photo-card figcaption select {
-    min-height: 40px;
+.photo-card figcaption .moment-choice {
+    flex: 1 1 100%;
+    width: 100%;
 }
 
 .report-notes-toggle {

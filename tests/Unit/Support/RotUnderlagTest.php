@@ -14,5 +14,12 @@ class RotUnderlagTest extends TestCase
         $this->assertSame(160000, RotUnderlag::materialOre('2', 80000));
         $this->assertSame(200000, RotUnderlag::materialOre('2.50', 80000));
         $this->assertSame(0, RotUnderlag::materialOre('0.01', 1));
+        $this->assertSame(24375, RotUnderlag::vatOre(97500));
+        $this->assertSame(40000, RotUnderlag::vatOre(160000));
+        $this->assertSame(64375, RotUnderlag::vatOre(257500));
+        $this->assertSame(
+            ['net' => null, 'vat' => null, 'gross' => null],
+            RotUnderlag::amounts(null),
+        );
     }
 }

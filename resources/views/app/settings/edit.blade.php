@@ -129,7 +129,7 @@
                         <li class="staff-list__item">
                             <div>
                                 <strong>{{ $invitation->email }}</strong>
-                                <p class="staff-list__meta">Gäller till {{ $invitation->expires_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</p>
+                                <p class="staff-list__meta">Gäller till {{ \App\Support\SwedishDate::formatDateTime($invitation->expires_at) }}</p>
                             </div>
                             <form method="POST" action="{{ route('app.invitations.destroy', $invitation) }}">
                                 @csrf

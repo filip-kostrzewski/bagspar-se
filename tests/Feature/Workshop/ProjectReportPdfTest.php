@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Workshop;
 
+use App\Models\Customer;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\WindowSash;
 use App\Support\EmbeddedImage;
+use App\Support\ProjectReport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -93,5 +95,43 @@ class ProjectReportPdfTest extends TestCase
         $this->actingAs($owner)
             ->get(route('app.projects.report.pdf', $project))
             ->assertOk();
+    }
+
+    public function test_the_pdf_markup_includes_the_customer_phone_and_the_status_qr(): void
+    {
+        $owner = User::factory()->create();
+        $customer = Customer::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'phone' => '070-111 22 33',
+        ]);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'customer_id' => $customer->getKey(),
+        ]);
+        $project->forceFill([
+            'client_status_enabled' => true,
+            'client_status_token' => str_repeat('d', 48),
+        ])->save();
+
+        $html = view('app.projects.report-pdf', [
+            ...ProjectReport::data($owner->workshop, $project->fresh(), false, false),
+            'photoEmbeds' => [],
+            'logoEmbed' => null,
+        ])->render();
+
+        $this->assertStringContainsString('070-111 22 33', $html);
+        $this->assertStringContainsString('Skanna koden', $html);
+        $this->assertStringContainsString('<svg', $html);
+
+        $project->forceFill(['client_status_enabled' => false])->save();
+
+        $withoutLink = view('app.projects.report-pdf', [
+            ...ProjectReport::data($owner->workshop, $project->fresh(), false, false),
+            'photoEmbeds' => [],
+            'logoEmbed' => null,
+        ])->render();
+
+        $this->assertStringContainsString('070-111 22 33', $withoutLink);
+        $this->assertStringNotContainsString('Skanna koden', $withoutLink);
     }
 }

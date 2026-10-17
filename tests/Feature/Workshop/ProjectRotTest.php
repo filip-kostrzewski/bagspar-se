@@ -49,7 +49,7 @@ class ProjectRotTest extends TestCase
                 'hourly_rate' => '650',
             ])
             ->assertRedirect()
-            ->assertSessionHas('status', 'Verkstadens uppgifter har sparats.');
+            ->assertSessionHas('status', 'Sparat');
         $this->assertSame(65000, $owner->workshop->fresh()->hourly_rate_ore);
 
         $this->actingAs($member)
@@ -102,7 +102,19 @@ class ProjectRotTest extends TestCase
             ->assertSee('Timpris 650 kr.', false)
             ->assertSee('Ägaren ändrar timpriset under verkstadens uppgifter.', false)
             ->assertDontSee('>Ändra timpriset</a>', false)
-            ->assertSee('Totalt 1 tim 30 min, 975 kr.', false)
+            ->assertSee('Totalt 1 tim 30 min, 975 kr exkl. moms.', false)
+            ->assertSee('Arbetskostnad', false)
+            ->assertSee('243,75 kr', false)
+            ->assertSee('1 218,75 kr', false)
+            ->assertSee('400 kr', false)
+            ->assertSee('2 000 kr', false)
+            ->assertSee('2 575 kr', false)
+            ->assertSee('643,75 kr', false)
+            ->assertSee('3 218,75 kr', false)
+            ->assertSee('Exkl. moms', false)
+            ->assertSee('Moms 25 %', false)
+            ->assertSee('Inkl. moms', false)
+            ->assertSee('Totalt (arbetskostnad + material)', false)
             ->assertSee('Bo Berg', false)
             ->assertSee('Kittade bågen', false)
             ->assertSee('16 okt 2026', false)
@@ -112,7 +124,7 @@ class ProjectRotTest extends TestCase
             ->assertSee('Linoljekitt', false)
             ->assertSee('Pris saknas', false)
             ->assertSee('1 rad saknar pris och ingår inte i materialsumman.', false)
-            ->assertSee('Material 1 600 kr.', false)
+            ->assertSee('Material 1 600 kr exkl. moms.', false)
             ->assertDontSee('30 %', false)
             ->assertDontSee('30%', false);
 
@@ -132,8 +144,10 @@ class ProjectRotTest extends TestCase
         $this->assertStringContainsString('Arbetstid;"16 okt 2026";V2-H;"Bo Berg";"1 tim 30 min";"Kittade bågen";650;975', $body);
         $this->assertStringContainsString('Material;;V2-H;"Glas, Energiglas";"2 m²";;800;"1 600"', $body);
         $this->assertStringContainsString('Material;;K1;"Kitt, Linoljekitt";"1 kg";"Pris saknas";;', $body);
-        $this->assertStringContainsString('Summering;;;Arbetskostnad;"1 tim 30 min";;;975', $body);
-        $this->assertStringContainsString('Summering;;;Material;;"Rader utan pris ingår inte";;"1 600"', $body);
+        $this->assertStringContainsString('Summering;;;Arbetskostnad;"1 tim 30 min";;;975;243,75;"1 218,75"', $body);
+        $this->assertStringContainsString('Summering;;;Material;;"Rader utan pris ingår inte";;"1 600";400;"2 000"', $body);
+        $this->assertStringContainsString('Summering;;;"Totalt (arbetskostnad + material)";;;;"2 575";643,75;"3 218,75"', $body);
+        $this->assertStringContainsString('Belopp exkl. moms (kr)', $body);
         $this->assertStringNotContainsString('30%', $body);
 
         $pdf = $this->get(route('app.projects.rot.pdf', $project));
@@ -164,6 +178,7 @@ class ProjectRotTest extends TestCase
             ->assertSee('Inget timpris är sparat.', false)
             ->assertSee('Totalt 1 tim.', false)
             ->assertSee('Timpris saknas', false)
+            ->assertSee('Kan inte räknas', false)
             ->assertDontSee('975 kr', false);
     }
 

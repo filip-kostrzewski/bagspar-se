@@ -38,7 +38,7 @@ class WorkshopSettingsControllerTest extends TestCase
             'contact_email' => '  VERKSTAD@EXAMPLE.TEST ',
             'address' => '  Storgatan 1, Uppsala  ',
         ])->assertRedirect()
-            ->assertSessionHas('status', 'Verkstadens uppgifter har sparats.');
+            ->assertSessionHas('status', 'Sparat');
 
         $workshop = $owner->workshop->fresh();
         $this->assertSame('Ekens Fönster', $workshop->name);
@@ -118,7 +118,7 @@ class WorkshopSettingsControllerTest extends TestCase
                 'hourly_rate' => '650,50',
                 'hourly_rate_ore' => 1,
             ])->assertRedirect()
-            ->assertSessionHas('status', 'Verkstadens uppgifter har sparats.');
+            ->assertSessionHas('status', 'Sparat');
 
         $this->assertSame(65050, $owner->workshop->fresh()->hourly_rate_ore);
 

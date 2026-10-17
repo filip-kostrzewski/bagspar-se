@@ -40,9 +40,15 @@
             @endif
         </p>
 
+        @include('partials.workshop.rot-amounts')
+
         <section aria-labelledby="labor-title">
             <h2 class="workshop-section-heading" id="labor-title">Arbetskostnad</h2>
-            <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}@if ($basis['labor_ore'] !== null), {{ \App\Support\Kronor::format($basis['labor_ore']) }}@endif.</p>
+            @if ($basis['labor_ore'] !== null)
+                <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}, {{ \App\Support\Kronor::format($basis['labor_ore']) }} exkl. moms.</p>
+            @else
+                <p>Totalt {{ \App\Support\WorkDuration::label($basis['labor_minutes']) }}.</p>
+            @endif
             @if ($basis['people'] !== [])
                 <table class="report-time">
                     <caption>Arbetstid per person</caption>
@@ -50,7 +56,7 @@
                         <tr>
                             <th scope="col">Person</th>
                             <th scope="col">Tid</th>
-                            <th scope="col">Belopp</th>
+                            <th scope="col">Belopp exkl. moms</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +82,7 @@
                             <th scope="col">Person</th>
                             <th scope="col">Tid</th>
                             <th scope="col">Anteckning</th>
-                            <th scope="col">Belopp</th>
+                            <th scope="col">Belopp exkl. moms</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,7 +103,7 @@
 
         <section aria-labelledby="material-title">
             <h2 class="workshop-section-heading" id="material-title">Material</h2>
-            <p>Material {{ \App\Support\Kronor::format($basis['material_ore']) }}.</p>
+            <p>Material {{ \App\Support\Kronor::format($basis['material_ore']) }} exkl. moms.</p>
             @if ($basis['unpriced_material_count'] > 0)
                 <p>{{ $basis['unpriced_material_count'] === 1 ? '1 rad saknar pris och ingår inte i materialsumman.' : $basis['unpriced_material_count'].' rader saknar pris och ingår inte i materialsumman.' }}</p>
             @endif
@@ -111,8 +117,8 @@
                             <th scope="col">Båge</th>
                             <th scope="col">Material</th>
                             <th scope="col">Mängd</th>
-                            <th scope="col">À-pris</th>
-                            <th scope="col">Belopp</th>
+                            <th scope="col">À-pris exkl. moms</th>
+                            <th scope="col">Belopp exkl. moms</th>
                         </tr>
                     </thead>
                     <tbody>

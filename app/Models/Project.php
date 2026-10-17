@@ -146,6 +146,13 @@ class Project extends Model
             && $this->client_status_token !== '';
     }
 
+    public function allSashesAreReady(): bool
+    {
+        $stages = $this->windowSashes()->pluck('stage');
+
+        return $stages->isNotEmpty() && $stages->every(fn (mixed $stage): bool => $stage === 'ready');
+    }
+
     public function issueClientStatusToken(): void
     {
         $this->client_status_token = Str::random(48);
