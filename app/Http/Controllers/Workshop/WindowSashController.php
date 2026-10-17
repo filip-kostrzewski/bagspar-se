@@ -15,10 +15,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class WindowSashController extends Controller
 {
+    private const MAX_BULK_LINES = 200;
+
     public function create(Request $request, Project $project): View
     {
         $workshop = $this->currentWorkshop($request);
@@ -65,6 +68,40 @@ class WindowSashController extends Controller
         app(ReadyCustomerNotifier::class)->sync($project);
 
         return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Sparat');
+    }
+
+    public function storeMany(Request $request, Project $project): RedirectResponse
+    {
+        $workshop = $this->currentWorkshop($request);
+        $project = $this->projectForWorkshop($workshop, $project);
+        $validated = $request->validate([
+            'lines' => ['required', 'string', 'max:100000'],
+        ], [
+            'lines.required' => 'Skriv minst en båge, en per rad.',
+            'lines.string' => 'Ange bågarna som text.',
+            'lines.max' => 'Listan är för lång. Lägg till bågarna i flera omgångar.',
+        ]);
+
+        $sashes = $this->parseBulkLines($validated['lines'], $project);
+        $actor = $request->user();
+
+        DB::transaction(function () use ($actor, $project, $sashes): void {
+            foreach ($sashes as $attributes) {
+                $sash = $project->windowSashes()->create($attributes + ['stage' => 'received']);
+
+                if ($actor instanceof User) {
+                    $sash->recordEvent($actor, SashEvent::KIND_STAGE, $sash->stage);
+                }
+            }
+        });
+
+        app(ReadyCustomerNotifier::class)->sync($project);
+
+        $count = count($sashes);
+
+        return redirect()
+            ->route('app.projects.show', $project)
+            ->with('status', $count.' '.($count === 1 ? 'båge tillagd.' : 'bågar tillagda.'));
     }
 
     public function show(Request $request, Project $project, WindowSash $sash): View
@@ -186,6 +223,74 @@ class WindowSashController extends Controller
         return redirect()
             ->route('app.projects.show', $project)
             ->with('status', 'Bågen och bildfilerna har tagits bort.');
+    }
+
+    /**
+     * @return list<array{code: string, room: string|null, location: string|null}>
+     */
+    private function parseBulkLines(string $input, Project $project): array
+    {
+        $existingCodes = $project->windowSashes()->pluck('code')
+            ->map(fn (string $code): string => mb_strtolower($code))
+            ->flip();
+        $seen = [];
+        $sashes = [];
+        $errors = [];
+
+        foreach (preg_split('/\R/u', $input) ?: [] as $index => $line) {
+            $lineNumber = $index + 1;
+
+            if (trim($line) === '') {
+                continue;
+            }
+
+            if (count($sashes) >= self::MAX_BULK_LINES) {
+                $errors[] = 'Du kan lägga till högst '.self::MAX_BULK_LINES.' bågar åt gången. Rad '.$lineNumber.' och de efter den ryms inte.';
+                break;
+            }
+
+            $parts = array_map('trim', explode(';', $line));
+            [$code, $room, $location] = $parts + [1 => '', 2 => ''];
+
+            if (count($parts) > 3) {
+                $errors[] = 'Rad '.$lineNumber.': använd högst två semikolon (kod; rum; placering).';
+            } elseif ($code === '') {
+                $errors[] = 'Rad '.$lineNumber.': koden saknas.';
+            } elseif (mb_strlen($code) > 120) {
+                $errors[] = 'Rad '.$lineNumber.': koden får vara högst 120 tecken.';
+            } elseif (mb_strlen($room) > 120) {
+                $errors[] = 'Rad '.$lineNumber.': rummet får vara högst 120 tecken.';
+            } elseif (mb_strlen($location) > 160) {
+                $errors[] = 'Rad '.$lineNumber.': placeringen får vara högst 160 tecken.';
+            } elseif ($existingCodes->has(mb_strtolower($code))) {
+                $errors[] = 'Rad '.$lineNumber.': koden '.$code.' används redan i det här projektet.';
+            } elseif (isset($seen[mb_strtolower($code)])) {
+                $errors[] = 'Rad '.$lineNumber.': koden '.$code.' finns redan på rad '.$seen[mb_strtolower($code)].'.';
+            } else {
+                $seen[mb_strtolower($code)] = $lineNumber;
+                $sashes[] = [
+                    'code' => $code,
+                    'room' => $room === '' ? null : $room,
+                    'location' => $location === '' ? null : $location,
+                ];
+            }
+        }
+
+        if ($errors === [] && $sashes === []) {
+            $errors[] = 'Skriv minst en båge, en per rad.';
+        }
+
+        if ($errors !== []) {
+            $shown = array_slice($errors, 0, 10);
+
+            if (count($errors) > count($shown)) {
+                $shown[] = '…och '.(count($errors) - count($shown)).' fel till.';
+            }
+
+            throw ValidationException::withMessages(['lines' => $shown]);
+        }
+
+        return $sashes;
     }
 
     private function normalizedNote(mixed $notes): string

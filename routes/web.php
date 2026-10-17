@@ -197,6 +197,7 @@ Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.acce
     Route::patch('/projekt/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('projects.update');
     Route::get('/projekt/{project}/bagar/nytt', [WindowSashController::class, 'create'])->whereNumber('project')->name('sashes.create');
     Route::post('/projekt/{project}/bagar', [WindowSashController::class, 'store'])->whereNumber('project')->name('sashes.store');
+    Route::post('/projekt/{project}/bagar/flera', [WindowSashController::class, 'storeMany'])->whereNumber('project')->name('sashes.store-many');
     Route::get('/projekt/{project}/bagar/{sash}/qr', SashQrCodeController::class)->whereNumber(['project', 'sash'])->name('sashes.qr');
     Route::get('/projekt/{project}/bagar/{sash}/etikett', [LabelPrintController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.label');
     Route::get('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.show');

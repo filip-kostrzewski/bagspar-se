@@ -171,7 +171,7 @@ class IntakeProtocolTest extends TestCase
 
         foreach (range(1, 5) as $number) {
             $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('fore'.$number.'.jpg', 40, 30),
+                'photos' => [UploadedFile::fake()->image('fore'.$number.'.jpg', 40, 30)],
                 'moment' => 'before',
             ])->assertRedirect();
         }

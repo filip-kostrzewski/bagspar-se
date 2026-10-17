@@ -64,7 +64,7 @@ class ProjectReportPdfTest extends TestCase
         $this->assertNotSame($plain, $withTime);
 
         $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-            'photo' => UploadedFile::fake()->image('fore.jpg', 40, 30),
+            'photos' => [UploadedFile::fake()->image('fore.jpg', 40, 30)],
             'moment' => 'before',
         ])->assertRedirect();
 

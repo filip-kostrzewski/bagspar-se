@@ -94,10 +94,14 @@ document.querySelectorAll('[data-file-picker]').forEach((button) => {
     });
 
     input.addEventListener('change', () => {
-        const file = input.files?.[0];
+        const files = input.files ?? [];
 
         if (name) {
-            name.textContent = file ? file.name : 'Ingen bild vald';
+            if (files.length === 0) {
+                name.textContent = 'Ingen bild vald';
+            } else {
+                name.textContent = files.length === 1 ? files[0].name : `${files.length} bilder valda`;
+            }
         }
     });
 });
@@ -482,105 +486,122 @@ document.querySelectorAll('[data-photo-upload]').forEach((form) => {
     const message = form.querySelector('[data-photo-upload-message]');
     const submit = form.querySelector('button[type="submit"]');
     const originalButtonText = submit?.textContent;
-    let previewUrl;
-    let selectedImageIsValid = false;
+    const maxFiles = Math.min(20, Number.parseInt(form.dataset.photoRemaining ?? '20', 10) || 20);
+    let previewUrls = [];
+    let selectionIsValid = false;
+    let checkId = 0;
+
+    const releasePreviews = () => {
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+        previewUrls = [];
+    };
+
+    const showMessage = (text, isError) => {
+        if (message) {
+            message.textContent = text;
+            message.dataset.error = isError ? 'true' : 'false';
+        }
+    };
+
+    const reject = (text) => {
+        input.value = '';
+        releasePreviews();
+        preview?.replaceChildren();
+        selectionIsValid = false;
+        form.querySelector('[data-file-name]')?.replaceChildren('Ingen bild vald');
+        showMessage(text, true);
+    };
 
     input?.addEventListener('change', async () => {
-        const file = input.files?.[0];
+        const files = Array.from(input.files ?? []);
+        const currentCheck = ++checkId;
 
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            previewUrl = undefined;
-        }
-        selectedImageIsValid = false;
+        releasePreviews();
+        selectionIsValid = false;
         preview?.replaceChildren();
-        if (message) {
-            message.textContent = '';
-            message.dataset.error = 'false';
+        showMessage('', false);
+
+        if (files.length === 0) {
+            return;
         }
 
-        if (!file) {
+        if (files.length > maxFiles) {
+            reject(maxFiles === 1
+                ? 'Det finns plats för en bild till på den här bågen.'
+                : `Det finns plats för ${maxFiles} bilder till på den här bågen. Välj färre bilder.`);
             return;
         }
 
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            input.value = '';
-            if (message) {
-                message.textContent = 'Välj en JPG-, PNG- eller WebP-bild.';
-                message.dataset.error = 'true';
+        const images = [];
+
+        for (const file of files) {
+            if (!allowedTypes.includes(file.type)) {
+                reject(`${file.name} är inte en JPG-, PNG- eller WebP-bild.`);
+                return;
             }
-            return;
-        }
 
-        if (file.size > 5 * 1024 * 1024) {
-            input.value = '';
-            if (message) {
-                message.textContent = 'Bilden är större än 5 MB. Välj en mindre fil.';
-                message.dataset.error = 'true';
+            if (file.size > 5 * 1024 * 1024) {
+                reject(`${file.name} är större än 5 MB. Välj en mindre fil.`);
+                return;
             }
-            return;
-        }
 
-        previewUrl = URL.createObjectURL(file);
-        const image = new Image();
-        image.src = previewUrl;
-        image.alt = `Förhandsvisning av ${file.name}`;
+            const url = URL.createObjectURL(file);
+            previewUrls.push(url);
+            const image = new Image();
+            image.src = url;
+            image.alt = `Förhandsvisning av ${file.name}`;
 
-        try {
-            await image.decode();
-        } catch {
-            input.value = '';
-            URL.revokeObjectURL(previewUrl);
-            previewUrl = undefined;
-            if (message) {
-                message.textContent = 'Bilden kunde inte öppnas. Välj en annan bildfil.';
-                message.dataset.error = 'true';
+            try {
+                await image.decode();
+            } catch {
+                if (currentCheck === checkId) {
+                    reject(`${file.name} kunde inte öppnas. Välj en annan bildfil.`);
+                }
+                return;
             }
-            return;
-        }
 
-        const pixelCount = image.naturalWidth * image.naturalHeight;
-        if (image.naturalWidth > 6000 || image.naturalHeight > 6000 || pixelCount > 16_000_000) {
-            input.value = '';
-            URL.revokeObjectURL(previewUrl);
-            previewUrl = undefined;
-            if (message) {
-                message.textContent = 'Bilden får vara högst 16 megapixlar och 6 000 pixlar på varje sida.';
-                message.dataset.error = 'true';
+            if (currentCheck !== checkId) {
+                return;
             }
-            return;
+
+            if (image.naturalWidth > 6000 || image.naturalHeight > 6000 || image.naturalWidth * image.naturalHeight > 12_000_000) {
+                reject(`${file.name} får vara högst 12 megapixlar och 6 000 pixlar på varje sida.`);
+                return;
+            }
+
+            images.push(image);
         }
 
-        selectedImageIsValid = true;
-        preview?.append(image);
-        if (message) {
-            const sizeInMegabytes = (file.size / (1024 * 1024)).toFixed(1).replace('.', ',');
-            message.textContent = `${file.name} · ${sizeInMegabytes} MB · vald för uppladdning, inte sparad ännu.`;
-        }
+        selectionIsValid = true;
+        preview?.append(...images);
+        const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+        const sizeInMegabytes = (totalBytes / (1024 * 1024)).toFixed(1).replace('.', ',');
+        showMessage(
+            files.length === 1
+                ? `${files[0].name} · ${sizeInMegabytes} MB · vald för uppladdning, inte sparad ännu.`
+                : `${files.length} bilder · ${sizeInMegabytes} MB · valda för uppladdning, inte sparade ännu.`,
+            false,
+        );
     });
 
     form.addEventListener('submit', (event) => {
-        const file = input?.files?.[0];
+        const hasFiles = (input?.files?.length ?? 0) > 0;
 
-        if (!file || !selectedImageIsValid) {
+        if (!hasFiles || !selectionIsValid) {
             event.preventDefault();
-            if (message) {
-                message.textContent = file ? 'Vänta tills bildens storlek har kontrollerats.' : 'Välj en bild innan du laddar upp.';
-                message.dataset.error = 'true';
-            }
+            showMessage(hasFiles ? 'Vänta tills bildernas storlek har kontrollerats.' : 'Välj minst en bild innan du laddar upp.', true);
             input?.focus();
             return;
         }
 
+        const many = (input?.files?.length ?? 0) > 1;
+
         if (submit) {
             submit.disabled = true;
-            submit.textContent = 'Laddar upp bilden…';
+            submit.textContent = many ? 'Laddar upp bilderna…' : 'Laddar upp bilden…';
         }
-        if (message) {
-            message.textContent = 'Bilden skickas. Den visas här först när uppladdningen är klar.';
-            message.dataset.error = 'false';
-        }
+        showMessage(many ? 'Bilderna skickas. De visas här först när uppladdningen är klar.' : 'Bilden skickas. Den visas här först när uppladdningen är klar.', false);
     });
 
     window.addEventListener('pageshow', () => {
@@ -590,9 +611,5 @@ document.querySelectorAll('[data-photo-upload]').forEach((form) => {
         }
     });
 
-    window.addEventListener('pagehide', () => {
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-        }
-    });
+    window.addEventListener('pagehide', releasePreviews);
 });

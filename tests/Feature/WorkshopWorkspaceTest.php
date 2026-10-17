@@ -170,7 +170,7 @@ class WorkshopWorkspaceTest extends TestCase
         $this->get(route('app.sashes.label', [$otherProject, $otherSash]))->assertNotFound();
         $this->patch(route('app.sashes.update', [$otherProject, $otherSash]), ['stage' => 'ready'])->assertNotFound();
         $this->post(route('app.sashes.photos.store', [$otherProject, $otherSash]), [
-            'photo' => UploadedFile::fake()->image('private.jpg', 80, 60),
+            'photos' => [UploadedFile::fake()->image('private.jpg', 80, 60)],
         ])->assertNotFound();
         $this->get(route('app.sashes.photos.show', [$otherProject, $otherSash, $otherPhoto]))->assertNotFound();
         $this->get(route('app.sashes.show', [$ownProject, $otherSash]))->assertNotFound();
@@ -189,7 +189,7 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->actingAs($owner)
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('before.jpg', 120, 90),
+                'photos' => [UploadedFile::fake()->image('before.jpg', 120, 90)],
                 'moment' => 'before',
             ])
             ->assertRedirect();
@@ -263,7 +263,7 @@ class WorkshopWorkspaceTest extends TestCase
             $this->assertStringContainsString("Exif\0\0", $source);
 
             $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->createWithContent('oriented-'.$orientation.'.jpg', $source),
+                'photos' => [UploadedFile::fake()->createWithContent('oriented-'.$orientation.'.jpg', $source)],
                 'moment' => 'after',
             ])->assertRedirect();
 
@@ -295,15 +295,15 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->create('unsafe.svg', 1, 'image/svg+xml'),
+                'photos' => [UploadedFile::fake()->create('unsafe.svg', 1, 'image/svg+xml')],
                 'moment' => 'before',
-            ])->assertSessionHasErrors('photo');
+            ])->assertSessionHasErrors('photos.0');
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('too-wide.jpg', 6001, 1),
+                'photos' => [UploadedFile::fake()->image('too-wide.jpg', 6001, 1)],
                 'moment' => 'before',
-            ])->assertSessionHasErrors('photo');
+            ])->assertSessionHasErrors('photos.0');
 
         for ($index = 0; $index < 20; $index++) {
             $path = 'sash-photos/'.$project->getKey().'/'.$sash->getKey().'/'.$index.'.webp';
@@ -318,9 +318,9 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('too-many.jpg', 80, 60),
+                'photos' => [UploadedFile::fake()->image('too-many.jpg', 80, 60)],
                 'moment' => 'before',
-            ])->assertSessionHasErrors('photo');
+            ])->assertSessionHasErrors('photos');
 
         $this->assertDatabaseCount('sash_photos', 20);
     }
@@ -335,12 +335,12 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('missing-moment.jpg', 80, 60),
+                'photos' => [UploadedFile::fake()->image('missing-moment.jpg', 80, 60)],
             ])->assertSessionHasErrors(['moment' => 'Välj om bilden är tagen före eller efter.']);
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('unknown-moment.jpg', 80, 60),
+                'photos' => [UploadedFile::fake()->image('unknown-moment.jpg', 80, 60)],
                 'moment' => 'during',
             ])->assertSessionHasErrors(['moment' => 'Välj före eller efter.']);
 
@@ -362,7 +362,7 @@ class WorkshopWorkspaceTest extends TestCase
             ->assertDontSee('name="moment" type="radio" value="after" checked', false);
 
         $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-            'photo' => UploadedFile::fake()->image('fore.jpg', 80, 60),
+            'photos' => [UploadedFile::fake()->image('fore.jpg', 80, 60)],
             'moment' => 'before',
         ])->assertRedirect()->assertSessionHas('status', 'Sparat');
 
@@ -388,7 +388,7 @@ class WorkshopWorkspaceTest extends TestCase
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'form_context' => 'photo',
                 'moment' => 'during',
-                'photo' => UploadedFile::fake()->image('bad.jpg', 80, 60),
+                'photos' => [UploadedFile::fake()->image('bad.jpg', 80, 60)],
             ])->assertSessionHasErrors('moment');
 
         $this->get(route('app.sashes.show', [$project, $sash]))

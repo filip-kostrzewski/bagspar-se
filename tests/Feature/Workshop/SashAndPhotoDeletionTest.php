@@ -186,7 +186,7 @@ class SashAndPhotoDeletionTest extends TestCase
         $this->actingAs($owner)
             ->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
-                'photo' => UploadedFile::fake()->image('fonster-fore.jpg', 80, 60),
+                'photos' => [UploadedFile::fake()->image('fonster-fore.jpg', 80, 60)],
                 'moment' => 'before',
             ])
             ->assertRedirect(route('app.sashes.show', [$project, $sash]));

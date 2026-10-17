@@ -512,10 +512,10 @@
             @else
             <div class="photo-upload-panel">
                 <div>
-                    <h3>Lägg till en bild</h3>
-                    <p>JPG, PNG eller WebP. Högst 5 MB, 12 megapixlar och 6 000 pixlar per sida. Upp till 20 bilder per båge.</p>
+                    <h3>Lägg till bilder</h3>
+                    <p>JPG, PNG eller WebP. Högst 5 MB, 12 megapixlar och 6 000 pixlar per sida. Upp till 20 bilder per båge. Du kan välja flera bilder på en gång.</p>
                 </div>
-                <form class="workshop-form photo-upload-form" method="POST" action="{{ route('app.sashes.photos.store', [$project, $sash]) }}" enctype="multipart/form-data" data-photo-upload>
+                <form class="workshop-form photo-upload-form" method="POST" action="{{ route('app.sashes.photos.store', [$project, $sash]) }}" enctype="multipart/form-data" data-photo-upload data-photo-remaining="{{ max(0, 20 - $photos->count()) }}">
                     @csrf
                     <input type="hidden" name="form_context" value="photo">
                     @php
@@ -542,21 +542,19 @@
                         @enderror
                     </fieldset>
                     <div class="form-field">
-                        <label class="visually-hidden" for="photo">Bildfil</label>
+                        <label class="visually-hidden" for="photo">Bildfiler</label>
                         <div class="file-picker">
-                            <input id="photo" class="visually-hidden" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required @if ($errors->has('photo')) aria-invalid="true" aria-describedby="photo-error" @endif>
-                            <button class="workshop-button workshop-button--secondary" type="button" data-file-picker="photo">Välj bild</button>
+                            <input id="photo" class="visually-hidden" name="photos[]" type="file" accept="image/jpeg,image/png,image/webp" multiple required @if ($errors->has('photos') || $errors->has('photos.*')) aria-invalid="true" aria-describedby="photo-error" @endif>
+                            <button class="workshop-button workshop-button--secondary" type="button" data-file-picker="photo">Välj bilder</button>
                             <span class="file-picker__name" data-file-name>Ingen bild vald</span>
                         </div>
-                        @error('photo')
-                            @if (old('form_context') === 'photo')
-                                <p class="form-field__error" id="photo-error">{{ $message }}</p>
-                            @endif
-                        @enderror
+                        @if (old('form_context') === 'photo' && ($errors->has('photos') || $errors->has('photos.*')))
+                            <p class="form-field__error" id="photo-error">{{ $errors->first('photos') ?: $errors->first('photos.*') }}</p>
+                        @endif
                     </div>
                     <div class="photo-preview" data-photo-preview aria-live="polite"></div>
                     <p class="photo-upload-status" role="status" data-photo-upload-message></p>
-                    <button class="workshop-button workshop-button--secondary" type="submit">Ladda upp bild</button>
+                    <button class="workshop-button workshop-button--secondary" type="submit">Ladda upp bilder</button>
                 </form>
             </div>
             @endif

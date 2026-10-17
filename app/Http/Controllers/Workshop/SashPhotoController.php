@@ -12,6 +12,7 @@ use App\Support\PrivateImageResponse;
 use App\Support\StoredSashPhoto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -33,80 +34,83 @@ class SashPhotoController extends Controller
         $project = $this->projectForWorkshop($workshop, $project);
         $sash = $this->sashForProject($project, $sash);
         $validated = $request->validate([
-            'photo' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:max_width=6000,max_height=6000'],
+            'photos' => ['required', 'array', 'min:1', 'max:'.self::MAX_PHOTOS_PER_SASH],
+            'photos.*' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:max_width=6000,max_height=6000'],
             'moment' => ['required', Rule::in(SashPhoto::MOMENTS)],
         ], [
             'moment.required' => 'Välj om bilden är tagen före eller efter.',
             'moment.in' => 'Välj före eller efter.',
-            'photo.required' => 'Välj en bild att ladda upp.',
-            'photo.file' => 'Filen kunde inte läsas som en uppladdad bild.',
-            'photo.image' => 'Filen måste vara en bild.',
-            'photo.mimes' => 'Bilden måste vara i formatet JPG, PNG eller WebP.',
-            'photo.max' => 'Bilden får vara högst 5 MB.',
-            'photo.dimensions' => 'Bilden får vara högst 6 000 pixlar bred eller hög.',
+            'photos.required' => 'Välj minst en bild att ladda upp.',
+            'photos.array' => 'Välj minst en bild att ladda upp.',
+            'photos.min' => 'Välj minst en bild att ladda upp.',
+            'photos.max' => 'Du kan ladda upp högst 20 bilder åt gången.',
+            'photos.*.required' => 'Bild :position kunde inte läsas.',
+            'photos.*.file' => 'Bild :position kunde inte läsas som en uppladdad bild.',
+            'photos.*.image' => 'Bild :position måste vara en bild.',
+            'photos.*.mimes' => 'Bild :position måste vara i formatet JPG, PNG eller WebP.',
+            'photos.*.max' => 'Bild :position får vara högst 5 MB.',
+            'photos.*.uploaded' => 'Bild :position kunde inte laddas upp. Den kan vara större än 5 MB.',
+            'photos.*.dimensions' => 'Bild :position får vara högst 6 000 pixlar bred eller hög.',
         ]);
 
         $actor = $request->user();
-        $file = $validated['photo'];
-        $imageInfo = @getimagesize($file->getRealPath());
+        $files = array_values($validated['photos']);
+        $encoded = [];
 
-        if (! is_array($imageInfo) || ! isset($imageInfo[0], $imageInfo[1], $imageInfo['mime'])) {
-            throw ValidationException::withMessages(['photo' => 'Bilden kan inte läsas. Välj en annan fil.']);
+        foreach ($files as $index => $file) {
+            $encoded[] = $this->encodeUploadedPhoto($file, $index + 1);
         }
 
-        $imageType = $imageInfo[2] ?? null;
-        if (! in_array($imageType, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
-            throw ValidationException::withMessages(['photo' => 'Bilden måste vara i formatet JPG, PNG eller WebP.']);
-        }
-
-        if ($imageInfo[0] * $imageInfo[1] > self::MAX_IMAGE_PIXELS) {
-            throw ValidationException::withMessages(['photo' => 'Bilden innehåller för många bildpunkter. Välj en mindre bild.']);
-        }
-
-        $webp = $this->reencodeAsWebp($file->getRealPath(), $imageType);
-        $path = null;
+        $paths = [];
 
         try {
-            DB::transaction(function () use ($actor, $file, $project, $sash, $validated, $webp, &$path): void {
+            DB::transaction(function () use ($actor, $files, $encoded, $project, $sash, $validated, &$paths): void {
                 $lockedSash = WindowSash::query()->lockForUpdate()->findOrFail($sash->getKey());
 
-                if ($lockedSash->photos()->count() >= self::MAX_PHOTOS_PER_SASH) {
-                    throw ValidationException::withMessages(['photo' => 'Ett arbetskort kan ha högst 20 bilder.']);
+                if ($lockedSash->photos()->count() + count($files) > self::MAX_PHOTOS_PER_SASH) {
+                    throw ValidationException::withMessages(['photos' => 'Ett arbetskort kan ha högst 20 bilder. Välj färre bilder eller ta bort några först.']);
                 }
 
-                $path = 'sash-photos/'.$project->getKey().'/'.$sash->getKey().'/'.Str::uuid().'.webp';
-                if (! Storage::disk('local')->put($path, $webp)) {
-                    throw new RuntimeException('Private photo storage failed.');
-                }
+                foreach ($files as $index => $file) {
+                    $webp = $encoded[$index];
+                    $path = 'sash-photos/'.$project->getKey().'/'.$sash->getKey().'/'.Str::uuid().'.webp';
 
-                $filename = $this->safeOriginalFilename($file->getClientOriginalName());
-                $lockedSash->photos()->create([
-                    'path' => $path,
-                    'moment' => $validated['moment'],
-                    'original_filename' => $filename,
-                    'mime_type' => 'image/webp',
-                    'size' => strlen($webp),
-                ]);
+                    if (! Storage::disk('local')->put($path, $webp)) {
+                        throw new RuntimeException('Private photo storage failed.');
+                    }
 
-                if ($actor instanceof User) {
-                    $moment = $validated['moment'] === 'after' ? 'Efter' : 'Före';
-                    $lockedSash->recordEvent(
-                        $actor,
-                        SashEvent::KIND_PHOTO,
-                        null,
-                        'Bilden lades till: '.($filename ?? 'bild').' ('.$moment.').',
-                    );
+                    $paths[] = $path;
+                    $filename = $this->safeOriginalFilename($file->getClientOriginalName());
+                    $lockedSash->photos()->create([
+                        'path' => $path,
+                        'moment' => $validated['moment'],
+                        'original_filename' => $filename,
+                        'mime_type' => 'image/webp',
+                        'size' => strlen($webp),
+                    ]);
+
+                    if ($actor instanceof User) {
+                        $moment = $validated['moment'] === 'after' ? 'Efter' : 'Före';
+                        $lockedSash->recordEvent(
+                            $actor,
+                            SashEvent::KIND_PHOTO,
+                            null,
+                            'Bilden lades till: '.($filename ?? 'bild').' ('.$moment.').',
+                        );
+                    }
                 }
             });
         } catch (Throwable $exception) {
-            if (is_string($path)) {
+            foreach ($paths as $path) {
                 Storage::disk('local')->delete($path);
             }
 
             throw $exception;
         }
 
-        return back()->with('status', 'Sparat');
+        $count = count($files);
+
+        return back()->with('status', $count === 1 ? 'Sparat' : $count.' bilder tillagda.');
     }
 
     public function update(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): RedirectResponse
@@ -168,6 +172,27 @@ class SashPhotoController extends Controller
         return PrivateImageResponse::make($photo->path, $photo->mime_type ?: 'image/webp');
     }
 
+    private function encodeUploadedPhoto(UploadedFile $file, int $position): string
+    {
+        $key = 'photos';
+        $imageInfo = @getimagesize($file->getRealPath());
+
+        if (! is_array($imageInfo) || ! isset($imageInfo[0], $imageInfo[1], $imageInfo['mime'])) {
+            throw ValidationException::withMessages([$key => 'Bild '.$position.' kan inte läsas. Välj en annan fil.']);
+        }
+
+        $imageType = $imageInfo[2] ?? null;
+        if (! in_array($imageType, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
+            throw ValidationException::withMessages([$key => 'Bild '.$position.' måste vara i formatet JPG, PNG eller WebP.']);
+        }
+
+        if ($imageInfo[0] * $imageInfo[1] > self::MAX_IMAGE_PIXELS) {
+            throw ValidationException::withMessages([$key => 'Bild '.$position.' innehåller för många bildpunkter. Välj en mindre bild.']);
+        }
+
+        return $this->reencodeAsWebp($file->getRealPath(), $imageType);
+    }
+
     private function reencodeAsWebp(string $sourcePath, int $imageType): string
     {
         abort_unless(
@@ -182,7 +207,7 @@ class SashPhotoController extends Controller
         $image = $contents === false ? false : @imagecreatefromstring($contents);
 
         if ($image === false) {
-            throw ValidationException::withMessages(['photo' => 'Bilden kan inte öppnas. Välj en annan fil.']);
+            throw ValidationException::withMessages(['photos' => 'Bilden kan inte öppnas. Välj en annan fil.']);
         }
 
         try {
@@ -191,7 +216,7 @@ class SashPhotoController extends Controller
             }
 
             if (! imageistruecolor($image) && ! imagepalettetotruecolor($image)) {
-                throw ValidationException::withMessages(['photo' => 'Bilden kan inte bearbetas. Välj en annan fil.']);
+                throw ValidationException::withMessages(['photos' => 'Bilden kan inte bearbetas. Välj en annan fil.']);
             }
 
             imagealphablending($image, false);
@@ -202,7 +227,7 @@ class SashPhotoController extends Controller
             $webp = ob_get_clean();
 
             if (! $encoded || ! is_string($webp) || $webp === '') {
-                throw ValidationException::withMessages(['photo' => 'Bilden kan inte bearbetas. Välj en annan fil.']);
+                throw ValidationException::withMessages(['photos' => 'Bilden kan inte bearbetas. Välj en annan fil.']);
             }
 
             return $webp;
@@ -230,11 +255,11 @@ class SashPhotoController extends Controller
     private function orientJpeg(\GdImage $image, int $orientation): \GdImage
     {
         if (in_array($orientation, [2, 5, 7], true) && ! imageflip($image, IMG_FLIP_HORIZONTAL)) {
-            throw ValidationException::withMessages(['photo' => 'Bilden kan inte orienteras. Välj en annan fil.']);
+            throw ValidationException::withMessages(['photos' => 'Bilden kan inte orienteras. Välj en annan fil.']);
         }
 
         if ($orientation === 4 && ! imageflip($image, IMG_FLIP_VERTICAL)) {
-            throw ValidationException::withMessages(['photo' => 'Bilden kan inte orienteras. Välj en annan fil.']);
+            throw ValidationException::withMessages(['photos' => 'Bilden kan inte orienteras. Välj en annan fil.']);
         }
 
         $rotation = match ($orientation) {
@@ -250,7 +275,7 @@ class SashPhotoController extends Controller
 
         $rotatedImage = imagerotate($image, $rotation, 0);
         if (! $rotatedImage instanceof \GdImage) {
-            throw ValidationException::withMessages(['photo' => 'Bilden kan inte orienteras. Välj en annan fil.']);
+            throw ValidationException::withMessages(['photos' => 'Bilden kan inte orienteras. Välj en annan fil.']);
         }
 
         imagedestroy($image);

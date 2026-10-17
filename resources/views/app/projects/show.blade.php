@@ -267,7 +267,10 @@
                     <p class="workshop-eyebrow">FÖNSTER FÖR FÖNSTER</p>
                     <h2 class="workshop-section-heading" id="sashes-title">Bågar <span>{{ $sashCount }}</span></h2>
                 </div>
-                <a class="workshop-button workshop-button--primary no-print" href="{{ route('app.sashes.create', $project) }}">Lägg till båge</a>
+                <div class="sash-add-actions no-print">
+                    <a class="workshop-button workshop-button--primary" href="{{ route('app.sashes.create', $project) }}">Lägg till båge</a>
+                    <a class="workshop-button workshop-button--secondary" href="{{ route('app.sashes.create', [$project, 'flera' => 1]) }}#flera">Lägg till flera</a>
+                </div>
             </div>
 
             @if ($sashes->isEmpty())

@@ -53,7 +53,7 @@ class ProjectReportTest extends TestCase
             ])->assertRedirect();
 
         $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-            'photo' => UploadedFile::fake()->image('IMG_4481.jpg', 80, 60),
+            'photos' => [UploadedFile::fake()->image('IMG_4481.jpg', 80, 60)],
             'moment' => 'before',
         ])->assertRedirect();
 

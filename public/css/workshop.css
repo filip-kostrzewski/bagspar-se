@@ -691,6 +691,16 @@ svg {
     margin-bottom: 28px;
 }
 
+.form-page__panel + .form-page__panel {
+    margin-top: 24px;
+}
+
+.sash-add-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .workshop-form {
     display: grid;
     gap: 20px;
@@ -1612,7 +1622,13 @@ svg {
 }
 
 .photo-preview {
-    width: min(180px, 100%);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+}
+
+.photo-preview:empty {
+    display: none;
 }
 
 .photo-preview img {

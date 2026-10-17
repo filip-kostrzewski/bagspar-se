@@ -59,11 +59,11 @@ class ClientStatusTest extends TestCase
         ])->assertRedirect();
 
         $this->actingAs($member)->post(route('app.sashes.photos.store', [$project, $sash]), [
-            'photo' => UploadedFile::fake()->image('fore.jpg', 80, 60),
+            'photos' => [UploadedFile::fake()->image('fore.jpg', 80, 60)],
             'moment' => 'before',
         ])->assertRedirect();
         $this->post(route('app.sashes.photos.store', [$project, $sash]), [
-            'photo' => UploadedFile::fake()->image('efter.jpg', 80, 60),
+            'photos' => [UploadedFile::fake()->image('efter.jpg', 80, 60)],
             'moment' => 'after',
         ])->assertRedirect();
 
@@ -173,7 +173,7 @@ class ClientStatusTest extends TestCase
         $otherSash = WindowSash::factory()->create(['project_id' => $otherProject->getKey()]);
 
         $this->actingAs($other)->post(route('app.sashes.photos.store', [$otherProject, $otherSash]), [
-            'photo' => UploadedFile::fake()->image('annan.jpg', 40, 40),
+            'photos' => [UploadedFile::fake()->image('annan.jpg', 40, 40)],
             'moment' => 'before',
         ])->assertRedirect();
         $otherPhoto = SashPhoto::query()->firstOrFail();
