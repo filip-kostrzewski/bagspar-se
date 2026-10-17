@@ -49,6 +49,18 @@ class WindowSash extends Model
         return $this->hasMany(SashEvent::class, 'sash_id');
     }
 
+    public function stageLabel(): string
+    {
+        return match ($this->stage) {
+            'scraping' => 'Skrapning',
+            'repair' => 'Trälagning',
+            'glazing' => 'Glasning',
+            'painting' => 'Målning',
+            'ready' => 'Klar',
+            default => 'Mottagen',
+        };
+    }
+
     public function recordEvent(User $user, string $kind, ?string $stage = null, ?string $body = null): SashEvent
     {
         $event = $this->events()->create([

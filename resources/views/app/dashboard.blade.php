@@ -10,11 +10,16 @@
                 <h1 class="workshop-heading" id="page-title">Projekt</h1>
                 <p class="workspace-lede">Håll ihop varje projekt, båge och arbetssteg.</p>
             </div>
-            @if ($projects->isNotEmpty())
-                <a class="workshop-button workshop-button--primary" href="{{ route('app.projects.create') }}">
-                    <span aria-hidden="true">＋</span> Nytt projekt
-                </a>
-            @endif
+            <div class="workspace-heading-row__actions">
+                @if (auth()->user()?->isOwner())
+                    <a class="workshop-button workshop-button--quiet" href="{{ route('app.export') }}">Ladda ner CSV</a>
+                @endif
+                @if ($projects->isNotEmpty() || $hasAnyProjects)
+                    <a class="workshop-button workshop-button--primary" href="{{ route('app.projects.create') }}">
+                        <span aria-hidden="true">＋</span> Nytt projekt
+                    </a>
+                @endif
+            </div>
         </div>
 
         @if (! $hasAnyProjects)

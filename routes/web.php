@@ -19,6 +19,7 @@ use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
 use App\Http\Controllers\Workshop\WindowSashController;
+use App\Http\Controllers\Workshop\WorkshopExportController;
 use App\Http\Controllers\Workshop\WorkshopInvitationController;
 use App\Http\Controllers\Workshop\WorkshopSettingsController;
 use Illuminate\Support\Facades\Route;
@@ -102,6 +103,7 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app')->name('app.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/export.csv', WorkshopExportController::class)->name('export');
     Route::get('/installningar', [WorkshopSettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/installningar', [WorkshopSettingsController::class, 'update'])->name('settings.update');
     Route::get('/installningar/logotyp', [WorkshopSettingsController::class, 'logo'])->name('settings.logo');
