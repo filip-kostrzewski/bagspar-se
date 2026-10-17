@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\SashPhoto;
 use App\Models\Workshop;
+use App\Support\ReadyCustomerNotifier;
 use App\Support\SashQrCodeRenderer;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
@@ -49,6 +50,7 @@ class ProjectController extends Controller
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
         ]);
 
+        $validated['notify_customer_when_ready'] = $request->boolean('notify_customer_when_ready');
         $validated = $this->withCustomer($workshop, $validated);
         $project = $workshop->projects()->create($validated);
 
@@ -91,10 +93,19 @@ class ProjectController extends Controller
         ]);
 
         abort_if($validated === [], 422);
+
+        if ($request->input('form_context') === 'project') {
+            $validated['notify_customer_when_ready'] = $request->boolean('notify_customer_when_ready');
+        }
+
         $validated = $this->withCustomer($workshop, $validated);
         $project->update($validated);
+        $sent = app(ReadyCustomerNotifier::class)->sync($project);
+        $message = $sent
+            ? 'Projektet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.'
+            : 'Projektet har uppdaterats.';
 
-        return back()->with('status', 'Projektet har uppdaterats.');
+        return back()->with('status', $message);
     }
 
     public function report(Request $request, Project $project): View

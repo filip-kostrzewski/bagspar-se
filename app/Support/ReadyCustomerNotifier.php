@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Support;
+
+use App\Mail\OutboundMail;
+use App\Mail\ProjectReadyMail;
+use App\Models\Project;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
+
+class ReadyCustomerNotifier
+{
+    public function sync(Project $project): bool
+    {
+        $project->refresh();
+        $stages = $project->windowSashes()->pluck('stage');
+        $allReady = $stages->isNotEmpty() && $stages->every(fn (mixed $stage): bool => $stage === 'ready');
+
+        if (! $allReady) {
+            if ($project->customer_ready_notified_at !== null) {
+                $project->customer_ready_notified_at = null;
+                $project->save();
+            }
+
+            return false;
+        }
+
+        if (! $project->notify_customer_when_ready || $project->customer_ready_notified_at !== null) {
+            return false;
+        }
+
+        $project->loadMissing('customer');
+        $email = $project->customer?->email;
+
+        if (! is_string($email) || trim($email) === '' || ! OutboundMail::isConfigured()) {
+            return false;
+        }
+
+        if (! $project->clientStatusIsPublic()) {
+            if (! is_string($project->client_status_token) || $project->client_status_token === '') {
+                $project->issueClientStatusToken();
+            }
+
+            $project->client_status_enabled = true;
+            $project->save();
+        }
+
+        $token = $project->client_status_token;
+
+        if (! is_string($token) || $token === '') {
+            return false;
+        }
+
+        try {
+            Mail::to($email)->send(new ProjectReadyMail(
+                $project,
+                route('client-status.show', ['token' => $token]),
+            ));
+        } catch (Throwable $exception) {
+            Log::warning('Ready notification could not be sent.', [
+                'project_id' => $project->getKey(),
+                'exception' => $exception::class,
+            ]);
+
+            return false;
+        }
+
+        $project->customer_ready_notified_at = now();
+        $project->save();
+
+        return true;
+    }
+}

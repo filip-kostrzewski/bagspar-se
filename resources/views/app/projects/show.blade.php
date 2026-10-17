@@ -149,6 +149,13 @@
                             @endif
                         @enderror
                     </div>
+                    <div class="form-field">
+                        <label class="workshop-checkbox" for="edit-notify-customer-when-ready">
+                            <input id="edit-notify-customer-when-ready" name="notify_customer_when_ready" type="checkbox" value="1" @checked(old('form_context') === 'project' ? old('notify_customer_when_ready') : $project->notify_customer_when_ready)>
+                            <span>Mejla kunden när alla bågar är klara</span>
+                        </label>
+                        <p class="form-field__hint">Mejlet skickas bara om kunden har en e-postadress. Det innehåller statuslänken och inga arbetsanteckningar.</p>
+                    </div>
                     <button class="workshop-button workshop-button--secondary" type="submit">Spara projektuppgifter</button>
                 </form>
             </div>

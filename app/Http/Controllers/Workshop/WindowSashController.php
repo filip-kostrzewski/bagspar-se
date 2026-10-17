@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\SashEvent;
 use App\Models\User;
 use App\Models\WindowSash;
+use App\Support\ReadyCustomerNotifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -56,6 +57,8 @@ class WindowSashController extends Controller
                 $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, $sash->notes);
             }
         }
+
+        app(ReadyCustomerNotifier::class)->sync($project);
 
         return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Arbetskortet har skapats.');
     }
@@ -114,6 +117,11 @@ class WindowSashController extends Controller
             }
         }
 
-        return back()->with('status', 'Arbetskortet har uppdaterats.');
+        $sent = app(ReadyCustomerNotifier::class)->sync($project);
+        $message = $sent
+            ? 'Arbetskortet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.'
+            : 'Arbetskortet har uppdaterats.';
+
+        return back()->with('status', $message);
     }
 }

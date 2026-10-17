@@ -59,6 +59,14 @@
                     @enderror
                 </div>
 
+                <div class="form-field">
+                    <label class="workshop-checkbox" for="notify-customer-when-ready">
+                        <input id="notify-customer-when-ready" name="notify_customer_when_ready" type="checkbox" value="1" @checked(old('notify_customer_when_ready'))>
+                        <span>Mejla kunden när alla bågar är klara</span>
+                    </label>
+                    <p class="form-field__hint">Mejlet skickas bara om kunden har en e-postadress. Det innehåller statuslänken och inga arbetsanteckningar.</p>
+                </div>
+
                 <div class="form-actions">
                     <button class="workshop-button workshop-button--primary" type="submit">Spara projekt</button>
                     <a class="workshop-button workshop-button--quiet" href="{{ route('app.dashboard') }}">Avbryt</a>

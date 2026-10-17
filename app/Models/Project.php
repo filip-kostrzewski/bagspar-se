@@ -23,6 +23,7 @@ class Project extends Model
         'location',
         'notes',
         'status',
+        'notify_customer_when_ready',
     ];
 
     /** @return BelongsTo<Workshop, $this> */
@@ -90,6 +91,8 @@ class Project extends Model
         return [
             'client_status_enabled' => 'boolean',
             'archived_at' => 'datetime',
+            'notify_customer_when_ready' => 'boolean',
+            'customer_ready_notified_at' => 'datetime',
         ];
     }
 }
