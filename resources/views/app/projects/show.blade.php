@@ -46,7 +46,7 @@
                         <p><span>Plats</span>{{ $project->location }}</p>
                     @endif
                     @if ($project->delivery_date)
-                        <p><span>Leveransdatum</span>{{ $project->delivery_date->toDateString() }}</p>
+                        <p><span>Leveransdatum</span>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
                     @endif
                     <p><span>Arbetskort</span>{{ $sashCount }} {{ $sashCount === 1 ? 'båge' : 'bågar' }}</p>
                 </div>
@@ -68,10 +68,10 @@
                     <button class="workshop-button workshop-button--quiet" type="submit">{{ $projectIsComplete ? 'Återöppna projekt' : 'Markera som avslutat' }}</button>
                 </form>
                 @if (auth()->user()?->isOwner())
-                    <form method="POST" action="{{ route('app.projects.archive', $project) }}" data-confirm="{{ $project->isArchived() ? 'Återställ projektet till den vanliga listan?' : 'Arkivera projektet? Det döljs i den vanliga listan.' }}">
+                    <form method="POST" action="{{ route('app.projects.archive', $project) }}" data-confirm="{{ $project->isArchived() ? 'Återställ projektet till den vanliga listan?' : 'Arkivera projektet? Det döljs i den vanliga listan.' }}" data-confirm-title="{{ $project->isArchived() ? 'Återställ projektet?' : 'Arkivera projektet?' }}">
                         @csrf
                         <input type="hidden" name="action" value="{{ $project->isArchived() ? 'restore' : 'archive' }}">
-                        <button class="workshop-button workshop-button--secondary" type="submit">{{ $project->isArchived() ? 'Återställ projekt' : 'Arkivera projekt' }}</button>
+                        <button class="workshop-button workshop-button--primary" type="submit">{{ $project->isArchived() ? 'Återställ projekt' : 'Arkivera projekt' }}</button>
                     </form>
                 @endif
             </div>
@@ -246,11 +246,35 @@
             </section>
         @endif
 
+        @if ($timeTotalMinutes > 0)
+            <section class="project-time" aria-labelledby="project-time-title">
+                <p class="workshop-eyebrow">NEDLAGD TID</p>
+                <h2 class="workshop-section-heading" id="project-time-title">Arbetstid</h2>
+                <p>Totalt {{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</p>
+                <ul class="project-time__people">
+                    @foreach ($timeByPerson as $name => $minutes)
+                        <li>{{ $name }}: {{ \App\Support\WorkDuration::label($minutes) }}</li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
+        <p class="no-print"><a class="workshop-text-link" href="{{ route('app.projects.materials', $project) }}">Materiallista</a></p>
+
         @if (auth()->user()?->isOwner())
             <section class="project-danger-zone" aria-labelledby="danger-title">
                 <h2 class="workshop-section-heading" id="danger-title">Ta bort projekt</h2>
-                <p>Borttagning raderar projektet och bildfilerna. Det går inte att ångra.</p>
-                <a class="workshop-button workshop-button--danger" href="{{ route('app.projects.confirm-destroy', $project) }}">Ta bort projekt</a>
+                <p>Borttagning raderar projektet och bildfilerna. Det går inte att ångra. Skriv ta-bort för att bekräfta.</p>
+                <form class="workshop-form" method="POST" action="{{ route('app.projects.destroy', $project) }}" data-confirm="Bågarna, historiken och bildfilerna tas bort." data-confirm-title="Ta bort projektet?" data-confirm-match="ta-bort" data-confirm-match-message="Skriv ta-bort för att bekräfta.">
+                    @csrf
+                    @method('DELETE')
+                    <div class="form-field">
+                        <label for="project-delete-confirmation">Skriv ta-bort för att bekräfta.</label>
+                        <input id="project-delete-confirmation" name="confirmation" type="text" value="{{ is_string(old('confirmation')) ? old('confirmation') : '' }}" autocomplete="off" required @if ($errors->has('confirmation')) aria-invalid="true" aria-describedby="project-delete-error" @endif>
+                        <p class="form-field__error" id="project-delete-error" data-confirm-error @if (! $errors->has('confirmation')) hidden @endif>@error('confirmation'){{ $message }}@enderror</p>
+                    </div>
+                    <button class="workshop-button workshop-button--danger" type="submit">Ta bort projekt</button>
+                </form>
             </section>
         @endif
 

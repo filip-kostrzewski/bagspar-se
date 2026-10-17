@@ -9,6 +9,7 @@ use App\Models\SashPhoto;
 use App\Models\User;
 use App\Models\WindowSash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -40,7 +41,8 @@ class SashAndPhotoDeletionTest extends TestCase
             ->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
             ->assertSee('Ta bort bild', false)
-            ->assertSee('data-confirm="Ta bort bilden? Filen tas bort från lagringen."', false);
+            ->assertSee('data-confirm-title="Ta bort bilden?"', false)
+            ->assertSee('data-confirm="Filen tas bort från lagringen."', false);
 
         $this->delete(route('app.sashes.photos.destroy', [$project, $sash, $photo]))
             ->assertRedirect(route('app.sashes.show', [$project, $sash]))
@@ -171,5 +173,34 @@ class SashAndPhotoDeletionTest extends TestCase
         $this->assertModelExists($photo);
         $this->assertModelExists($sash);
         Storage::disk('local')->assertExists($path);
+    }
+
+    public function test_uploading_a_photo_records_who_added_it(): void
+    {
+        Storage::fake('local');
+
+        $owner = User::factory()->create(['name' => 'Ada Ek']);
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+
+        $this->actingAs($owner)
+            ->from(route('app.sashes.show', [$project, $sash]))
+            ->post(route('app.sashes.photos.store', [$project, $sash]), [
+                'photo' => UploadedFile::fake()->image('fonster-fore.jpg', 80, 60),
+                'moment' => 'before',
+            ])
+            ->assertRedirect(route('app.sashes.show', [$project, $sash]));
+
+        $this->assertDatabaseHas('sash_events', [
+            'sash_id' => $sash->getKey(),
+            'user_id' => $owner->getKey(),
+            'user_name' => 'Ada Ek',
+            'kind' => SashEvent::KIND_PHOTO,
+            'body' => 'Bilden lades till: fonster-fore.jpg (Före).',
+        ]);
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('Bilden lades till: fonster-fore.jpg (Före).', false);
     }
 }

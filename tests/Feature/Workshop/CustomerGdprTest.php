@@ -47,7 +47,7 @@ class CustomerGdprTest extends TestCase
             'stage' => 'glazing',
             'notes' => 'Kitt saknas.',
         ]);
-        SashEvent::factory()->create([
+        $note = SashEvent::factory()->create([
             'sash_id' => $sash->getKey(),
             'user_id' => $member->getKey(),
             'user_name' => 'Bo Berg',
@@ -55,6 +55,7 @@ class CustomerGdprTest extends TestCase
             'stage' => null,
             'body' => 'Nytt kitt.',
         ]);
+        $note->forceFill(['created_at' => '2026-10-16 08:30:00'])->save();
         $photo = SashPhoto::factory()->create([
             'sash_id' => $sash->getKey(),
             'moment' => 'before',
@@ -119,6 +120,10 @@ class CustomerGdprTest extends TestCase
         $json->assertJsonPath('projekt.0.bagar.0.etapp', 'Glasning');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.text', 'Nytt kitt.');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.anvandare', 'Bo Berg');
+        $json->assertJsonPath('projekt.0.bagar.0.historik.0.slag', 'note');
+        $json->assertJsonPath('projekt.0.bagar.0.historik.0.etikett', 'anteckning');
+        $json->assertJsonPath('projekt.0.historik.0.slag', 'sash-removed');
+        $json->assertJsonPath('projekt.0.historik.0.etikett', 'båge borttagen');
         $json->assertJsonPath('projekt.0.bagar.0.bilder.0.url', route('app.sashes.photos.show', [$project, $sash, $photo]));
         $json->assertJsonPath('projekt.0.historik.0.text', 'Bågen B-1 togs bort.');
         $this->assertSame($loose->name, 'Löst projekt');
@@ -128,11 +133,12 @@ class CustomerGdprTest extends TestCase
         $csvResponse->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
         $csv = $csvResponse->streamedContent();
         $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
-        $this->assertStringContainsString('Typ;Kund;Projekt;Båge;Uppgift;Värde', $csv);
+        $this->assertStringContainsString('Typ;Kund;Projekt;Båge;Tid;Uppgift;Värde', $csv);
         $this->assertStringContainsString("'=BRF <script>alert(1)</script>", $csv);
         $this->assertStringContainsString('Villa Ek', $csv);
         $this->assertStringContainsString('V2-H', $csv);
         $this->assertStringContainsString('Nytt kitt.', $csv);
+        $this->assertStringContainsString('2026-10-16 10:30', $csv);
         $this->assertStringContainsString('Bågen B-1 togs bort.', $csv);
         $this->assertStringContainsString(route('app.sashes.photos.show', [$project, $sash, $photo]), $csv);
         $this->assertStringNotContainsString('Hemlig granne', $csv);
@@ -172,7 +178,9 @@ class CustomerGdprTest extends TestCase
             ->get(route('app.customers.edit', $customer))
             ->assertOk()
             ->assertSee('Radera kund', false)
-            ->assertSee('data-confirm="Radera kunden? Det går inte att ångra."', false)
+            ->assertSee('data-confirm-title="Radera kunden?"', false)
+            ->assertSee('data-confirm-match="BRF Eken"', false)
+            ->assertSee('id="removal-anonymize" name="removal" type="radio" value="anonymize" required checked', false)
             ->assertSee('Skriv BRF Eken för att bekräfta.', false)
             ->assertSee('value="anonymize"', false)
             ->assertSee('value="delete-projects"', false);
@@ -200,6 +208,11 @@ class CustomerGdprTest extends TestCase
             ])
             ->assertRedirect(route('app.customers.edit', $customer))
             ->assertInvalid(['confirmation' => 'Skriv kundens namn för att bekräfta.']);
+        $this->get(route('app.customers.edit', $customer))
+            ->assertOk()
+            ->assertSee('id="confirmation-error"', false)
+            ->assertSee('Skriv kundens namn för att bekräfta.', false)
+            ->assertDontSee('Kontrollera de markerade uppgifterna.', false);
         $this->assertModelExists($customer);
         $this->assertSame('BRF Eken', $project->refresh()->customer_name);
 
@@ -218,6 +231,9 @@ class CustomerGdprTest extends TestCase
         ])
             ->assertRedirect(route('app.customers.index'))
             ->assertSessionHas('status', 'Kunden har raderats. Projekten är kvar utan kunduppgifter.');
+        $this->get(route('app.customers.index'))
+            ->assertOk()
+            ->assertSee('Kunden har raderats. Projekten är kvar utan kunduppgifter.', false);
 
         $this->assertModelMissing($customer);
         $project->refresh();
@@ -264,6 +280,9 @@ class CustomerGdprTest extends TestCase
             ])
             ->assertRedirect(route('app.customers.index'))
             ->assertSessionHas('status', 'Kunden, projekten och bildfilerna har tagits bort.');
+        $this->get(route('app.customers.index'))
+            ->assertOk()
+            ->assertSee('Kunden, projekten och bildfilerna har tagits bort.', false);
 
         $this->assertModelMissing($customer);
         $this->assertModelMissing($project);

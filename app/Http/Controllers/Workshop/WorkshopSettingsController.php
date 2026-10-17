@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Workshop;
+use App\Support\PrivateImageResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class WorkshopSettingsController extends Controller
 {
@@ -103,23 +104,15 @@ class WorkshopSettingsController extends Controller
         return back()->with('status', $message);
     }
 
-    public function logo(Request $request): BinaryFileResponse
+    public function logo(Request $request): Response
     {
         $workshop = $this->currentWorkshop($request);
         $path = $workshop->logo_path;
         $prefix = 'workshop-logos/'.$workshop->getKey().'/';
-        $disk = Storage::disk('local');
 
-        abort_unless(is_string($path) && str_starts_with($path, $prefix) && $disk->exists($path), 404);
+        abort_unless(is_string($path) && str_starts_with($path, $prefix), 404);
 
-        $response = response()->file($disk->path($path), [
-            'Content-Type' => 'image/webp',
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
-        $response->setPrivate();
-        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
-
-        return $response;
+        return PrivateImageResponse::make($path, 'image/webp');
     }
 
     private function storeLogo(Workshop $workshop, string $sourcePath): string

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Workshop;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Project;
+use App\Models\SashTimeEntry;
 use App\Models\Workshop;
 use App\Support\ReadyCustomerNotifier;
 use App\Support\SashQrCodeRenderer;
@@ -70,8 +71,25 @@ class ProjectController extends Controller
         $customers = $workshop->customers()->orderBy('name')->orderBy('id')->get();
         $projectEvents = $project->events()->orderBy('id')->get();
         $project->load('customer');
+        $timeEntries = SashTimeEntry::query()
+            ->whereHas('sash', fn ($query) => $query->where('project_id', $project->getKey()))
+            ->orderBy('user_name')
+            ->orderBy('id')
+            ->get();
+        $timeByPerson = $timeEntries
+            ->groupBy('user_name')
+            ->map(fn ($rows): int => (int) $rows->sum('minutes'))
+            ->sortKeys();
 
-        return view('app.projects.show', compact('workshop', 'project', 'sashes', 'customers', 'projectEvents'));
+        return view('app.projects.show', [
+            'workshop' => $workshop,
+            'project' => $project,
+            'sashes' => $sashes,
+            'customers' => $customers,
+            'projectEvents' => $projectEvents,
+            'timeByPerson' => $timeByPerson,
+            'timeTotalMinutes' => (int) $timeEntries->sum('minutes'),
+        ]);
     }
 
     public function update(Request $request, Project $project): RedirectResponse
@@ -141,6 +159,10 @@ class ProjectController extends Controller
         }
 
         $includeWorkNotes = $request->boolean('anteckningar');
+        $includeWorkTime = $request->boolean('arbetstid');
+        $timeTotalMinutes = (int) SashTimeEntry::query()
+            ->whereHas('sash', fn ($query) => $query->where('project_id', $project->getKey()))
+            ->sum('minutes');
 
         return view('app.projects.report', compact(
             'workshop',
@@ -149,6 +171,8 @@ class ProjectController extends Controller
             'clientStatusUrl',
             'clientStatusQr',
             'includeWorkNotes',
+            'includeWorkTime',
+            'timeTotalMinutes',
         ));
     }
 
@@ -179,8 +203,12 @@ class ProjectController extends Controller
     public function destroy(Request $request, Project $project): RedirectResponse
     {
         $project = $this->ownedProject($request, $project);
-        $confirmed = $request->string('confirmation')->toString();
-        abort_unless($confirmed === 'ta-bort', 422);
+        $request->validate([
+            'confirmation' => ['required', 'string', 'in:ta-bort'],
+        ], [
+            'confirmation.required' => 'Skriv ta-bort för att bekräfta.',
+            'confirmation.in' => 'Skriv ta-bort för att bekräfta.',
+        ]);
 
         $project->deleteStoredPhotoFiles();
         $project->delete();

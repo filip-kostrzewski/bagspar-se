@@ -74,8 +74,10 @@ class WindowSashController extends Controller
         $sash = $this->sashForProject($project, $sash);
         $photos = $sash->photos()->inDocumentOrder()->get();
         $events = $sash->events()->orderBy('id')->get();
+        $timeEntries = $sash->timeEntries()->orderBy('worked_on')->orderBy('id')->get();
+        $materials = $sash->materials()->orderBy('id')->get();
 
-        return view('app.sashes.show', compact('workshop', 'project', 'sash', 'photos', 'events'));
+        return view('app.sashes.show', compact('workshop', 'project', 'sash', 'photos', 'events', 'timeEntries', 'materials'));
     }
 
     public function update(Request $request, Project $project, WindowSash $sash): RedirectResponse

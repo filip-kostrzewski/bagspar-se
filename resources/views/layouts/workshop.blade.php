@@ -58,7 +58,7 @@
     </header>
 
     @if (session('status'))
-        <div class="workshop-flash workshop-flash--success" role="status" aria-live="polite" tabindex="-1" data-workshop-focus>
+        <div class="workshop-flash workshop-flash--success" role="status" aria-live="polite">
             <span class="workshop-flash__icon" aria-hidden="true">✓</span>
             <span>{{ session('status') }}</span>
         </div>

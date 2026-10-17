@@ -114,7 +114,23 @@ class ClientStatusTest extends TestCase
         $this->get(route('client-status.photos', ['token' => $token, 'photo' => $hidden]))
             ->assertOk()
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
-        $this->get(route('client-status.logo', ['token' => $token]))->assertOk();
+        $logo = $this->get(route('client-status.logo', ['token' => $token]));
+        $logo->assertOk()
+            ->assertHeader('Content-Type', 'image/webp')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+        $logoBytes = $logo->getContent();
+        $this->assertIsString($logoBytes);
+        $this->assertStringStartsWith('RIFF', $logoBytes);
+        $logoImage = imagecreatefromstring($logoBytes);
+        $this->assertNotFalse($logoImage);
+        $this->assertGreaterThan(0, imagesx($logoImage));
+        $this->assertGreaterThan(0, imagesy($logoImage));
+        imagedestroy($logoImage);
+
+        $photoResponse = $this->get(route('client-status.photos', ['token' => $token, 'photo' => $before]));
+        $photoBytes = $photoResponse->getContent();
+        $this->assertIsString($photoBytes);
+        $this->assertStringStartsWith('RIFF', $photoBytes);
 
         $report = $this->actingAs($member)->get(route('app.projects.report', $project));
         $report->assertOk()

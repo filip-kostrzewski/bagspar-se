@@ -38,6 +38,10 @@
                         <input id="include-work-notes" name="anteckningar" type="checkbox" value="1" @checked($includeWorkNotes)>
                         <span>Visa arbetsanteckningar i rapporten</span>
                     </label>
+                    <label class="workshop-checkbox" for="include-work-time">
+                        <input id="include-work-time" name="arbetstid" type="checkbox" value="1" @checked($includeWorkTime)>
+                        <span>Visa arbetstid i rapporten</span>
+                    </label>
                     <button class="workshop-button workshop-button--quiet" type="submit">Uppdatera rapporten</button>
                 </form>
                 <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.show', $project) }}">Till projektet</a>
@@ -70,6 +74,12 @@
                 @endif
                 @if ($project->location)
                     <div><dt>Plats</dt><dd>{{ $project->location }}</dd></div>
+                @endif
+                @if ($project->delivery_date)
+                    <div><dt>Leveransdatum</dt><dd>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</dd></div>
+                @endif
+                @if ($includeWorkTime)
+                    <div><dt>Arbetstid totalt</dt><dd>{{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</dd></div>
                 @endif
                 <div><dt>Antal bågar</dt><dd>{{ $sashCount }}</dd></div>
                 @if ($project->created_at)

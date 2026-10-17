@@ -8,6 +8,7 @@ use App\Models\SashEvent;
 use App\Models\SashPhoto;
 use App\Models\User;
 use App\Models\WindowSash;
+use App\Support\PrivateImageResponse;
 use App\Support\StoredSashPhoto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class SashPhotoController extends Controller
@@ -45,6 +46,7 @@ class SashPhotoController extends Controller
             'photo.dimensions' => 'Bilden får vara högst 6 000 pixlar bred eller hög.',
         ]);
 
+        $actor = $request->user();
         $file = $validated['photo'];
         $imageInfo = @getimagesize($file->getRealPath());
 
@@ -65,7 +67,7 @@ class SashPhotoController extends Controller
         $path = null;
 
         try {
-            DB::transaction(function () use ($file, $project, $sash, $validated, $webp, &$path): void {
+            DB::transaction(function () use ($actor, $file, $project, $sash, $validated, $webp, &$path): void {
                 $lockedSash = WindowSash::query()->lockForUpdate()->findOrFail($sash->getKey());
 
                 if ($lockedSash->photos()->count() >= self::MAX_PHOTOS_PER_SASH) {
@@ -77,13 +79,24 @@ class SashPhotoController extends Controller
                     throw new RuntimeException('Private photo storage failed.');
                 }
 
+                $filename = $this->safeOriginalFilename($file->getClientOriginalName());
                 $lockedSash->photos()->create([
                     'path' => $path,
                     'moment' => $validated['moment'],
-                    'original_filename' => $this->safeOriginalFilename($file->getClientOriginalName()),
+                    'original_filename' => $filename,
                     'mime_type' => 'image/webp',
                     'size' => strlen($webp),
                 ]);
+
+                if ($actor instanceof User) {
+                    $moment = $validated['moment'] === 'after' ? 'Efter' : 'Före';
+                    $lockedSash->recordEvent(
+                        $actor,
+                        SashEvent::KIND_PHOTO,
+                        null,
+                        'Bilden lades till: '.($filename ?? 'bild').' ('.$moment.').',
+                    );
+                }
             });
         } catch (Throwable $exception) {
             if (is_string($path)) {
@@ -145,24 +158,14 @@ class SashPhotoController extends Controller
         return back()->with('status', 'Bilden har tagits bort.');
     }
 
-    public function show(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): BinaryFileResponse
+    public function show(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): Response
     {
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
         $sash = $this->sashForProject($project, $sash);
         $photo = $sash->photos()->whereKey($photo->getKey())->firstOrFail();
-        $disk = Storage::disk('local');
 
-        abort_unless($disk->exists($photo->path), 404);
-
-        $response = response()->file($disk->path($photo->path), [
-            'Content-Type' => $photo->mime_type,
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
-        $response->setPrivate();
-        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
-
-        return $response;
+        return PrivateImageResponse::make($photo->path, $photo->mime_type ?: 'image/webp');
     }
 
     private function reencodeAsWebp(string $sourcePath, int $imageType): string

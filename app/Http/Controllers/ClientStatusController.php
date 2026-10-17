@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\SashPhoto;
+use App\Support\PrivateImageResponse;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ClientStatusController extends Controller
@@ -25,17 +24,17 @@ class ClientStatusController extends Controller
         return $this->publicResponse(view('client-status.show', compact('project', 'workshop', 'sashes', 'token')));
     }
 
-    public function photo(string $token, SashPhoto $photo): BinaryFileResponse
+    public function photo(string $token, SashPhoto $photo): Response
     {
         $project = $this->projectForToken($token);
         $photo = SashPhoto::query()->whereKey($photo->getKey())->firstOrFail();
         $sash = $photo->sash()->first();
         abort_unless($sash !== null && $sash->project_id === $project->getKey(), 404);
 
-        return $this->privateFile($photo->path, $photo->mime_type ?: 'image/webp');
+        return PrivateImageResponse::make($photo->path, $photo->mime_type ?: 'image/webp');
     }
 
-    public function logo(string $token): BinaryFileResponse
+    public function logo(string $token): Response
     {
         $project = $this->projectForToken($token);
         $workshop = $project->workshop()->firstOrFail();
@@ -43,7 +42,7 @@ class ClientStatusController extends Controller
         $prefix = 'workshop-logos/'.$workshop->getKey().'/';
         abort_unless(is_string($path) && str_starts_with($path, $prefix), 404);
 
-        return $this->privateFile($path, 'image/webp');
+        return PrivateImageResponse::make($path, 'image/webp');
     }
 
     private function projectForToken(string $token): Project
@@ -59,21 +58,5 @@ class ClientStatusController extends Controller
         return response($view)
             ->header('X-Robots-Tag', 'noindex, nofollow')
             ->header('Cache-Control', 'private, no-store');
-    }
-
-    private function privateFile(string $path, string $contentType): BinaryFileResponse
-    {
-        $disk = Storage::disk('local');
-        abort_unless($disk->exists($path), 404);
-
-        $response = response()->file($disk->path($path), [
-            'Content-Type' => $contentType,
-            'X-Content-Type-Options' => 'nosniff',
-            'X-Robots-Tag' => 'noindex, nofollow',
-        ]);
-        $response->setPrivate();
-        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
-
-        return $response;
     }
 }

@@ -237,12 +237,43 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
             return;
         }
 
+        const expected = form.getAttribute('data-confirm-match');
+
+        if (expected !== null) {
+            const field = form.querySelector('input[name="confirmation"]');
+            const typed = field instanceof HTMLInputElement ? field.value : '';
+
+            if (typed !== expected) {
+                event.preventDefault();
+                const error = form.querySelector('[data-confirm-error]');
+                const mismatch = form.getAttribute('data-confirm-match-message') || 'Bekräftelsen stämmer inte.';
+
+                if (error) {
+                    error.hidden = false;
+                    error.textContent = mismatch;
+                }
+
+                if (field instanceof HTMLInputElement) {
+                    field.setAttribute('aria-invalid', 'true');
+                    field.focus();
+                }
+
+                return;
+            }
+        }
+
         event.preventDefault();
         pendingConfirmForm = form;
 
         const messageNode = confirmDialog.querySelector('[data-confirm-message]');
+        const titleNode = confirmDialog.querySelector('.workshop-dialog__title');
         const acceptButton = confirmDialog.querySelector('[data-confirm-accept]');
         const cancelButton = confirmDialog.querySelector('[data-confirm-cancel]');
+        const title = form.getAttribute('data-confirm-title');
+
+        if (titleNode) {
+            titleNode.textContent = title && title !== '' ? title : 'Bekräfta';
+        }
 
         if (messageNode) {
             messageNode.textContent = message;

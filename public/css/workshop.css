@@ -222,6 +222,15 @@ svg {
     text-underline-offset: 3px;
 }
 
+.workshop-flash[hidden] {
+    display: none;
+}
+
+.workshop-flash:focus,
+.workshop-flash:focus-visible {
+    outline: none;
+}
+
 .workshop-flash {
     display: flex;
     width: min(760px, calc(100% - var(--page-gutter) * 2));
@@ -1782,7 +1791,7 @@ svg {
     height: 72px;
     flex: 0 0 72px;
     object-fit: contain;
-    background: #fff;
+    background: transparent;
 }
 
 .report-workshop__name {
@@ -2000,20 +2009,36 @@ svg {
         gap: 8px 16px;
     }
 
-    .workshop-header__account,
     .workshop-nav {
         flex-wrap: wrap;
     }
 
     .workshop-header__account {
+        display: grid;
         flex: 1 1 100%;
-        gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px 12px;
     }
 
     .workshop-header__workspace {
         display: block;
-        max-width: 100%;
+        grid-column: 1 / -1;
+        max-width: none;
+        overflow: visible;
         font-size: 12px;
+        text-overflow: unset;
+        white-space: normal;
+    }
+
+    .workshop-header__account .workshop-nav {
+        grid-column: 1;
+        justify-self: start;
+    }
+
+    .workshop-header__account form {
+        grid-column: 2;
+        justify-self: end;
     }
 
     .workshop-main {
@@ -2082,6 +2107,10 @@ svg {
             'link';
         gap: 12px;
         margin-top: 16px;
+    }
+
+    .sash-log__form {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .photo-upload-panel {
@@ -3296,6 +3325,67 @@ body.label-print-sheet {
     margin: 8px 0 0;
     color: var(--ink-soft);
     font-size: 14px;
+}
+
+.sash-log,
+.sash-materials {
+    grid-column: 1 / -1;
+    min-width: 0;
+}
+
+.sash-log__form {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
+    margin-top: 16px;
+}
+
+.sash-log__form .workshop-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+}
+
+.sash-log__list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sash-log__list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--rule);
+}
+
+.sash-log__list form {
+    margin: 0;
+}
+
+.project-time {
+    margin-top: 28px;
+}
+
+.project-time__people {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.material-sheet {
+    width: 100%;
+    margin-top: 24px;
+    border-collapse: collapse;
+}
+
+.material-sheet th,
+.material-sheet td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
 }
 
 .sash-history {

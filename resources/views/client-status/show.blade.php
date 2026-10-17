@@ -37,7 +37,7 @@
                 <p class="client-status__location">{{ $project->location }}</p>
             @endif
             @if ($project->delivery_date)
-                <p class="client-status__location">Beräknad leverans {{ $project->delivery_date->toDateString() }}</p>
+                <p class="client-status__location">Beräknad leverans {{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
             @endif
         </section>
 

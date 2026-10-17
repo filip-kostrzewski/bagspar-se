@@ -6,7 +6,9 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectEvent;
 use App\Models\SashEvent;
+use App\Models\SashMaterial;
 use App\Models\SashPhoto;
+use App\Models\SashTimeEntry;
 use App\Models\WindowSash;
 use Illuminate\Support\Carbon;
 
@@ -24,6 +26,8 @@ final class CustomerDataExport
             ->with([
                 'windowSashes.photos',
                 'windowSashes.events',
+                'windowSashes.timeEntries',
+                'windowSashes.materials',
                 'events',
             ])
             ->orderBy('id')
@@ -78,7 +82,7 @@ final class CustomerDataExport
         }
 
         fwrite($handle, "\xEF\xBB\xBF");
-        fputcsv($handle, ['Typ', 'Kund', 'Projekt', 'Båge', 'Uppgift', 'Värde'], ';', '"', '\\');
+        fputcsv($handle, ['Typ', 'Kund', 'Projekt', 'Båge', 'Tid', 'Uppgift', 'Värde'], ';', '"', '\\');
 
         $customerName = $payload['kund']['namn'];
 
@@ -89,7 +93,7 @@ final class CustomerDataExport
             'Adress' => $payload['kund']['adress'],
             'E-post' => $payload['kund']['epost'],
         ] as $label => $value) {
-            $this->put($handle, ['Kund', $customerName, '', '', $label, $this->text($value)]);
+            $this->put($handle, ['Kund', $customerName, '', '', '', $label, $this->text($value)]);
         }
 
         foreach ($payload['projekt'] as $project) {
@@ -103,7 +107,7 @@ final class CustomerDataExport
                 'Leveransdatum' => $project['leveransdatum'] ?? null,
                 'Kundnamn' => $project['kundnamn'] ?? null,
             ] as $label => $value) {
-                $this->put($handle, ['Projekt', $customerName, $projectName, '', $label, $this->text($value)]);
+                $this->put($handle, ['Projekt', $customerName, $projectName, '', '', $label, $this->text($value)]);
             }
 
             foreach ($project['bagar'] as $sash) {
@@ -115,7 +119,7 @@ final class CustomerDataExport
                     'Etapp' => $sash['etapp'] ?? null,
                     'Anteckningar' => $sash['anteckningar'] ?? null,
                 ] as $label => $value) {
-                    $this->put($handle, ['Båge', $customerName, $projectName, $code, $label, $this->text($value)]);
+                    $this->put($handle, ['Båge', $customerName, $projectName, $code, '', $label, $this->text($value)]);
                 }
 
                 foreach ($sash['historik'] as $event) {
@@ -124,6 +128,7 @@ final class CustomerDataExport
                         $customerName,
                         $projectName,
                         $code,
+                        $this->text($event['tid'] ?? null),
                         $this->text($event['anvandare'] ?? null),
                         $this->text($event['text'] ?? null),
                     ]);
@@ -135,8 +140,33 @@ final class CustomerDataExport
                         $customerName,
                         $projectName,
                         $code,
+                        '',
                         $this->text($photo['tillfalle'] ?? null),
                         $this->text($photo['url'] ?? null),
+                    ]);
+                }
+
+                foreach ($sash['arbetstid'] as $entry) {
+                    $this->put($handle, [
+                        'Arbetstid',
+                        $customerName,
+                        $projectName,
+                        $code,
+                        $this->text($entry['datum'] ?? null),
+                        $this->text($entry['anvandare'] ?? null),
+                        trim($this->text($entry['minuter'] ?? null).' min '.$this->text($entry['anteckning'] ?? null)),
+                    ]);
+                }
+
+                foreach ($sash['material'] as $material) {
+                    $this->put($handle, [
+                        'Material',
+                        $customerName,
+                        $projectName,
+                        $code,
+                        '',
+                        $this->text($material['typ'] ?? null),
+                        trim($this->text($material['mangd'] ?? null).' '.$this->text($material['enhet'] ?? null).' '.$this->text($material['beskrivning'] ?? null)),
                     ]);
                 }
             }
@@ -147,6 +177,7 @@ final class CustomerDataExport
                     $customerName,
                     $projectName,
                     '',
+                    $this->text($event['tid'] ?? null),
                     $this->text($event['anvandare'] ?? null),
                     $this->text($event['text'] ?? null),
                 ]);
@@ -182,6 +213,26 @@ final class CustomerDataExport
                     return $this->eventRow($event->created_at, $event->user_name, $event->kind, $text);
                 })
                 ->all(),
+            'arbetstid' => $sash->timeEntries
+                ->sortBy('id')
+                ->values()
+                ->map(fn (SashTimeEntry $entry): array => [
+                    'datum' => $entry->worked_on?->toDateString(),
+                    'minuter' => $entry->minutes,
+                    'anvandare' => $entry->user_name,
+                    'anteckning' => $entry->note,
+                ])
+                ->all(),
+            'material' => $sash->materials
+                ->sortBy('id')
+                ->values()
+                ->map(fn (SashMaterial $material): array => [
+                    'typ' => SashMaterial::labelForType($material->type),
+                    'beskrivning' => $material->description,
+                    'mangd' => SashMaterial::quantityLabel($material->quantity),
+                    'enhet' => $material->unit,
+                ])
+                ->all(),
             'bilder' => $sash->photos
                 ->sortBy('id')
                 ->values()
@@ -195,7 +246,7 @@ final class CustomerDataExport
     }
 
     /**
-     * @return array{tid: ?string, anvandare: string, slag: string, text: ?string}
+     * @return array{tid: ?string, anvandare: string, slag: string, etikett: string, text: ?string}
      */
     private function eventRow(mixed $createdAt, string $userName, string $kind, ?string $text): array
     {
@@ -207,8 +258,20 @@ final class CustomerDataExport
             'tid' => $timestamp,
             'anvandare' => $userName,
             'slag' => $kind,
+            'etikett' => $this->eventLabel($kind),
             'text' => $text,
         ];
+    }
+
+    private function eventLabel(string $kind): string
+    {
+        return match ($kind) {
+            SashEvent::KIND_STAGE => 'etapp',
+            SashEvent::KIND_NOTE => 'anteckning',
+            SashEvent::KIND_PHOTO => 'bild',
+            ProjectEvent::KIND_SASH_REMOVED => 'båge borttagen',
+            default => $kind,
+        };
     }
 
     /**

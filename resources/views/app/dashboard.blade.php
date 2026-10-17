@@ -90,7 +90,7 @@
                     <select id="filter-delivery" name="leverans">
                         <option value="">Alla</option>
                         <option value="forsenade" @selected($filters['leverans'] === 'forsenade')>Försenade</option>
-                        <option value="denna-vecka" @selected($filters['leverans'] === 'denna-vecka')>Denna vecka</option>
+                        <option value="kommande" @selected($filters['leverans'] === 'kommande')>Kommande 7 dagar</option>
                     </select>
                 </div>
                 <div class="form-field">
@@ -123,11 +123,11 @@
                 </section>
             @endif
 
-            @if ($weekProjects->isNotEmpty())
-                <section class="project-list-section" aria-labelledby="week-title">
-                    <h2 class="workshop-section-heading" id="week-title">Denna vecka <span>{{ $weekProjects->count() }}</span></h2>
+            @if ($upcomingProjects->isNotEmpty())
+                <section class="project-list-section" aria-labelledby="upcoming-title">
+                    <h2 class="workshop-section-heading" id="upcoming-title">Kommande 7 dagar <span>{{ $upcomingProjects->count() }}</span></h2>
                     <div class="project-grid">
-                        @foreach ($weekProjects as $project)
+                        @foreach ($upcomingProjects as $project)
                             @include('partials.workshop.project-card', ['project' => $project])
                         @endforeach
                     </div>

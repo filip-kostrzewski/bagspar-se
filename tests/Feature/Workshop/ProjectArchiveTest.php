@@ -66,6 +66,9 @@ class ProjectArchiveTest extends TestCase
         $this->actingAs($owner)->get(route('app.projects.show', $project))
             ->assertOk()
             ->assertSee('data-confirm="Arkivera projektet? Det döljs i den vanliga listan."', false)
+            ->assertSee('data-confirm-title="Arkivera projektet?"', false)
+            ->assertSee('Arkivera projekt</button>', false)
+            ->assertSee('workshop-button--primary" type="submit">Arkivera projekt', false)
             ->assertSee('aria-labelledby="workshop-confirm-title"', false)
             ->assertSee('aria-describedby="workshop-confirm-text"', false)
             ->assertSee('id="workshop-confirm-title" class="workshop-dialog__title">Bekräfta</h2>', false)
@@ -110,12 +113,24 @@ class ProjectArchiveTest extends TestCase
             ->assertSee('Arkivera i stället', false)
             ->assertSee('Det går inte att ångra.', false);
 
-        $this->delete(route('app.projects.destroy', $project))->assertStatus(422);
+        $this->from(route('app.projects.show', $project))
+            ->delete(route('app.projects.destroy', $project))
+            ->assertRedirect(route('app.projects.show', $project))
+            ->assertInvalid(['confirmation' => 'Skriv ta-bort för att bekräfta.']);
+        $this->get(route('app.projects.show', $project))
+            ->assertOk()
+            ->assertSee('data-confirm-title="Ta bort projektet?"', false)
+            ->assertSee('data-confirm-match="ta-bort"', false)
+            ->assertSee('id="project-delete-error"', false)
+            ->assertSee('Skriv ta-bort för att bekräfta.', false);
         $this->assertModelExists($project);
 
         $this->delete(route('app.projects.destroy', $project), ['confirmation' => 'ta-bort'])
             ->assertRedirect(route('app.dashboard'))
             ->assertSessionHas('status', 'Projektet och bildfilerna har tagits bort.');
+        $this->get(route('app.dashboard'))
+            ->assertOk()
+            ->assertSee('Projektet och bildfilerna har tagits bort.', false);
 
         $this->assertModelMissing($project);
         $this->assertDatabaseMissing('window_sashes', ['id' => $sash->getKey()]);

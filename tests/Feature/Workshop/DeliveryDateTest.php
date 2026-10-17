@@ -36,7 +36,13 @@ class DeliveryDateTest extends TestCase
         $this->get(route('app.projects.show', $project))
             ->assertOk()
             ->assertSee('Leveransdatum', false)
+            ->assertSee('20 okt 2026', false)
             ->assertSee('2026-10-20', false);
+
+        $this->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertSee('Leveransdatum', false)
+            ->assertSee('20 okt 2026', false);
 
         $this->patch(route('app.projects.update', $project), [
             'form_context' => 'project',
@@ -80,7 +86,7 @@ class DeliveryDateTest extends TestCase
 
         $this->get(route('client-status.show', ['token' => $project->client_status_token]))
             ->assertOk()
-            ->assertSee('Beräknad leverans 2026-10-20', false)
+            ->assertSee('Beräknad leverans 20 okt 2026', false)
             ->assertDontSee('070-999 88 77', false)
             ->assertDontSee('Telefon', false);
 
@@ -104,8 +110,11 @@ class DeliveryDateTest extends TestCase
         $owner = User::factory()->create();
         $other = User::factory()->create();
         $overdue = $this->project($owner, 'Villa Sen', '2026-10-10', 'received');
-        $both = $this->project($owner, 'Villa Tisdag', '2026-10-13', 'scraping');
+        $lateThisWeek = $this->project($owner, 'Villa Tisdag', '2026-10-13', 'scraping');
+        $today = $this->project($owner, 'Villa Idag', '2026-10-17', 'received');
         $sunday = $this->project($owner, 'Villa Söndag', '2026-10-18', 'received');
+        $edge = $this->project($owner, 'Villa Sex', '2026-10-23', 'received');
+        $later = $this->project($owner, 'Villa Sju', '2026-10-24', 'received');
         $ready = $this->project($owner, 'Villa Klar', '2026-10-01', 'ready');
         $empty = Project::factory()->create([
             'workshop_id' => $owner->workshop_id,
@@ -122,24 +131,32 @@ class DeliveryDateTest extends TestCase
         $html = $dashboard->getContent();
         $this->assertIsString($html);
 
-        $overdueSection = $this->between($html, 'id="overdue-title"', 'id="week-title"');
-        $weekSection = $this->between($html, 'id="week-title"', 'id="projects-title"');
+        $overdueSection = $this->between($html, 'id="overdue-title"', 'id="upcoming-title"');
+        $upcomingSection = $this->between($html, 'id="upcoming-title"', 'id="projects-title"');
         $this->assertStringContainsString('Försenade', $overdueSection);
         $this->assertStringContainsString('Villa Sen', $overdueSection);
         $this->assertStringContainsString('Villa Tisdag', $overdueSection);
         $this->assertStringContainsString('Villa Tom', $overdueSection);
+        $this->assertStringNotContainsString('Villa Idag', $overdueSection);
         $this->assertStringNotContainsString('Villa Söndag', $overdueSection);
         $this->assertStringNotContainsString('Villa Klar', $overdueSection);
         $this->assertStringNotContainsString('Villa Arkiv', $overdueSection);
         $this->assertStringNotContainsString('Villa Utan', $overdueSection);
         $this->assertStringNotContainsString('Villa Främmande', $overdueSection);
-        $this->assertStringContainsString('Denna vecka', $weekSection);
-        $this->assertStringContainsString('Villa Tisdag', $weekSection);
-        $this->assertStringContainsString('Villa Söndag', $weekSection);
-        $this->assertStringNotContainsString('Villa Sen', $weekSection);
-        $this->assertStringNotContainsString('Villa Klar', $weekSection);
-        $this->assertStringNotContainsString('Villa Tom', $weekSection);
-        $this->assertStringContainsString('Leveransdatum 2026-10-18', $html);
+        $this->assertStringContainsString('Kommande 7 dagar', $upcomingSection);
+        $this->assertStringContainsString('Villa Idag', $upcomingSection);
+        $this->assertStringContainsString('Villa Söndag', $upcomingSection);
+        $this->assertStringContainsString('Villa Sex', $upcomingSection);
+        $this->assertStringNotContainsString('Villa Tisdag', $upcomingSection);
+        $this->assertStringNotContainsString('Villa Sju', $upcomingSection);
+        $this->assertStringNotContainsString('Villa Sen', $upcomingSection);
+        $this->assertStringNotContainsString('Villa Klar', $upcomingSection);
+        $this->assertStringNotContainsString('Villa Tom', $upcomingSection);
+        $this->assertStringContainsString('Leveransdatum 18 okt 2026', $html);
+        $this->assertNotNull($lateThisWeek->getKey());
+        $this->assertNotNull($today->getKey());
+        $this->assertNotNull($edge->getKey());
+        $this->assertNotNull($later->getKey());
         $this->assertNotNull($empty->getKey());
         $this->assertNotNull($ready->getKey());
         $this->assertNotNull($undated->getKey());
@@ -156,18 +173,25 @@ class DeliveryDateTest extends TestCase
         $this->assertStringNotContainsString('Villa Utan', $list);
         $this->assertStringNotContainsString('Villa Främmande', $list);
 
-        $week = $this->after($this->get(route('app.dashboard', ['leverans' => 'denna-vecka']))->assertOk()->getContent(), 'id="projects-title"');
-        $this->assertStringContainsString('Villa Tisdag', $week);
+        $week = $this->after($this->get(route('app.dashboard', ['leverans' => 'kommande']))->assertOk()->getContent(), 'id="projects-title"');
+        $this->assertStringContainsString('Villa Idag', $week);
         $this->assertStringContainsString('Villa Söndag', $week);
+        $this->assertStringContainsString('Villa Sex', $week);
+        $this->assertStringNotContainsString('Villa Tisdag', $week);
+        $this->assertStringNotContainsString('Villa Sju', $week);
         $this->assertStringNotContainsString('Villa Sen', $week);
         $this->assertStringNotContainsString('Villa Tom', $week);
+
+        $oldWeek = $this->after($this->get(route('app.dashboard', ['leverans' => 'denna-vecka']))->assertOk()->getContent(), 'id="projects-title"');
+        $this->assertStringContainsString('Villa Sen', $oldWeek);
+        $this->assertStringContainsString('Villa Sju', $oldWeek);
 
         $archive = $this->get(route('app.dashboard', ['arkiv' => 1, 'leverans' => 'forsenade']));
         $archive->assertOk();
         $archiveHtml = $archive->getContent();
         $this->assertIsString($archiveHtml);
         $this->assertStringNotContainsString('id="overdue-title"', $archiveHtml);
-        $this->assertStringNotContainsString('id="week-title"', $archiveHtml);
+        $this->assertStringNotContainsString('id="upcoming-title"', $archiveHtml);
         $this->assertStringContainsString('Villa Arkiv', $archiveHtml);
         $this->assertStringNotContainsString('Villa Sen', $archiveHtml);
 

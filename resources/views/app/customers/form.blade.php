@@ -13,11 +13,14 @@
         <section class="form-page__panel" aria-labelledby="page-title">
             <h1 class="workshop-heading" id="page-title">{{ $customer->exists ? 'Kunduppgifter' : 'Ny kund' }}</h1>
 
-            @if ($errors->any())
+            @php
+                $formErrors = collect($errors->messages())->except(['confirmation', 'removal'])->flatten();
+            @endphp
+            @if ($formErrors->isNotEmpty())
                 <div class="workshop-error-summary" role="alert" tabindex="-1" data-workshop-focus>
                     <strong>Kontrollera de markerade uppgifterna.</strong>
                     <ul>
-                        @foreach ($errors->all() as $message)
+                        @foreach ($formErrors as $message)
                             <li>{{ $message }}</li>
                         @endforeach
                     </ul>
@@ -70,26 +73,27 @@
                         <section class="project-danger-zone" aria-labelledby="erase-title">
                             <h2 class="workshop-section-heading" id="erase-title">Radera kund</h2>
                             <p>Skriv kundens namn. Välj om projekten ska vara kvar utan kunduppgifter eller tas bort tillsammans med bildfilerna.</p>
-                            <form class="workshop-form" method="POST" action="{{ route('app.customers.destroy', $customer) }}" data-confirm="Radera kunden? Det går inte att ångra.">
+                            <form class="workshop-form" method="POST" action="{{ route('app.customers.destroy', $customer) }}" data-confirm="Det går inte att ångra." data-confirm-title="Radera kunden?" data-confirm-match="{{ $customer->name }}" data-confirm-match-message="Skriv kundens namn för att bekräfta.">
                                 @csrf
                                 @method('DELETE')
                                 <fieldset class="customer-removal">
                                     <legend>Vad ska hända med projekten?</legend>
                                     <label class="workshop-checkbox" for="removal-anonymize">
-                                        <input id="removal-anonymize" name="removal" type="radio" value="anonymize" required @checked(old('removal') === 'anonymize')>
+                                        <input id="removal-anonymize" name="removal" type="radio" value="anonymize" required @checked(old('removal', 'anonymize') === 'anonymize')>
                                         <span>Behåll projekten utan kunduppgifter</span>
                                     </label>
                                     <label class="workshop-checkbox" for="removal-delete-projects">
                                         <input id="removal-delete-projects" name="removal" type="radio" value="delete-projects" @checked(old('removal') === 'delete-projects')>
                                         <span>Ta bort projekten och bildfilerna</span>
                                     </label>
+                                    @error('removal')
+                                        <p class="form-field__error" id="removal-error">{{ $message }}</p>
+                                    @enderror
                                 </fieldset>
                                 <div class="form-field">
                                     <label for="confirmation">Skriv {{ $customer->name }} för att bekräfta.</label>
                                     <input id="confirmation" name="confirmation" type="text" value="{{ is_string(old('confirmation')) ? old('confirmation') : '' }}" autocomplete="off" required @if ($errors->has('confirmation')) aria-invalid="true" aria-describedby="confirmation-error" @endif>
-                                    @error('confirmation')
-                                        <p class="form-field__error" id="confirmation-error">{{ $message }}</p>
-                                    @enderror
+                                    <p class="form-field__error" id="confirmation-error" data-confirm-error @if (! $errors->has('confirmation')) hidden @endif>@error('confirmation'){{ $message }}@enderror</p>
                                 </div>
                                 <button class="workshop-button workshop-button--danger" type="submit">Radera kund</button>
                             </form>

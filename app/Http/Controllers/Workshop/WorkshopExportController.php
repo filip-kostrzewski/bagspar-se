@@ -17,7 +17,7 @@ class WorkshopExportController extends Controller
         Gate::authorize('update', $workshop);
 
         $projects = $workshop->projects()
-            ->with('windowSashes')
+            ->with(['windowSashes.timeEntries', 'windowSashes.materials'])
             ->orderBy('name')
             ->orderBy('id')
             ->get();
@@ -42,6 +42,8 @@ class WorkshopExportController extends Controller
                 'Etapp',
                 'Skapad',
                 'Uppdaterad',
+                'Arbetstid (minuter)',
+                'Material',
             ], ';', '"', '\\');
 
             foreach ($projects as $project) {
@@ -82,6 +84,8 @@ class WorkshopExportController extends Controller
             $this->cell($sash?->stageLabel() ?? ''),
             $this->cell($created ?? ''),
             $this->cell($updated ?? ''),
+            $this->cell($sash instanceof WindowSash ? (string) $sash->timeMinutes() : ''),
+            $this->cell($sash instanceof WindowSash ? $sash->materialSummary() : ''),
         ];
     }
 

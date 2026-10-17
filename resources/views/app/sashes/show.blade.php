@@ -163,6 +163,138 @@
                 @endif
             </section>
 
+            <section class="sash-log" aria-labelledby="time-title">
+                <p class="workshop-eyebrow">NEDLAGD TID</p>
+                <h2 class="workshop-section-heading" id="time-title">Arbetstid</h2>
+                @if ($timeEntries->isEmpty())
+                    <p class="sash-history__empty">Ingen tid är registrerad ännu.</p>
+                @else
+                    <ul class="sash-log__list">
+                        @foreach ($timeEntries as $entry)
+                            <li>
+                                <span>{{ \App\Support\SwedishDate::format($entry->worked_on) }}</span>
+                                <span>{{ \App\Support\WorkDuration::label($entry->minutes) }}</span>
+                                <span>{{ $entry->user_name }}</span>
+                                @if (is_string($entry->note) && $entry->note !== '')
+                                    <span>{{ $entry->note }}</span>
+                                @endif
+                                @if (auth()->user()?->isOwner() || $entry->user_id === auth()->id())
+                                    <form method="POST" action="{{ route('app.sashes.time.destroy', [$project, $sash, $entry]) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="workshop-button workshop-button--quiet" type="submit">Ta bort</button>
+                                    </form>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.time.store', [$project, $sash]) }}">
+                    @csrf
+                    <input type="hidden" name="form_context" value="time">
+                    <div class="form-field">
+                        <label for="worked_on">Datum</label>
+                        <input id="worked_on" name="worked_on" type="date" value="{{ old('form_context') === 'time' && is_string(old('worked_on')) ? old('worked_on') : now()->timezone('Europe/Stockholm')->toDateString() }}" required @if ($errors->has('worked_on') && old('form_context') === 'time') aria-invalid="true" aria-describedby="worked-on-error" @endif>
+                        @error('worked_on')
+                            @if (old('form_context') === 'time')
+                                <p class="form-field__error" id="worked-on-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="hours">Timmar</label>
+                        <input id="hours" name="hours" type="number" min="0" max="99" step="1" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('hours')) ? old('hours') : '0' }}" @if ($errors->has('hours') && old('form_context') === 'time') aria-invalid="true" aria-describedby="hours-error" @endif>
+                        @error('hours')
+                            @if (old('form_context') === 'time')
+                                <p class="form-field__error" id="hours-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="minutes">Minuter</label>
+                        <input id="minutes" name="minutes" type="number" min="0" max="59" step="1" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('minutes')) ? old('minutes') : '0' }}" @if ($errors->has('minutes') && old('form_context') === 'time') aria-invalid="true" aria-describedby="minutes-error" @endif>
+                        @error('minutes')
+                            @if (old('form_context') === 'time')
+                                <p class="form-field__error" id="minutes-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="time-note">Anteckning <span class="form-optional">Valfritt</span></label>
+                        <input id="time-note" name="note" type="text" maxlength="500" value="{{ old('form_context') === 'time' && is_string(old('note')) ? old('note') : '' }}">
+                    </div>
+                    <button class="workshop-button workshop-button--primary" type="submit">Spara tid</button>
+                </form>
+            </section>
+
+            <section class="sash-materials" aria-labelledby="materials-title">
+                <p class="workshop-eyebrow">DET SOM GÅTT ÅT</p>
+                <h2 class="workshop-section-heading" id="materials-title">Material</h2>
+                @if ($materials->isEmpty())
+                    <p class="sash-history__empty">Inget material är registrerat ännu.</p>
+                @else
+                    <ul class="sash-log__list">
+                        @foreach ($materials as $material)
+                            <li>
+                                <span>{{ \App\Models\SashMaterial::labelForType($material->type) }}</span>
+                                <span>{{ $material->description }}</span>
+                                <span>{{ \App\Models\SashMaterial::quantityLabel($material->quantity) }} {{ $material->unit }}</span>
+                                <form method="POST" action="{{ route('app.sashes.materials.destroy', [$project, $sash, $material]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="workshop-button workshop-button--quiet" type="submit">Ta bort</button>
+                                </form>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.materials.store', [$project, $sash]) }}">
+                    @csrf
+                    <input type="hidden" name="form_context" value="material">
+                    <div class="form-field">
+                        <label for="material-type">Typ</label>
+                        <select id="material-type" name="type" required @if ($errors->has('type') && old('form_context') === 'material') aria-invalid="true" @endif>
+                            @foreach (\App\Models\SashMaterial::TYPES as $type)
+                                <option value="{{ $type }}" @selected((old('form_context') === 'material' ? old('type') : 'glas') === $type)>{{ \App\Models\SashMaterial::labelForType($type) }}</option>
+                            @endforeach
+                        </select>
+                        @error('type')
+                            @if (old('form_context') === 'material')
+                                <p class="form-field__error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="material-description">Beskrivning</label>
+                        <input id="material-description" name="description" type="text" maxlength="160" required value="{{ old('form_context') === 'material' && is_string(old('description')) ? old('description') : '' }}" @if ($errors->has('description') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        @error('description')
+                            @if (old('form_context') === 'material')
+                                <p class="form-field__error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="material-quantity">Mängd</label>
+                        <input id="material-quantity" name="quantity" type="text" inputmode="decimal" required value="{{ old('form_context') === 'material' && is_string(old('quantity')) ? old('quantity') : '' }}" @if ($errors->has('quantity') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        @error('quantity')
+                            @if (old('form_context') === 'material')
+                                <p class="form-field__error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
+                        <label for="material-unit">Enhet</label>
+                        <input id="material-unit" name="unit" type="text" maxlength="20" required value="{{ old('form_context') === 'material' && is_string(old('unit')) ? old('unit') : '' }}" @if ($errors->has('unit') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        @error('unit')
+                            @if (old('form_context') === 'material')
+                                <p class="form-field__error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <button class="workshop-button workshop-button--primary" type="submit">Spara material</button>
+                </form>
+            </section>
+
             <section class="work-card-link-panel" aria-labelledby="link-title">
                 <p class="workshop-eyebrow">SKANNA FÖR ARBETSKORTET</p>
                 <h2 class="workshop-section-heading" id="link-title">QR-kod för den här bågen</h2>
@@ -226,7 +358,7 @@
                                     </select>
                                     <button class="workshop-button workshop-button--quiet" type="submit">Spara tillfälle</button>
                                 </form>
-                                <form method="POST" action="{{ route('app.sashes.photos.destroy', [$project, $sash, $photo]) }}" data-confirm="Ta bort bilden? Filen tas bort från lagringen.">
+                                <form method="POST" action="{{ route('app.sashes.photos.destroy', [$project, $sash, $photo]) }}" data-confirm="Filen tas bort från lagringen." data-confirm-title="Ta bort bilden?">
                                     @csrf
                                     @method('DELETE')
                                     <button class="workshop-button workshop-button--quiet" type="submit">Ta bort bild</button>
@@ -301,7 +433,7 @@
                 <section class="project-danger-zone" aria-labelledby="sash-danger-title">
                     <h2 class="workshop-section-heading" id="sash-danger-title">Ta bort båge</h2>
                     <p>Borttagning raderar bågen och bildfilerna. Det går inte att ångra.</p>
-                    <form method="POST" action="{{ route('app.sashes.destroy', [$project, $sash]) }}" data-confirm="Ta bort bågen {{ $sash->code }}? Bildfilerna tas bort.">
+                    <form method="POST" action="{{ route('app.sashes.destroy', [$project, $sash]) }}" data-confirm="Ta bort bågen {{ $sash->code }}? Bildfilerna tas bort." data-confirm-title="Ta bort bågen?">
                         @csrf
                         @method('DELETE')
                         <button class="workshop-button workshop-button--danger" type="submit">Ta bort båge</button>

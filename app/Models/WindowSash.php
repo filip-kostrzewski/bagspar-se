@@ -66,6 +66,39 @@ class WindowSash extends Model
         return $this->hasMany(SashEvent::class, 'sash_id');
     }
 
+    /** @return HasMany<SashTimeEntry, $this> */
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(SashTimeEntry::class, 'sash_id');
+    }
+
+    /** @return HasMany<SashMaterial, $this> */
+    public function materials(): HasMany
+    {
+        return $this->hasMany(SashMaterial::class, 'sash_id');
+    }
+
+    public function timeMinutes(): int
+    {
+        if ($this->relationLoaded('timeEntries')) {
+            return (int) $this->timeEntries->sum('minutes');
+        }
+
+        return (int) $this->timeEntries()->sum('minutes');
+    }
+
+    public function materialSummary(): string
+    {
+        $materials = $this->relationLoaded('materials')
+            ? $this->materials
+            : $this->materials()->orderBy('id')->get();
+
+        return $materials
+            ->sortBy('id')
+            ->map(fn (SashMaterial $material): string => SashMaterial::labelForType($material->type).': '.SashMaterial::quantityLabel($material->quantity).' '.$material->unit.' '.$material->description)
+            ->implode('; ');
+    }
+
     public function stageLabel(): string
     {
         return self::labelForStage($this->stage);
