@@ -16,4 +16,9 @@ class WorkshopPolicy
     {
         return $this->update($user, $workshop);
     }
+
+    public function manageBilling(User $user, Workshop $workshop): bool
+    {
+        return $this->update($user, $workshop);
+    }
 }

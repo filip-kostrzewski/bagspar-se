@@ -6,7 +6,7 @@
 
 <p>Se ett exempel med testuppgifter: <a href="{{ route('demo') }}">{{ route('demo') }}</a>.</p>
 
-<p>{{ config('bagspar.pilot_offer') }}. {{ config('bagspar.pilot_follow_up') }} {{ config('bagspar.pilot_price_line') }}</p>
+<p>{{ \App\Support\Pricing::trialHeadline() }}. {{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::yearlySentence() }}</p>
 
 @if (filled(config('bagspar.contact_email')))
     <p>Vill du att vi raderar uppgifterna, skriv till <a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a>.</p>

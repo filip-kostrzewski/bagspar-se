@@ -30,6 +30,18 @@ final class SwedishDate
         return $date->format('j').' '.$months[(int) $date->format('n')].' '.$date->format('Y');
     }
 
+    /**
+     * The calendar date in Sweden, for an instant stored in UTC.
+     */
+    public static function formatLocal(mixed $date): string
+    {
+        if (! $date instanceof Carbon) {
+            return '';
+        }
+
+        return self::format($date->copy()->timezone('Europe/Stockholm'));
+    }
+
     public static function formatDateTime(mixed $date): string
     {
         if (! $date instanceof Carbon) {

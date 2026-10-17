@@ -14,6 +14,7 @@ use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Workshop\BillingController;
 use App\Http\Controllers\Workshop\CustomerController;
 use App\Http\Controllers\Workshop\DashboardController;
 use App\Http\Controllers\Workshop\DeliveryApprovalController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Workshop\WindowSashController;
 use App\Http\Controllers\Workshop\WorkshopExportController;
 use App\Http\Controllers\Workshop\WorkshopInvitationController;
 use App\Http\Controllers\Workshop\WorkshopSettingsController;
+use App\Http\Controllers\WorkshopAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -58,6 +60,8 @@ Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest')
 Route::middleware(['admin', 'throttle:30,1'])->group(function (): void {
     Route::get('/admin/anmalningar', [SignupAdminController::class, 'index'])->name('admin.signups');
     Route::get('/admin/anmalningar.csv', [SignupAdminController::class, 'export'])->name('admin.signups.export');
+    Route::get('/admin/verkstader', [WorkshopAdminController::class, 'index'])->name('admin.workshops');
+    Route::patch('/admin/verkstader/{workshop}', [WorkshopAdminController::class, 'update'])->whereNumber('workshop')->name('admin.workshops.update');
 });
 Route::post('/intresse', PilotLeadController::class)
     ->middleware('throttle:5,1')
@@ -118,8 +122,10 @@ Route::middleware('auth')->group(function (): void {
         ->name('verification.send');
 });
 
-Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app')->name('app.')->group(function (): void {
+Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.access'])->prefix('app')->name('app.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/abonnemang', [BillingController::class, 'edit'])->name('billing.edit');
+    Route::post('/abonnemang', [BillingController::class, 'store'])->middleware('throttle:10,1')->name('billing.store');
     Route::get('/export.csv', WorkshopExportController::class)->name('export');
     Route::get('/kunder', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/kunder/ny', [CustomerController::class, 'create'])->name('customers.create');

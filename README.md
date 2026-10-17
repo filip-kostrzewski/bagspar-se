@@ -6,15 +6,17 @@ Live site: [https://bagspar.se](https://bagspar.se). Operated by Prodi Digital A
 
 ## Who it is for
 
-Workshops that take wooden sashes out, restore them, and put each sash back in the same opening. The site explains that workflow, shows one fictional example card, and takes pilot signups.
+Workshops that take wooden sashes out, restore them, and put each sash back in the same opening. The site explains that workflow, shows one fictional example card, and lets a workshop create an account.
 
-## Pilot offer
+## Trial, price, and invoicing
 
-Copy on the homepage comes from `config/bagspar.php`:
+Numbers live in `config/bagspar.php` and every public sentence about them is built by `App\Support\Pricing`:
 
-- Free 3-month pilot. `BAGSPAR_PILOT_OFFER` replaces that headline when it is set.
-- 790 kr/month excluding VAT after the pilot. No binding period.
-- Signing up reserves a pilot spot. The example card is public. A workshop account is part of the pilot. Someone follows up within a few working days.
+- 14-day free trial from registration (`trial_days`). No card.
+- 1 490 kr/month excluding VAT per workshop, 3 users included, 349 kr/month per extra user. 14 900 kr/year when paid annually.
+- The owner orders under `/app/abonnemang`, choosing monthly or yearly, and gives the organization number and an invoice address. The order mails `LEAD_NOTIFICATION_EMAIL` with everything needed for the invoice and sends the workshop a confirmation. Invoices are issued by hand (Fortnox); there is no card payment and no Stripe.
+- Access is the latest of `trial_ends_at`, `paid_until`, and `subscription_ordered_at` plus `order_grace_days` (30). When it has passed, the `workshop.access` middleware sends every `/app` request to the billing page. Exports stay open so no data is held hostage. The admin records `paid_until` under `/admin/verkstader` once an invoice is sent or paid.
+- Workshops created before this change keep the `trial_ends_at` they were given.
 
 ## What this repository ships
 
@@ -22,7 +24,7 @@ This repository is the public site and the example card.
 
 | Path | Purpose |
 | --- | --- |
-| `/` | Homepage, pilot offer, and signup form |
+| `/` | Homepage, price, and contact form |
 | `/demo` | Example work card for fictional sash 2-KÖK-F1-B2 |
 | `GET` and `POST /demo/synk` | Reads and stores that example’s step and notes |
 | `/fonsterrenovering-dokumentation` | Guide: what to record on each sash |
@@ -32,8 +34,10 @@ This repository is the public site and the example card.
 | `/sitemap.xml` | Public HTML pages. Locations use `APP_URL` |
 | `/robots.txt` | Static file. Points crawlers at the sitemap |
 | `/manifest.webmanifest` | Web app manifest. Start URL is `/demo` |
-| `POST /intresse` | Saves a pilot signup and sends mail when configured |
+| `POST /intresse` | Saves an interest signup and sends mail when configured |
 | `/admin/anmalningar` | Signup list. `/admin/anmalningar.csv` downloads the same rows |
+| `/admin/verkstader` | Workshop list with trial, order, and paid period. `PATCH /admin/verkstader/{id}` records `paid_until` and the plan |
+| `/app/abonnemang` | Billing page inside the workshop app. The owner orders or changes the subscription |
 | `/up` | Laravel health check |
 
 The example card lives in the browser (`localStorage`). Changing the step or notes posts them to `/demo/synk`, which keeps them in cache for 14 days (`config('bagspar.demo_sync_days')`). Photos added on the example stay in the browser and are not uploaded. A service worker (`public/sw.js`) caches `/demo` and its assets so the example can be opened offline. `demo/synk` is exempt from CSRF because a later visit may not have a fresh session token.
@@ -79,14 +83,13 @@ Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit
 | --- | --- |
 | `APP_URL` | Sitemap and canonical URLs. Production rewrites an `http` value to `https`. The sitemap falls back to `https://bagspar.se` when the value is not a usable URL |
 | `APP_KEY` | Application key from `php artisan key:generate` |
-| `LEAD_NOTIFICATION_EMAIL` | Recipient of new pilot signups. Mail is skipped when this is empty. See `config/bagspar.php` |
+| `LEAD_NOTIFICATION_EMAIL` | Recipient of new signups, contact messages, and subscription orders. Mail is skipped when this is empty. See `config/bagspar.php` |
 | `POSTMARK_API_KEY` | Postmark server token (`config/services.php`). Leave it empty in `.env.example` |
 | `MAIL_MAILER` | `postmark` on the server. Unset, Laravel uses `log` |
 | `MAIL_FROM_ADDRESS` | From address. `.env.example` uses `noreply@bagspar.se` |
 | `MAIL_FROM_NAME` | From name. Defaults to `APP_NAME` |
 | `BAGSPAR_ADMIN_TOKEN` | Secret for the signup list. Empty hides those routes with 404 |
 | `BAGSPAR_CONTACT_EMAIL` | Footer and privacy-policy contact. Empty uses `kontakt@bagspar.se`. That domain had no MX record when this was written, so the mailbox has to exist or the variable has to point at an address that already receives mail |
-| `BAGSPAR_PILOT_OFFER` | Optional pilot headline. Empty keeps the default offer |
 | `GA_MEASUREMENT_ID` | Optional Google Analytics 4 measurement ID. Empty uses the public ID `G-SSL2JZK3LY`. `gtag.js` is requested only after the visitor chooses Godkänn |
 
 ## Tests and build

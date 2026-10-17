@@ -148,10 +148,10 @@
     <aside class="demo-next" aria-labelledby="demo-next-title">
         <div>
             <h2 id="demo-next-title">Börja med ett eget konto</h2>
-            <p>Kortet ovan är öppet för alla. Starta en kostnadsfri pilot för din verkstad; arbetskort sparas på servern med internetanslutning.</p>
+            <p>Kortet ovan är öppet för alla. Prova gratis i {{ \App\Support\Pricing::trialDays() }} dagar med ett eget verkstadskonto; arbetskort sparas på servern med internetanslutning.</p>
         </div>
-        <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
-        <p><a href="{{ route('home') }}#kontakt">Vill du stämma av piloten? Kontakta oss</a></p>
+        <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
+        <p><a href="{{ route('home') }}#pris">Se priset</a> · <a href="{{ route('home') }}#kontakt">Frågor? Kontakta oss</a></p>
     </aside>
 
     <dialog class="site-dialog" data-confirm-dialog aria-labelledby="demo-confirm-title" aria-describedby="demo-confirm-text">

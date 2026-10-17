@@ -1,7 +1,6 @@
 <?php
 
 $contactEmail = env('BAGSPAR_CONTACT_EMAIL');
-$pilotOffer = env('BAGSPAR_PILOT_OFFER');
 $adminToken = env('BAGSPAR_ADMIN_TOKEN');
 
 /*
@@ -41,16 +40,27 @@ return [
         : $defaultContactEmail,
 
     /*
-     * Pilot offer headline. BAGSPAR_PILOT_OFFER replaces the default.
-     * A blank value keeps the default so the offer stays visible.
+     * Free trial for a new workshop account, in days from registration.
      */
-    'pilot_offer' => is_string($pilotOffer) && trim($pilotOffer) !== ''
-        ? trim($pilotOffer)
-        : 'Gratis pilot till 31 december 2026',
+    'trial_days' => 14,
 
-    'pilot_follow_up' => 'Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.',
+    /*
+     * Days a workshop keeps its access after ordering a subscription, so the
+     * invoice can be issued and paid without the account locking meanwhile.
+     */
+    'order_grace_days' => 30,
 
-    'pilot_price_line' => 'Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.',
+    /*
+     * Price list in kronor excluding VAT. App\Support\Pricing turns these
+     * into the sentences shown on the public pages and in the app.
+     */
+    'pricing' => [
+        'monthly_kr' => 1490,
+        'yearly_kr' => 14900,
+        'included_seats' => 3,
+        'extra_seat_kr' => 349,
+        'invoice_days' => 30,
+    ],
 
     'demo_sync_days' => 14,
 

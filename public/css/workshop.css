@@ -3616,3 +3616,135 @@ body.label-print-sheet {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Access notice: trial ending, locked account */
+
+.workshop-access-notice {
+    display: flex;
+    width: min(760px, calc(100% - var(--page-gutter) * 2));
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin: 20px auto 0;
+    padding: 14px 18px;
+    border: 1px solid #e2c98f;
+    border-radius: 6px;
+    background: #fbf3df;
+    color: #5a4214;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.workshop-access-notice--locked {
+    border-color: #d9a39d;
+    background: #fbeae8;
+    color: var(--danger);
+}
+
+.workshop-access-notice .workshop-button {
+    min-height: 40px;
+    padding: 8px 14px;
+}
+
+/* Billing page */
+
+.billing-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px 28px;
+    max-width: 860px;
+    margin: 28px 0 0;
+    padding: 20px 22px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--white);
+}
+
+.billing-summary div {
+    min-width: 0;
+}
+
+.billing-summary dt {
+    margin: 0 0 4px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.billing-summary dd {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.billing-order {
+    max-width: 560px;
+    margin-top: 44px;
+}
+
+.billing-plans {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.billing-plans legend {
+    margin-bottom: 10px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.billing-plan {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: var(--white);
+    cursor: pointer;
+}
+
+.billing-plan.is-selected,
+.billing-plan:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.billing-plan input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin: 2px 0 0;
+    accent-color: var(--ink);
+}
+
+.billing-plan > span {
+    display: grid;
+    gap: 3px;
+}
+
+.billing-plan strong {
+    font-size: 15px;
+}
+
+.billing-plan small {
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.billing-note {
+    margin: 24px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.5;
+}

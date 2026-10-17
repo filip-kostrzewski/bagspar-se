@@ -8,9 +8,9 @@
         <h1 id="page-title" class="workshop-heading">Skapa ett konto</h1>
         <p class="auth-page__intro">Börja med verkstaden. Lägg sedan till projekt och bågar när arbetet tar form.</p>
 
-        <aside class="registration-terms" aria-label="Pilot och pris">
-            <strong>Gratis pilot till 31 december 2026</strong>
-            <p>Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
+        <aside class="registration-terms" aria-label="Provperiod och pris">
+            <strong>{{ \App\Support\Pricing::trialHeadline() }} – inget kort behövs</strong>
+            <p>{{ \App\Support\Pricing::offerSentence() }} Vi skickar faktura först när ägaren beställer abonnemanget i appen.</p>
         </aside>
 
         @if ($errors->any())

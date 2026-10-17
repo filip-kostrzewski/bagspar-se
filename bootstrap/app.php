@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\EnsureVerifiedEmailInProduction;
+use App\Http\Middleware\EnsureWorkshopAccess;
 use App\Http\Middleware\ForceProductionHttps;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AuthenticateAdmin::class,
             'verified.production' => EnsureVerifiedEmailInProduction::class,
+            'workshop.access' => EnsureWorkshopAccess::class,
         ]);
         $middleware->redirectGuestsTo(fn (Request $request): string => route('login'));
         $middleware->redirectUsersTo(fn (Request $request): string => route('app.dashboard'));

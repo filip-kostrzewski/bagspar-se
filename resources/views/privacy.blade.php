@@ -29,10 +29,10 @@
         <p>Anmälan har inga andra fält. Den ber inte om telefonnummer, personnummer eller en beskrivning av ert arbetssätt.</p>
 
         <h2>Varför vi behandlar uppgifterna</h2>
-        <p>Uppgifterna används för att ta emot anmälan och kontakta dig om pilotplatsen. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal om piloten. Vi säljer inte uppgifterna.</p>
+        <p>Uppgifterna används för att ta emot anmälan och kontakta dig om Bågspår. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal. Vi säljer inte uppgifterna.</p>
 
         <h2>Hur länge uppgifterna sparas</h2>
-        <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Du kan när som helst kontakta oss och be att uppgifterna raderas.</p>
+        <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan. Du kan när som helst kontakta oss och be att uppgifterna raderas.</p>
 
         <h2>Meddelanden via kontaktformuläret</h2>
         <p>När du skriver till oss via kontaktformuläret sparar vi namn, e-postadress, meddelande och tidpunkt. Företag och telefonnummer sparas bara om du fyller i dem. Uppgifterna används för att läsa och besvara meddelandet. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran. Vi sparar dem så länge de behövs för att hantera meddelandet. Du kan be oss radera dem.</p>
@@ -61,8 +61,9 @@
             <li>projektets namn, kund eller beställare, plats och anteckningar</li>
             <li>varje båges kod, rum, placering, aktuella arbetssteg och anteckningar</li>
             <li>bilder som laddas upp till en båge, med originalfilnamn, filtyp och filstorlek</li>
+            <li>faktureringsuppgifter när verkstaden beställer abonnemang: organisationsnummer, fakturamejl, vald betalningsperiod och en eventuell referens</li>
         </ul>
-        <p>Uppgifterna används för att visa och hantera projekt, arbetskort, bilder och projektrapporter i Bågspår. Kontots uppgifter och bilder hör till verkstaden. De visas efter inloggning för användare med åtkomst till verkstadens konto. Bildfilerna är privata och visas via en skyddad appfunktion, inte som publika bildlänkar. Om verkstaden slår på en statuslänk för ett projekt kan den som har länken se bågarnas etapp och bilder märkta före eller efter. Anteckningar ingår inte, och länken kan stängas av. Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet.</p>
+        <p>Uppgifterna används för att visa och hantera projekt, arbetskort, bilder och projektrapporter i Bågspår, och faktureringsuppgifterna för att skicka fakturan. Fakturor bokförs hos vår redovisningsleverantör och sparas så länge bokföringslagen kräver. Kontots uppgifter och bilder hör till verkstaden. De visas efter inloggning för användare med åtkomst till verkstadens konto. Bildfilerna är privata och visas via en skyddad appfunktion, inte som publika bildlänkar. Om verkstaden slår på en statuslänk för ett projekt kan den som har länken se bågarnas etapp och bilder märkta före eller efter. Anteckningar ingår inte, och länken kan stängas av. Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet.</p>
         <p>Om du vill få uppgifter i ett konto raderade, kontakta oss via e-postadressen nedan. Appen har för närvarande ingen egen funktion för att radera konto eller enskilda arbetskort.</p>
 
         <h2>Dina rättigheter</h2>

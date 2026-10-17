@@ -59,10 +59,10 @@
                     'url' => $configuredAppUrl.'/',
                     'offers' => [
                         '@type' => 'Offer',
-                        'price' => '790',
+                        'price' => (string) \App\Support\Pricing::monthlyKr(),
                         'priceCurrency' => 'SEK',
-                        'description' => config('bagspar.pilot_offer').'. '.config('bagspar.pilot_follow_up'),
-                        'url' => $configuredAppUrl.'/#pilot',
+                        'description' => \App\Support\Pricing::trialHeadline().'. '.\App\Support\Pricing::offerSentence(),
+                        'url' => $configuredAppUrl.'/#pris',
                     ],
                 ],
             ],
@@ -120,7 +120,7 @@
                 @endif
                 <a class="site-nav__link site-nav__contact" href="{{ route('contact') }}">Kontakt</a>
                 <a class="site-nav__link site-nav__login" href="{{ route('login') }}">Logga in</a>
-                <a class="button button--small site-nav__cta" href="{{ route('register') }}">Starta gratis pilot</a>
+                <a class="button button--small site-nav__cta" href="{{ route('register') }}">Prova gratis</a>
             </nav>
         </div>
     </header>

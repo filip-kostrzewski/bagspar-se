@@ -62,7 +62,7 @@ class GuidePageTest extends TestCase
         $response->assertSee('href="'.route('demo').'"', false);
         $response->assertSee('Se exempel med testuppgifter', false);
         $response->assertSee('href="'.route('home').'#kontakt"', false);
-        $response->assertSee('Starta gratis pilot', false);
+        $response->assertSee('Prova gratis i 14 dagar', false);
         $response->assertDontSee('tänkt', false);
         $response->assertDontSee('planerat', false);
         $response->assertDontSee('tanken är', false);

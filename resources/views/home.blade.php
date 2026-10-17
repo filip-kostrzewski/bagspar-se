@@ -8,12 +8,16 @@
     /** @var list<array{question: string, answer: string}> $homeFaqs */
     $homeFaqs = [
         [
-            'question' => 'Hur startar jag den gratis piloten?',
-            'answer' => 'Skapa ett verkstadskonto för att börja. Ägaren kan bjuda in medarbetare till samma verkstad.',
+            'question' => 'Hur kommer jag igång?',
+            'answer' => 'Skapa ett verkstadskonto. De första '.\App\Support\Pricing::trialDays().' dagarna är gratis och kräver inget kort. Ägaren kan bjuda in medarbetare till samma verkstad.',
         ],
         [
-            'question' => 'Vad kostar Bågspår efter piloten?',
-            'answer' => 'Piloten är gratis till 31 december 2026. Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.',
+            'question' => 'Vad kostar Bågspår?',
+            'answer' => \App\Support\Pricing::monthlyLabel().' exkl. moms per verkstad. '.\App\Support\Pricing::seatsSentence().' '.\App\Support\Pricing::yearlySentence().' '.\App\Support\Pricing::invoiceSentence(),
+        ],
+        [
+            'question' => 'Vad händer när provperioden tar slut?',
+            'answer' => 'Kontot låses tills ägaren beställer abonnemanget i appen. Projekt, bågar och bilder finns kvar, och verkstadens data kan alltid laddas ner. Ingen faktura skickas utan en beställning.',
         ],
         [
             'question' => 'Kan jag prova arbetskortet först?',
@@ -56,13 +60,13 @@
             <h1 id="hero-title" class="display-heading">Varje båge. Rätt arbetskort.</h1>
             <p class="home-hero__intro">Håll ihop märkning, bilder och arbetssteg från verkstad till återmontering.</p>
             <div class="home-hero__actions">
-                <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
+                <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
                 <a class="text-link home-hero__demo-link" href="{{ route('demo') }}">
                     Prova exempel
                     @include('partials.icon', ['name' => 'arrow-right'])
                 </a>
             </div>
-            <p class="home-hero__offer">{{ config('bagspar.pilot_offer') }} <span aria-hidden="true">·</span> {{ config('bagspar.pilot_follow_up') }}</p>
+            <p class="home-hero__offer">Inget kort behövs <span aria-hidden="true">·</span> {{ \App\Support\Pricing::offerSentence() }}</p>
             <ul class="hero-benefits" aria-label="Det här samlar arbetskortet">
                 <li>
                     @include('partials.icon', ['name' => 'tag'])
@@ -261,19 +265,20 @@
         </div>
     </section>
 
-    <section id="pilot" class="pilot-pricing page-shell" aria-labelledby="pilot-title">
+    <section id="pris" class="pilot-pricing page-shell" aria-labelledby="pilot-title">
+        <div id="pilot"></div>
         <div class="pilot-pricing__copy" data-reveal>
-            <p class="eyebrow">BÖRJA I LUGN OCH RO</p>
-            <h2 id="pilot-title" class="section-heading">{{ config('bagspar.pilot_offer') }}</h2>
-            <p class="body-copy">{{ config('bagspar.pilot_follow_up') }}</p>
-            <ul class="pilot-features" aria-label="Det här ingår i piloten">
+            <p class="eyebrow">PRIS</p>
+            <h2 id="pilot-title" class="section-heading">{{ \App\Support\Pricing::trialHeadline() }}. Sedan ett pris per verkstad.</h2>
+            <p class="body-copy">{{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::invoiceSentence() }}</p>
+            <ul class="pilot-features" aria-label="Det här ingår">
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
-                    <span><strong>Verkstadens konto</strong><small>Bågar, bilder och anteckningar samlas här.</small></span>
+                    <span><strong>Verkstadens konto</strong><small>Bågar, bilder och anteckningar samlas här. Ägaren kan bjuda in medarbetare till samma verkstad.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
-                    <span><strong>Projekt och arbetskort</strong><small>Samla steg och anteckningar för varje båge.</small></span>
+                    <span><strong>Obegränsat med projekt</strong><small>Samla steg och anteckningar för varje båge, projekt efter projekt.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'tag'])</span>
@@ -288,10 +293,14 @@
                     <span><strong>Projektrapport</strong><small>Ladda ner som PDF eller skriv ut.</small></span>
                 </li>
             </ul>
-            <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
+            <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
         </div>
         <div class="pilot-pricing__price" data-reveal>
-            <p class="pilot-pricing__terms">{{ config('bagspar.pilot_price_line') }}</p>
+            <p class="pilot-pricing__label">Per verkstad, exkl. moms</p>
+            <p class="pilot-pricing__amount"><span>{{ \App\Support\Pricing::kr(\App\Support\Pricing::monthlyKr()) }}</span><span>kr/mån</span></p>
+            <p class="pilot-pricing__vat">{{ \App\Support\Pricing::seatsSentence() }}</p>
+            <p class="pilot-pricing__vat">{{ \App\Support\Pricing::yearlySentence() }}</p>
+            <p class="pilot-pricing__vat">Ingen bindningstid. Faktura, inget kort.</p>
         </div>
     </section>
 
@@ -316,7 +325,7 @@
             <div class="contact-note__intro" data-reveal>
                 <p class="eyebrow">KONTAKT</p>
                 <h2 id="contact-title" class="section-heading">Skriv till oss</h2>
-                <p>Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten. Företag och telefon är valfria. Det här formuläret skapar inget konto.</p>
+                <p>Namn, e-post och ett meddelande räcker, också om du vill ha en genomgång innan verkstaden börjar. Företag och telefon är valfria. Det här formuläret skapar inget konto.</p>
             </div>
             <div class="contact-note__form-wrap" data-reveal>
                 @if (session('pilot_lead_duplicate'))

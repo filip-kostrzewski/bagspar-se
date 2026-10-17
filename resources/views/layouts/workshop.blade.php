@@ -44,6 +44,7 @@
                         <a href="{{ route('app.customers.index') }}" @if (request()->routeIs('app.customers.*')) aria-current="page" @endif>Kunder</a>
                         @if (auth()->user()?->isOwner())
                             <a href="{{ route('app.settings.edit') }}" @if (request()->routeIs('app.settings.*')) aria-current="page" @endif>Inställningar</a>
+                            <a href="{{ route('app.billing.edit') }}" @if (request()->routeIs('app.billing.*')) aria-current="page" @endif>Abonnemang</a>
                         @endif
                     </nav>
                     <form method="POST" action="{{ route('auth.logout') }}">
@@ -63,6 +64,21 @@
             <span>{{ session('status') }}</span>
         </div>
     @endif
+
+    @auth
+        @php
+            $accessWorkshop = $workshop ?? auth()->user()->workshop;
+            $accessNotice = $accessWorkshop instanceof \App\Models\Workshop ? \App\Support\AccessNotice::for($accessWorkshop) : null;
+        @endphp
+        @if (is_array($accessNotice))
+            <div class="workshop-access-notice workshop-access-notice--{{ $accessNotice['tone'] }}" role="status">
+                <span>{{ $accessNotice['text'] }}</span>
+                @if (auth()->user()->isOwner() && ! request()->routeIs('app.billing.*'))
+                    <a class="workshop-button workshop-button--primary" href="{{ route('app.billing.edit') }}">{{ $accessNotice['action'] }}</a>
+                @endif
+            </div>
+        @endif
+    @endauth
 
     <main id="main" class="workshop-main page-shell">
         @yield('content')

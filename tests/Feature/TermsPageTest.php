@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 class TermsPageTest extends TestCase
 {
-    public function test_terms_page_states_the_pilot_price_and_the_right_to_cancel(): void
+    public function test_terms_page_states_the_price_the_invoice_terms_and_the_right_to_cancel(): void
     {
         config(['bagspar.contact_email' => 'kontakt@bagspar.se']);
 
@@ -18,12 +18,13 @@ class TermsPageTest extends TestCase
         $response->assertSee('559214-9370', false);
         $response->assertSee('Tegelbrukets väg 41', false);
         $response->assertSee('195 59 Märsta', false);
-        $response->assertSee('kostnadsfritt till 31 december 2026', false);
-        $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
+        $response->assertSee('kostnadsfritt i 14 dagar', false);
+        $response->assertSee('1 490 kr/mån exkl. moms per verkstad', false);
+        $response->assertSee('14 900 kr/år', false);
+        $response->assertSee('30 dagars betalningsvillkor', false);
+        $response->assertSee('Ingen bindningstid utöver den betalningsperiod', false);
+        $response->assertSee('dröjsmålsränta', false);
         $response->assertDontSee('3 månader', false);
-        $response->assertSee('Ingen betalning dras automatiskt', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
-        $response->assertSee('Ingen bindningstid och ingen uppsägningstid.', false);
         $response->assertSee('ladda ner eller skriva ut en projektrapport', false);
         $response->assertDontSee('ROT-underlag', false);
         $response->assertDontSee('Godkänn leverans', false);

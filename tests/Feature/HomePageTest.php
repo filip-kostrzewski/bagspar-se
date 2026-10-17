@@ -6,24 +6,26 @@ use Tests\TestCase;
 
 class HomePageTest extends TestCase
 {
-    public function test_homepage_describes_the_product_and_shows_the_pilot_offer(): void
+    public function test_homepage_describes_the_product_and_shows_the_price(): void
     {
         $response = $this->get(route('home'));
 
         $response->assertOk();
         $response->assertSee('Prova exempel', false);
         $response->assertSee('href="'.route('demo').'"', false);
-        $response->assertSee('Starta gratis pilot', false);
+        $response->assertSee('Prova gratis i 14 dagar', false);
         $response->assertSee('href="'.route('register').'"', false);
         $response->assertSee('Logga in', false);
         $response->assertSee('href="'.route('login').'"', false);
-        $response->assertSee('Gratis pilot till 31 december', false);
-        $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
-        $response->assertSee('Vad kostar Bågspår efter piloten?', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
+        $response->assertSee('1 490', false);
+        $response->assertSee('kr/mån', false);
+        $response->assertSee('id="pris"', false);
+        $response->assertSee('Därefter 1 490 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.', false);
+        $response->assertSee('Betala per år: 14 900 kr/år exkl. moms, vilket motsvarar två månader gratis.', false);
+        $response->assertSee('Vad kostar Bågspår?', false);
+        $response->assertSee('Vad händer när provperioden tar slut?', false);
         $response->assertDontSee('3 månader', false);
         $response->assertDontSee('tre månader', false);
-        $response->assertDontSee('Efter pilotperioden', false);
         $response->assertSee('Mottagen', false);
         $response->assertSee('Skrapning', false);
         $response->assertSee('Trälagning', false);
@@ -100,12 +102,12 @@ class HomePageTest extends TestCase
         $response->assertSee('property="og:image"', false);
         $response->assertSee('name="twitter:card"', false);
         $response->assertSee('"@type":"Organization"', false);
-        $response->assertSee('"price":"790"', false);
+        $response->assertSee('"price":"1490"', false);
         $response->assertDontSee('aggregateRating', false);
         $response->assertDontSee('tel:', false);
         $response->assertDontSee('bekräftelse', false);
         $response->assertDontSee('skickar en bekräftelse', false);
-        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten.', false);
+        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill ha en genomgång innan verkstaden börjar.', false);
         $response->assertDontSee('Be oss kontakta dig', false);
     }
 
@@ -119,22 +121,9 @@ class HomePageTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertSee('Du får en bekräftelse via e-post.', false);
-        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten.', false);
+        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill ha en genomgång innan verkstaden börjar.', false);
         $response->assertDontSee('Be oss kontakta dig', false);
         $response->assertDontSee('skickar en bekräftelse', false);
-    }
-
-    public function test_custom_pilot_offer_replaces_the_default_headline(): void
-    {
-        config(['bagspar.pilot_offer' => 'Eget erbjudande för testet']);
-
-        $response = $this->get(route('home'));
-
-        $response->assertOk();
-        $response->assertSee('Eget erbjudande för testet', false);
-        $response->assertDontSee('Gratis pilot i 3 månader', false);
-        $response->assertDontSee('Gratis pilot till 31 december', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
     }
 
     public function test_contact_email_is_shown_in_the_footer(): void

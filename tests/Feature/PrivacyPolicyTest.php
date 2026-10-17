@@ -23,7 +23,7 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('verkstadens eller företagets namn', false);
         $response->assertSee('e-postadress', false);
         $response->assertSee('tidpunkten då anmälan skickades', false);
-        $response->assertSee('så länge de behövs för att följa upp anmälan och piloten', false);
+        $response->assertSee('så länge de behövs för att följa upp anmälan', false);
         $response->assertSee('Meddelanden via kontaktformuläret', false);
         $response->assertSee('Företag och telefonnummer sparas bara om du fyller i dem.', false);
         $response->assertDontSee('Vi ber inte om telefonnummer', false);
