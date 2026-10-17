@@ -9,11 +9,11 @@
     $homeFaqs = [
         [
             'question' => 'Hur startar jag den gratis piloten?',
-            'answer' => 'Skapa ett verkstadskonto för att börja. Piloten gäller en inloggning per verkstad; medarbetare kan inte bjudas in.',
+            'answer' => 'Skapa ett verkstadskonto för att börja. Ett konto per verkstad.',
         ],
         [
             'question' => 'Vad kostar Bågspår efter tre månader?',
-            'answer' => '790 kr/mån per verkstad exkl. moms. Fortsättning avtalas separat och inget debiteras automatiskt. Kontakta oss via formuläret om du vill stämma av upplägget.',
+            'answer' => 'Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.',
         ],
         [
             'question' => 'Kan jag prova arbetskortet först?',
@@ -62,7 +62,7 @@
                     @include('partials.icon', ['name' => 'arrow-right'])
                 </a>
             </div>
-            <p class="home-hero__offer">{{ config('bagspar.pilot_offer') }} <span aria-hidden="true">·</span> 790 kr/mån per verkstad exkl. moms</p>
+            <p class="home-hero__offer">{{ config('bagspar.pilot_offer') }} <span aria-hidden="true">·</span> {{ config('bagspar.pilot_price_line') }}</p>
             <ul class="hero-benefits" aria-label="Det här samlar arbetskortet">
                 <li>
                     @include('partials.icon', ['name' => 'tag'])
@@ -237,7 +237,7 @@
                 <p class="eyebrow">PRAKTISKT I VERKSTADEN</p>
                 <h2 id="guide-ribbon-title" class="section-heading">Bra rutiner, steg för steg.</h2>
             </div>
-            <p class="guide-ribbon__intro">Korta guider om märkning och dokumentation.</p>
+            <p class="guide-ribbon__intro">Korta guider om märkning och dokumentation. <a href="{{ route('guides.index') }}">Alla guider</a></p>
         </div>
         <div class="guide-ribbon__items">
             <a class="guide-teaser" href="{{ route('guides.marking') }}" data-reveal>
@@ -252,6 +252,32 @@
                 <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-restored-small.webp') }}" srcset="{{ asset('images/workshop-restored-small.webp') }} 600w, {{ asset('images/workshop-restored.webp') }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Färdigrenoverad träbåge efter arbetet" width="1200" height="800" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
+            <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för ett exempelprojekt med två märkta bågar" width="2560" height="1866" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="product-proof page-shell" aria-labelledby="product-proof-title">
+        <div data-reveal>
+            <p class="eyebrow">FRÅN VERKSTADSKONTOT</p>
+            <h2 id="product-proof-title" class="section-heading">Så ser kontot ut.</h2>
+            <p class="product-proof__intro">Skärmbilder från ett exempel med testuppgifter. Ingen kund och inga omdömen.</p>
+        </div>
+        <div class="product-proof__items">
+            <figure data-reveal>
+                <img src="{{ asset('images/product/arbetskort.webp') }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning och stegen Mottagen till Klar" width="2560" height="1800" loading="lazy" decoding="async">
+                <figcaption><strong>Arbetskort</strong> Plats, anteckning och arbetssteg för en båge.</figcaption>
+            </figure>
+            <figure data-reveal>
+                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="Utskriven QR-etikett för båge 2-KÖK-F1-B2 med texten att skanning kräver inloggning" width="832" height="460" loading="lazy" decoding="async">
+                <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanning kräver inloggning.</figcaption>
+            </figure>
+            <figure data-reveal>
+                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt med bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2, arbetssteg och anteckningar" width="2560" height="1866" loading="lazy" decoding="async">
+                <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
+            </figure>
         </div>
     </section>
 
@@ -262,7 +288,7 @@
             <ul class="pilot-features" aria-label="Det här ingår i piloten">
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
-                    <span><strong>Ett konto per verkstad</strong><small>En inloggning, utan medarbetarinbjudningar.</small></span>
+                    <span><strong>Verkstadens konto</strong><small>Bågar, bilder och anteckningar samlas här.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
@@ -287,7 +313,7 @@
             <p class="pilot-pricing__label">Efter pilotperioden</p>
             <p class="pilot-pricing__amount"><span>790</span><span>kr/mån</span></p>
             <p class="pilot-pricing__vat">Per verkstad · exkl. moms.</p>
-            <p class="pilot-pricing__terms">Fortsättning avtalas separat. Inget debiteras automatiskt.</p>
+            <p class="pilot-pricing__terms">{{ config('bagspar.pilot_price_line') }}</p>
         </div>
     </section>
 
@@ -357,14 +383,6 @@
         </div>
     </section>
 
-    <section class="sister-note page-shell" aria-labelledby="sister-title">
-        <div class="sister-note__mark" aria-hidden="true">W</div>
-        <div class="sister-note__copy">
-            <p class="eyebrow">FRÅN SAMMA STUDIO</p>
-            <h2 id="sister-title">Driver ni också städverksamhet?</h2>
-            <p>Upptäck <a href="https://wisegent.se/se">Wisegent, ett system för städföretag</a>.</p>
-        </div>
-    </section>
 </main>
 @endsection
 

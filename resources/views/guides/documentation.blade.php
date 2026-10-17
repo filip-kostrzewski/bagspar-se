@@ -51,7 +51,7 @@
         <p>Kök räcker inte. Köket har ofta fler än en öppning, och inner- och ytterbåge ska tillbaka som par. Utan fönsternummer och bågnummer blir bunten ett pussel den dag färgen är på och bågarna ser likadana ut.</p>
 
         <h3>Skicket skrivs efter skrapningen</h3>
-        <p>Då är ytan redan borta. Skriv kitt, färg, trä och beslag vid öppningen. Komplettera vid bänken om du hittar mer, men ersätt inte den första anteckningen. Båda raderna behövs: hur det såg ut i huset, och vad som syntes när färgen var borta.</p>
+        <p>Då är ytan redan borta. Skriv kitt, färg, trä och beslag vid öppningen. Komplettera vid bänken om du hittar mer, men ersätt inte den första anteckningen.</p>
 
         <h3>Glaset noteras för hela fönstret på en gång</h3>
         <p>Sprickan sitter i en ruta på en båge. Skriv båge och ruta. Annars kan glaset tas ur på fel båge, eller så blandas originalglas från två öppningar i samma back.</p>
@@ -84,6 +84,8 @@
                 'answer' => 'Den som inte var med vid demonteringen. Skriv rum, nummer och skada i klartext, utan förkortningar som bara du använder. Kulör och kitt ska gå att läsa av någon som tar vid nästa dag, eller av den som monterar tillbaka bågen flera veckor senare.',
             ],
         ]])
+
+        <p>Hur märkning, före- och efterbilder, steg och projektrapport hänger ihop beskrivs i <a href="{{ route('guides.document-renovation') }}">guiden om att dokumentera en fönsterrenovering</a>.</p>
 
         @include('partials.guide-cta')
     </div>

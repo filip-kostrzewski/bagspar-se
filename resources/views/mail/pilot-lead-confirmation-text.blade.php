@@ -6,7 +6,7 @@ Det här formuläret skapar inget konto. Frågor? Kontakta oss på {{ config('ba
 
 Se ett exempel med testuppgifter: {{ route('demo') }}
 
-{{ config('bagspar.pilot_offer') }}. Därefter {{ config('bagspar.pilot_price_line') }}
+{{ config('bagspar.pilot_offer') }}. {{ config('bagspar.pilot_price_line') }}
 
 @if (filled(config('bagspar.contact_email')))
 Vill du att vi raderar uppgifterna, skriv till {{ config('bagspar.contact_email') }}.

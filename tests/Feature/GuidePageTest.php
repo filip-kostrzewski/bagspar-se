@@ -138,6 +138,75 @@ class GuidePageTest extends TestCase
         }
     }
 
+    public function test_existing_guides_link_to_the_renovation_documentation_guide(): void
+    {
+        foreach (['guides.documentation', 'guides.work-card', 'guides.marking'] as $routeName) {
+            $this->get(route($routeName))
+                ->assertOk()
+                ->assertSee('href="'.route('guides.document-renovation').'"', false)
+                ->assertSee('guiden om att dokumentera en fönsterrenovering', false);
+        }
+    }
+
+    public function test_guide_index_lists_the_articles_and_exposes_article_metadata(): void
+    {
+        $response = $this->get(route('guides.index'));
+
+        $response->assertOk();
+        $response->assertSee('<title>Guider för fönsterverkstaden — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Praktiska guider om märkning, arbetskort, bilder före och efter och projektrapport för fönsterverkstäder.">', false);
+        $response->assertSee('Guider för verkstaden', false);
+        $response->assertSee('href="'.route('guides.document-renovation').'"', false);
+        $response->assertSee('href="'.route('guides.documentation').'"', false);
+        $response->assertSee('href="'.route('guides.work-card').'"', false);
+        $response->assertSee('href="'.route('guides.marking').'"', false);
+        $this->assertArticleSchema($response->getContent(), 'Guider för verkstaden', route('guides.index'));
+    }
+
+    public function test_renovation_guide_explains_the_routine_without_promising_a_result(): void
+    {
+        $response = $this->get(route('guides.document-renovation'));
+        $html = $response->getContent();
+
+        $response->assertOk();
+        $response->assertSee('<title>Dokumentera en fönsterrenovering — Bågspår</title>', false);
+        $response->assertSee('Dokumentera fönsterrenoveringen', false);
+        $response->assertSee('Bilder före och efter, per båge', false);
+        $response->assertSee('Projektrapport till kunden eller föreningen', false);
+        $response->assertSee('Mottagen, Skrapning, Trälagning, Glasning, Målning och Klar', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.marking').'"', false);
+        $response->assertSee('href="'.route('guides.work-card').'"', false);
+        $response->assertSee('href="'.route('guides.documentation').'"', false);
+        $response->assertSee('Den lovar inte ett resultat', false);
+        $response->assertDontSee('tänkt', false);
+        $response->assertDontSee('planerat', false);
+        $response->assertDontSee('tanken är', false);
+
+        $wordCount = $this->mainContentWordCount($html);
+        $this->assertGreaterThanOrEqual(900, $wordCount, 'renovation guide has '.$wordCount.' words');
+        $this->assertLessThanOrEqual(1200, $wordCount, 'renovation guide has '.$wordCount.' words');
+        $this->assertArticleSchema($html, 'Dokumentera fönsterrenoveringen', route('guides.document-renovation'));
+    }
+
+    public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
+    {
+        $this->app['env'] = 'production';
+        config(['app.url' => 'http://bagspar.se']);
+
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider">', false);
+
+        $this->get(route('guides.document-renovation'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/dokumentera-fonsterrenovering">', false);
+
+        $this->get(route('terms'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/villkor">', false);
+    }
+
     public function test_guide_page_is_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -151,6 +220,32 @@ class GuidePageTest extends TestCase
             '<link rel="canonical" href="https://bagspar.se/fonsterrenovering-dokumentation">',
             false,
         );
+    }
+
+    private function assertArticleSchema(string $html, string $headline, string $pageUrl): void
+    {
+        preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches);
+        $schema = null;
+
+        foreach ($matches[1] as $json) {
+            $decoded = json_decode($json, true);
+
+            if (is_array($decoded) && ($decoded['@type'] ?? null) === 'Article') {
+                $schema = $decoded;
+                break;
+            }
+        }
+
+        $this->assertIsArray($schema);
+        $this->assertSame('https://schema.org', $schema['@context']);
+        $this->assertSame('Article', $schema['@type']);
+        $this->assertSame($headline, $schema['headline']);
+        $this->assertSame('sv', $schema['inLanguage']);
+        $this->assertSame('2026-10-17', $schema['datePublished']);
+        $this->assertSame('2026-10-17', $schema['dateModified']);
+        $this->assertSame($pageUrl, $schema['mainEntityOfPage']['@id']);
+        $this->assertSame('Prodi Digital AB', $schema['author']['name']);
+        $this->assertSame('Organization', $schema['publisher']['@type']);
     }
 
     private function mainContentWordCount(string $html): int

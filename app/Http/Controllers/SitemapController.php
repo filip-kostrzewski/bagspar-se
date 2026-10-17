@@ -20,7 +20,10 @@ class SitemapController extends Controller
         'guides.documentation',
         'guides.work-card',
         'guides.marking',
+        'guides.index',
+        'guides.document-renovation',
         'privacy',
+        'terms',
     ];
 
     public function __invoke(): Response

@@ -87,6 +87,8 @@
             ],
         ]])
 
+        <p>Hur märkning, före- och efterbilder, steg och projektrapport hänger ihop beskrivs i <a href="{{ route('guides.document-renovation') }}">guiden om att dokumentera en fönsterrenovering</a>.</p>
+
         @include('partials.guide-cta')
     </div>
 </main>

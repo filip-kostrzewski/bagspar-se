@@ -140,11 +140,12 @@
                 @endif
             </div>
             <nav class="site-footer__links" aria-label="Sidfot">
+                <a href="{{ route('guides.index') }}">Guider</a>
                 <a href="{{ route('guides.documentation') }}">Dokumentation</a>
                 <a href="{{ route('guides.work-card') }}">Arbetskort</a>
                 <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
-                <a href="https://wisegent.se/se">Wisegent – system för städföretag</a>
+                <a href="{{ route('terms') }}">Villkor</a>
                 @if ($showGoogleAnalytics)
                     <button type="button" data-cookie-settings>Cookie-inställningar</button>
                 @endif

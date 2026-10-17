@@ -30,8 +30,11 @@ Route::post('/demo/synk', [DemoSyncController::class, 'store'])
 Route::view('/fonsterrenovering-dokumentation', 'guides.documentation')->name('guides.documentation');
 Route::view('/arbetskort-fonsterbagar', 'guides.work-card')->name('guides.work-card');
 Route::view('/markning-av-fonsterbagar', 'guides.marking')->name('guides.marking');
+Route::view('/guider', 'guides.index')->name('guides.index');
+Route::view('/guider/dokumentera-fonsterrenovering', 'guides.document-renovation')->name('guides.document-renovation');
 Route::redirect('/integritet', '/integritetspolicy', 301);
 Route::view('/integritetspolicy', 'privacy')->name('privacy');
+Route::view('/villkor', 'terms')->name('terms');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
 Route::middleware(['admin', 'throttle:30,1'])->group(function (): void {

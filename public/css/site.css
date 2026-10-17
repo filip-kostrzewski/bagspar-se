@@ -2239,7 +2239,7 @@ html.cookie-choice-saved .cookie-banner {
 .guide-ribbon .eyebrow,
 .pilot-pricing .eyebrow,
 .contact-note .eyebrow,
-.sister-note .eyebrow {
+.product-proof .eyebrow {
     margin-bottom: 18px;
     font-size: 12px;
     letter-spacing: 0.1em;
@@ -2820,7 +2820,7 @@ html.cookie-choice-saved .cookie-banner {
 
 .guide-ribbon__items {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: clamp(14px, 2vw, 26px);
 }
 
@@ -2865,6 +2865,52 @@ html.cookie-choice-saved .cookie-banner {
 
 .guide-teaser__copy .icon {
     color: #936c27;
+}
+
+.product-proof {
+    padding-top: clamp(72px, 8vw, 104px);
+}
+
+.product-proof__intro {
+    max-width: 38rem;
+    margin: 12px 0 0;
+    color: var(--ink-soft);
+    line-height: 1.55;
+}
+
+.product-proof__items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+    margin-top: 28px;
+}
+
+.product-proof figure {
+    min-width: 0;
+    margin: 0;
+}
+
+.product-proof img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: #fff;
+}
+
+.product-proof figcaption {
+    margin-top: 10px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.product-proof figcaption strong {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--ink);
+    font-weight: 800;
 }
 
 .pilot-pricing {
@@ -3025,7 +3071,7 @@ html.cookie-choice-saved .cookie-banner {
 }
 
 .contact-note__privacy a,
-.sister-note__copy a {
+.guide-ribbon__intro a {
     color: var(--ink);
     font-weight: 800;
     text-decoration-color: var(--brass);
@@ -3079,56 +3125,6 @@ html.cookie-choice-saved .cookie-banner {
 .faq-list summary {
     min-height: 64px;
     align-content: center;
-}
-
-.sister-note {
-    display: grid;
-    grid-template-columns: 42px minmax(0, 1fr);
-    align-items: center;
-    gap: 20px;
-    margin-bottom: clamp(52px, 7vw, 84px);
-    padding-top: 24px;
-    padding-bottom: 24px;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-}
-
-.sister-note__mark {
-    display: grid;
-    width: 42px;
-    height: 42px;
-    place-items: center;
-    border: 1px solid var(--ink);
-    border-radius: 50%;
-    color: var(--ink);
-    font-family: var(--serif);
-    font-size: 23px;
-    font-weight: 700;
-}
-
-.sister-note__copy .eyebrow {
-    margin-bottom: 5px;
-    font-size: 10px;
-}
-
-.sister-note__copy h2 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: clamp(1.55rem, 2.7vw, 2.2rem);
-    font-weight: 500;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
-}
-
-.sister-note__copy p:last-child {
-    margin: 6px 0 0;
-    color: var(--ink-soft);
-    font-size: 14px;
-}
-
-.site-footer__links a[href="https://wisegent.se/se"] {
-    color: var(--ink);
-    text-decoration-color: var(--brass);
 }
 
 .visually-hidden {
@@ -3189,7 +3185,12 @@ html.cookie-choice-saved .cookie-banner {
     }
 
     .guide-ribbon__items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 16px;
+    }
+
+    .product-proof__items {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
@@ -3677,28 +3678,6 @@ html.cookie-choice-saved .cookie-banner {
         gap: 24px;
         padding-top: 62px;
         padding-bottom: 62px;
-    }
-
-    .sister-note {
-        grid-template-columns: 36px minmax(0, 1fr);
-        gap: 13px;
-        margin-bottom: 50px;
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-
-    .sister-note__mark {
-        width: 36px;
-        height: 36px;
-        font-size: 20px;
-    }
-
-    .sister-note__copy .eyebrow {
-        font-size: 9px;
-    }
-
-    .sister-note__copy h2 {
-        font-size: 1.55rem;
     }
 
     .site-footer__links {

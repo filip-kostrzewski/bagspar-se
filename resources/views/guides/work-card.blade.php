@@ -62,7 +62,7 @@
         <p>Steget är det den som tar vid ska tro på. Sätt trälagning när reparationen börjar och glasning när glas- och kittarbetet pågår, inte när någon hoppas att det blir gjort under dagen. Är träet inte färdigt för glasning, stanna på trälagning och skriv vad som återstår.</p>
 
         <h3>Anteckningen hamnar i en pärm</h3>
-        <p>En rad i en pärm på kontoret syns inte vid bänken. Skriv där arbetet sker, på bågens kort. Pärmen kan finnas för annat. Kortet är det som följer med bågen.</p>
+        <p>En rad i en pärm på kontoret syns inte vid bänken. Skriv där arbetet sker, på bågens kort. Kortet är det som följer med bågen.</p>
 
         <h3>Bilden visar inte vilken båge det är</h3>
         <p>En närbild på ett hörn utan nummer kan tillhöra vilken båge som helst från samma fasad. Lägg bilden på rätt kort direkt, eller se till att lappen syns i bild.</p>
@@ -71,7 +71,7 @@
         <p>Klar är bågen som kan lämna verkstaden mot sin öppning. Grundstruket, kitt som fortfarande torkar eller en saknad skruv är inte klar. Skriv det som återstår och låt steget stå kvar på det arbete som pågår.</p>
 
         <h2>När täckningen är svag</h2>
-        <p>Verkstadskontot kräver internetanslutning. Arbetskort och ändringar sparas på servern, så att verkstaden kan öppna samma uppgifter från sitt konto. Exemplet med testuppgifter är separat och går att prova utan täckning.</p>
+        <p>Verkstadskontot kräver internetanslutning. Arbetskort och ändringar sparas på servern. Exemplet med testuppgifter är separat och går att prova utan täckning.</p>
 
         @include('partials.guide-faq', ['faqs' => [
             [
@@ -95,6 +95,8 @@
                 'answer' => 'När bågen är färdig att paras ihop med sin öppning: skrapad, kittad, målad, med glas och beslag enligt anteckningen, och med ett nummer som fortfarande går att läsa. Klar betyder inte att den redan är monterad i karmen. Skriv en rad till när den sitter på plats.',
             ],
         ]])
+
+        <p>Hur märkning, före- och efterbilder, steg och projektrapport hänger ihop beskrivs i <a href="{{ route('guides.document-renovation') }}">guiden om att dokumentera en fönsterrenovering</a>.</p>
 
         @include('partials.guide-cta')
     </div>

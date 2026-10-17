@@ -24,7 +24,10 @@ class SitemapControllerTest extends TestCase
             'https://example.test/fonsterrenovering-dokumentation',
             'https://example.test/arbetskort-fonsterbagar',
             'https://example.test/markning-av-fonsterbagar',
+            'https://example.test/guider',
+            'https://example.test/guider/dokumentera-fonsterrenovering',
             'https://example.test/integritetspolicy',
+            'https://example.test/villkor',
         ]);
     }
 
@@ -45,7 +48,10 @@ class SitemapControllerTest extends TestCase
             'https://bagspar.se/fonsterrenovering-dokumentation',
             'https://bagspar.se/arbetskort-fonsterbagar',
             'https://bagspar.se/markning-av-fonsterbagar',
+            'https://bagspar.se/guider',
+            'https://bagspar.se/guider/dokumentera-fonsterrenovering',
             'https://bagspar.se/integritetspolicy',
+            'https://bagspar.se/villkor',
         ]);
     }
 
@@ -65,7 +71,10 @@ class SitemapControllerTest extends TestCase
             'https://bagspar.se/fonsterrenovering-dokumentation',
             'https://bagspar.se/arbetskort-fonsterbagar',
             'https://bagspar.se/markning-av-fonsterbagar',
+            'https://bagspar.se/guider',
+            'https://bagspar.se/guider/dokumentera-fonsterrenovering',
             'https://bagspar.se/integritetspolicy',
+            'https://bagspar.se/villkor',
         ]);
     }
 
@@ -83,6 +92,10 @@ class SitemapControllerTest extends TestCase
         $response->assertSee('href="https://bagspar.se/arbetskort-fonsterbagar"', false);
         $response->assertSee('href="https://bagspar.se/markning-av-fonsterbagar"', false);
         $response->assertSee('href="https://bagspar.se/integritetspolicy"', false);
+        $response->assertSee('href="https://bagspar.se/villkor"', false);
+        $response->assertSee('href="https://bagspar.se/guider"', false);
+        $response->assertSee('href="https://bagspar.se/guider/dokumentera-fonsterrenovering"', false);
+        $response->assertDontSee('wisegent.se', false);
         $response->assertDontSee('http://bagspar.se', false);
         $this->assertSame('https://bagspar.se/integritetspolicy', route('privacy'));
         $this->assertSame('https://bagspar.se/integritetspolicy', redirect()->route('privacy')->getTargetUrl());
@@ -104,7 +117,10 @@ class SitemapControllerTest extends TestCase
             $appUrl.'/fonsterrenovering-dokumentation',
             $appUrl.'/arbetskort-fonsterbagar',
             $appUrl.'/markning-av-fonsterbagar',
+            $appUrl.'/guider',
+            $appUrl.'/guider/dokumentera-fonsterrenovering',
             $appUrl.'/integritetspolicy',
+            $appUrl.'/villkor',
         ]);
     }
 

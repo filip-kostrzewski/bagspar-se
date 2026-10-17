@@ -56,8 +56,11 @@ class PilotLeadControllerTest extends TestCase
         });
         Mail::assertSent(PilotLeadConfirmation::class, function (PilotLeadConfirmation $mail): bool {
             $mail->assertSeeInHtml('Det här formuläret skapar inget konto', false);
-            $mail->assertSeeInHtml('Inget debiteras automatiskt', false);
+            $mail->assertSeeInHtml('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+            $mail->assertDontSeeInHtml('Fortsättning avtalas separat', false);
+            $mail->assertDontSeeInHtml('Därefter Efter piloten', false);
             $mail->assertSeeInText('Det här formuläret skapar inget konto');
+            $mail->assertSeeInText('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.');
             $mail->assertDontSeeInHtml('eget konto ingår i piloten');
             $mail->assertDontSeeInHtml('prototyp');
 
