@@ -108,6 +108,9 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/kunder', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/kunder/ny', [CustomerController::class, 'create'])->name('customers.create');
     Route::post('/kunder', [CustomerController::class, 'store'])->name('customers.store');
+    Route::get('/kunder/{customer}/export.json', [CustomerController::class, 'exportJson'])->whereNumber('customer')->name('customers.export.json');
+    Route::get('/kunder/{customer}/export.csv', [CustomerController::class, 'exportCsv'])->whereNumber('customer')->name('customers.export.csv');
+    Route::delete('/kunder/{customer}', [CustomerController::class, 'destroy'])->whereNumber('customer')->name('customers.destroy');
     Route::get('/kunder/{customer}', [CustomerController::class, 'edit'])->whereNumber('customer')->name('customers.edit');
     Route::patch('/kunder/{customer}', [CustomerController::class, 'update'])->whereNumber('customer')->name('customers.update');
     Route::get('/installningar', [WorkshopSettingsController::class, 'edit'])->name('settings.edit');

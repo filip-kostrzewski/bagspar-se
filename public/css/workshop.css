@@ -3018,6 +3018,37 @@ body.label-print-sheet {
     color: var(--ink-soft);
 }
 
+.customer-privacy {
+    display: grid;
+    gap: 28px;
+    margin-top: 36px;
+}
+
+.customer-privacy__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.customer-privacy .project-danger-zone {
+    margin-top: 0;
+}
+
+.customer-removal {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 0;
+}
+
+.customer-removal legend {
+    margin-bottom: 8px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 650;
+}
+
 .project-danger-zone {
     margin-top: 48px;
     padding-top: 24px;

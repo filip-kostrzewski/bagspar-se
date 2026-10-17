@@ -4,10 +4,16 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Project;
+use App\Support\CustomerDataExport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CustomerController extends Controller
 {
@@ -58,6 +64,87 @@ class CustomerController extends Controller
         $customer->update($this->validated($request));
 
         return back()->with('status', 'Sparat');
+    }
+
+    public function exportJson(Request $request, Customer $customer): Response
+    {
+        $customer = $this->customerForWorkshop($request, $customer);
+        $json = app(CustomerDataExport::class)->json($customer);
+
+        return response($json, 200, [
+            'Content-Type' => 'application/json; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="kund-'.$customer->getKey().'.json"',
+        ]);
+    }
+
+    public function exportCsv(Request $request, Customer $customer): StreamedResponse
+    {
+        $customer = $this->customerForWorkshop($request, $customer);
+        $csv = app(CustomerDataExport::class)->csv($customer);
+
+        return response()->streamDownload(function () use ($csv): void {
+            echo $csv;
+        }, 'kund-'.$customer->getKey().'.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function destroy(Request $request, Customer $customer): RedirectResponse
+    {
+        $customer = $this->customerForWorkshop($request, $customer);
+        Gate::authorize('delete', $customer);
+
+        $validated = $request->validate([
+            'removal' => ['required', 'in:anonymize,delete-projects'],
+            'confirmation' => ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) use ($customer): void {
+                if (! is_string($value) || ! hash_equals($customer->name, $value)) {
+                    $fail('Skriv kundens namn för att bekräfta.');
+                }
+            }],
+        ], [
+            'removal.required' => 'Välj om projekten ska behållas eller tas bort.',
+            'removal.in' => 'Välj om projekten ska behållas eller tas bort.',
+            'confirmation.required' => 'Skriv kundens namn för att bekräfta.',
+        ]);
+
+        $projects = $customer->projects()->get();
+        $deletesProjects = $validated['removal'] === 'delete-projects';
+
+        if ($deletesProjects) {
+            foreach ($projects as $project) {
+                $project->deleteStoredPhotoFiles();
+            }
+        }
+
+        DB::transaction(function () use ($customer, $deletesProjects, $projects): void {
+            if ($deletesProjects) {
+                foreach ($projects as $project) {
+                    if ($project instanceof Project) {
+                        $project->delete();
+                    }
+                }
+            } else {
+                $customer->projects()->update([
+                    'customer_id' => null,
+                    'customer_name' => Customer::ANONYMIZED_NAME,
+                ]);
+            }
+
+            $customer->delete();
+        });
+
+        $message = $deletesProjects
+            ? 'Kunden, projekten och bildfilerna har tagits bort.'
+            : 'Kunden har raderats. Projekten är kvar utan kunduppgifter.';
+
+        return redirect()->route('app.customers.index')->with('status', $message);
+    }
+
+    private function customerForWorkshop(Request $request, Customer $customer): Customer
+    {
+        $workshop = $this->currentWorkshop($request);
+
+        return $workshop->customers()->whereKey($customer->getKey())->firstOrFail();
     }
 
     /**

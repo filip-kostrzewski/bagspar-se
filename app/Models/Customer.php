@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
+    public const ANONYMIZED_NAME = 'Borttagen kund';
+
     /** @use HasFactory<CustomerFactory> */
     use HasFactory;
 

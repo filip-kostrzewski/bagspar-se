@@ -54,6 +54,49 @@
                 </div>
                 <button class="workshop-button workshop-button--primary" type="submit">Spara kund</button>
             </form>
+
+            @if ($customer->exists)
+                <div class="customer-privacy">
+                    <section aria-labelledby="export-title">
+                        <h2 class="workshop-section-heading" id="export-title">Exportera kunddata</h2>
+                        <p>JSON och CSV innehåller kunden, projekten, bågarna, historiken och bildlänkarna.</p>
+                        <div class="customer-privacy__actions">
+                            <a class="workshop-button workshop-button--secondary" href="{{ route('app.customers.export.json', $customer) }}">JSON</a>
+                            <a class="workshop-button workshop-button--secondary" href="{{ route('app.customers.export.csv', $customer) }}">CSV</a>
+                        </div>
+                    </section>
+
+                    @if (auth()->user()?->isOwner())
+                        <section class="project-danger-zone" aria-labelledby="erase-title">
+                            <h2 class="workshop-section-heading" id="erase-title">Radera kund</h2>
+                            <p>Skriv kundens namn. Välj om projekten ska vara kvar utan kunduppgifter eller tas bort tillsammans med bildfilerna.</p>
+                            <form class="workshop-form" method="POST" action="{{ route('app.customers.destroy', $customer) }}" data-confirm="Radera kunden? Det går inte att ångra.">
+                                @csrf
+                                @method('DELETE')
+                                <fieldset class="customer-removal">
+                                    <legend>Vad ska hända med projekten?</legend>
+                                    <label class="workshop-checkbox" for="removal-anonymize">
+                                        <input id="removal-anonymize" name="removal" type="radio" value="anonymize" required @checked(old('removal') === 'anonymize')>
+                                        <span>Behåll projekten utan kunduppgifter</span>
+                                    </label>
+                                    <label class="workshop-checkbox" for="removal-delete-projects">
+                                        <input id="removal-delete-projects" name="removal" type="radio" value="delete-projects" @checked(old('removal') === 'delete-projects')>
+                                        <span>Ta bort projekten och bildfilerna</span>
+                                    </label>
+                                </fieldset>
+                                <div class="form-field">
+                                    <label for="confirmation">Skriv {{ $customer->name }} för att bekräfta.</label>
+                                    <input id="confirmation" name="confirmation" type="text" value="{{ is_string(old('confirmation')) ? old('confirmation') : '' }}" autocomplete="off" required @if ($errors->has('confirmation')) aria-invalid="true" aria-describedby="confirmation-error" @endif>
+                                    @error('confirmation')
+                                        <p class="form-field__error" id="confirmation-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <button class="workshop-button workshop-button--danger" type="submit">Radera kund</button>
+                            </form>
+                        </section>
+                    @endif
+                </div>
+            @endif
         </section>
     </div>
 @endsection
