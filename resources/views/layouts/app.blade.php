@@ -147,6 +147,7 @@
                 <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
                 <a href="{{ route('terms') }}">Villkor</a>
+                <a href="{{ route('dpa') }}">Personuppgiftsbiträdesavtal</a>
                 <a href="{{ route('contact') }}">Kontakt</a>
                 @if ($showGoogleAnalytics)
                     <button type="button" data-cookie-settings>Cookie-inställningar</button>

@@ -24,6 +24,7 @@ class SitemapController extends Controller
         'guides.document-renovation',
         'privacy',
         'terms',
+        'dpa',
         'contact',
     ];
 

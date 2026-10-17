@@ -103,6 +103,10 @@
                 </div>
                 <p class="copy-link-control__status" aria-live="polite" data-copy-status></p>
                 <div class="client-status-share__actions">
+                    <form method="POST" action="{{ route('app.projects.client-status.send', $project) }}">
+                        @csrf
+                        <button class="workshop-button workshop-button--primary" type="submit">Skicka länken till kunden</button>
+                    </form>
                     <form method="POST" action="{{ route('app.projects.client-status.update', $project) }}">
                         @csrf
                         <input type="hidden" name="action" value="rotate">
@@ -114,6 +118,16 @@
                         <button class="workshop-button workshop-button--secondary" type="submit">Stäng av statuslänk</button>
                     </form>
                 </div>
+                @php
+                    $statusLinkEmail = $project->customer?->email;
+                @endphp
+                <p class="copy-link-control__status">
+                    @if (is_string($statusLinkEmail) && trim($statusLinkEmail) !== '')
+                        Mejlas till {{ trim($statusLinkEmail) }}.
+                    @else
+                        Kunden har ingen e-postadress än. Lägg till den under Kunder.
+                    @endif
+                </p>
             @else
                 <form method="POST" action="{{ route('app.projects.client-status.update', $project) }}">
                     @csrf

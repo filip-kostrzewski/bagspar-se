@@ -26,6 +26,7 @@ use App\Http\Controllers\Workshop\ProjectMaterialController;
 use App\Http\Controllers\Workshop\ProjectReportPdfController;
 use App\Http\Controllers\Workshop\ProjectRotController;
 use App\Http\Controllers\Workshop\QuoteController;
+use App\Http\Controllers\Workshop\SampleProjectController;
 use App\Http\Controllers\Workshop\SashMaterialController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
@@ -53,6 +54,7 @@ Route::view('/guider/dokumentera-fonsterrenovering', 'guides.document-renovation
 Route::redirect('/integritet', '/integritetspolicy', 301);
 Route::view('/integritetspolicy', 'privacy')->name('privacy');
 Route::view('/villkor', 'terms')->name('terms');
+Route::view('/personuppgiftsbitradesavtal', 'dpa')->name('dpa');
 Route::get('/kontakt', [ContactMessageController::class, 'create'])->name('contact');
 Route::post('/kontakt', [ContactMessageController::class, 'store'])
     ->middleware('throttle:5,1')
@@ -169,6 +171,8 @@ Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.acce
     Route::get('/projekt/{project}/ta-bort', [ProjectController::class, 'confirmDestroy'])->whereNumber('project')->name('projects.confirm-destroy');
     Route::delete('/projekt/{project}', [ProjectController::class, 'destroy'])->whereNumber('project')->name('projects.destroy');
     Route::post('/projekt/{project}/statuslank', [ProjectClientStatusController::class, 'update'])->whereNumber('project')->name('projects.client-status.update');
+    Route::post('/projekt/{project}/statuslank/skicka', [ProjectClientStatusController::class, 'send'])->middleware('throttle:10,1')->whereNumber('project')->name('projects.client-status.send');
+    Route::post('/exempelprojekt', [SampleProjectController::class, 'store'])->middleware('throttle:5,1')->name('sample-project.store');
     Route::get('/projekt/{project}/offert', [QuoteController::class, 'edit'])->whereNumber('project')->name('projects.quote.edit');
     Route::patch('/projekt/{project}/offert', [QuoteController::class, 'update'])->whereNumber('project')->name('projects.quote.update');
     Route::post('/projekt/{project}/offert/rader', [QuoteController::class, 'fill'])->whereNumber('project')->name('projects.quote.fill');

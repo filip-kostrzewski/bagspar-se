@@ -3858,3 +3858,44 @@ body.label-print-sheet {
 .quote-public__lines .basis-notice {
     margin-top: 20px;
 }
+
+.dashboard-empty__actions {
+    display: grid;
+    grid-column: 1;
+    gap: 14px;
+    justify-items: start;
+}
+
+.dashboard-empty__sample {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    margin: 0;
+}
+
+.dashboard-empty__sample .workshop-button {
+    min-width: 210px;
+}
+
+.dashboard-empty__hint {
+    max-width: 320px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+    .dashboard-empty__actions,
+    .dashboard-empty__sample {
+        justify-items: stretch;
+    }
+
+    .dashboard-empty__sample .workshop-button {
+        width: 100%;
+    }
+
+    .dashboard-empty__hint {
+        max-width: none;
+    }
+}

@@ -41,6 +41,20 @@ class TermsPageTest extends TestCase
         $response->assertDontSee('medarbetare kan inte bjudas in', false);
     }
 
+    public function test_terms_make_the_workshop_controller_and_include_the_dpa(): void
+    {
+        $response = $this->get(route('terms'));
+
+        $response->assertOk();
+        $response->assertSee('är verkstaden personuppgiftsansvarig', false);
+        $response->assertSee('Prodi Digital AB är personuppgiftsbiträde.', false);
+        $response->assertSee('href="'.route('dpa').'"', false);
+        $response->assertSee('är en del av dessa villkor och godkänns tillsammans med dem.', false);
+        $response->assertDontSee('separat personuppgiftsbiträdesavtal krävs', false);
+        $response->assertDontSee('krävs ett separat personuppgiftsbiträdesavtal', false);
+        $response->assertDontSee('Kontakta oss innan kontot används för sådan behandling.', false);
+    }
+
     public function test_footer_links_terms_next_to_the_privacy_policy(): void
     {
         $this->get(route('home'))
@@ -50,6 +64,9 @@ class TermsPageTest extends TestCase
                 'Integritetspolicy',
                 'href="'.route('terms').'"',
                 'Villkor',
+                'href="'.route('dpa').'"',
+                'Personuppgiftsbiträdesavtal',
+                'href="'.route('contact').'"',
             ], false);
     }
 }

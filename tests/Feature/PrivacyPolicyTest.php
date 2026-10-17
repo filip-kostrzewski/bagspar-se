@@ -55,6 +55,17 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('Kontakt', false);
     }
 
+    public function test_privacy_policy_says_the_company_is_processor_for_the_workshops_customer_data(): void
+    {
+        $response = $this->get(route('privacy'));
+
+        $response->assertOk();
+        $response->assertSee('är Prodi Digital AB personuppgiftsbiträde enligt', false);
+        $response->assertSee('href="'.route('dpa').'"', false);
+        $response->assertSee('Verkstaden är personuppgiftsansvarig, så kontakta verkstaden om dessa uppgifter.', false);
+        $response->assertSee('Om du vill få uppgifter i ett konto raderade', false);
+    }
+
     public function test_old_privacy_path_redirects_to_the_policy(): void
     {
         $this->get('/integritet')->assertRedirect('/integritetspolicy');

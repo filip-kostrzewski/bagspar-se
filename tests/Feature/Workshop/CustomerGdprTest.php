@@ -5,6 +5,8 @@ namespace Tests\Feature\Workshop;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectEvent;
+use App\Models\Quote;
+use App\Models\QuoteLine;
 use App\Models\SashEvent;
 use App\Models\SashMaterial;
 use App\Models\SashPhoto;
@@ -359,6 +361,62 @@ class CustomerGdprTest extends TestCase
             ['Material', 'BRF Eken', 'Villa Ek', 'V2-H', '', 'Glas', '1,5 m² Energiglas'],
             $rows,
         );
+    }
+
+    public function test_the_customer_export_includes_the_quote_and_who_accepted_it(): void
+    {
+        $owner = User::factory()->create();
+        $customer = Customer::factory()->create(['workshop_id' => $owner->workshop_id, 'name' => 'BRF Eken']);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'customer_id' => $customer->getKey(),
+            'name' => 'Villa Ek',
+            'customer_name' => 'BRF Eken',
+        ]);
+        $quote = Quote::factory()->accepted()->create([
+            'project_id' => $project->getKey(),
+            'introduction' => 'Renovering av fem bågar.',
+            'valid_until' => '2026-11-30',
+            'accepted_at' => '2026-10-16 08:30:00',
+            'accepted_name' => 'Ada Ek',
+        ]);
+        QuoteLine::factory()->create([
+            'quote_id' => $quote->getKey(),
+            'description' => 'Renovering kökssprossfönster',
+            'quantity' => 2,
+            'unit_price_ore' => 450000,
+        ]);
+        Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'customer_id' => $customer->getKey(),
+            'name' => 'Utan offert',
+            'customer_name' => 'BRF Eken',
+        ]);
+
+        $this->actingAs($owner);
+
+        $json = $this->get(route('app.customers.export.json', $customer));
+        $json->assertJsonPath('projekt.0.offert.status', 'Godkänd');
+        $json->assertJsonPath('projekt.0.offert.inledning', 'Renovering av fem bågar.');
+        $json->assertJsonPath('projekt.0.offert.giltig_till', '2026-11-30');
+        $json->assertJsonPath('projekt.0.offert.godkand', '16 okt 2026 10:30');
+        $json->assertJsonPath('projekt.0.offert.godkand_av', 'Ada Ek');
+        $json->assertJsonPath('projekt.0.offert.rader.0.beskrivning', 'Renovering kökssprossfönster');
+        $json->assertJsonPath('projekt.0.offert.rader.0.antal', 2);
+        $json->assertJsonPath('projekt.0.offert.rader.0.styckpris', '4 500 kr');
+        $json->assertJsonPath('projekt.0.offert.rader.0.radsumma', '9 000 kr');
+        $json->assertJsonPath('projekt.0.offert.summa_exkl_moms', '9 000 kr');
+        $json->assertJsonPath('projekt.0.offert.moms', '2 250 kr');
+        $json->assertJsonPath('projekt.0.offert.summa_inkl_moms', '11 250 kr');
+        $json->assertJsonPath('projekt.1.namn', 'Utan offert');
+        $json->assertJsonPath('projekt.1.offert', null);
+
+        $rows = $this->csvRows($this->get(route('app.customers.export.csv', $customer))->streamedContent());
+        $this->assertContains(['Offert', 'BRF Eken', 'Villa Ek', '', '', 'Godkänd av', 'Ada Ek'], $rows);
+        $this->assertContains(['Offert', 'BRF Eken', 'Villa Ek', '', '', 'Status', 'Godkänd'], $rows);
+        $this->assertContains(['Offert', 'BRF Eken', 'Villa Ek', '', '', 'Summa exkl. moms', '9 000 kr'], $rows);
+        $this->assertContains(['Offertrad', 'BRF Eken', 'Villa Ek', '', '', 'Renovering kökssprossfönster', '2 x 4 500 kr = 9 000 kr'], $rows);
+        $this->assertSame([], array_values(array_filter($rows, fn (array $row): bool => $row[0] === 'Offert' && $row[2] === 'Utan offert')));
     }
 
     /**

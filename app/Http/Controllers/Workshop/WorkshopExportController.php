@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Quote;
 use App\Models\WindowSash;
+use App\Support\Kronor;
 use App\Support\SwedishDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +20,7 @@ class WorkshopExportController extends Controller
         Gate::authorize('update', $workshop);
 
         $projects = $workshop->projects()
-            ->with(['windowSashes.timeEntries', 'windowSashes.materials'])
+            ->with(['windowSashes.timeEntries', 'windowSashes.materials', 'quote.lines'])
             ->orderBy('name')
             ->orderBy('id')
             ->get();
@@ -45,6 +47,10 @@ class WorkshopExportController extends Controller
                 'Uppdaterad',
                 'Arbetstid (minuter)',
                 'Material',
+                'Offertstatus',
+                'Offert exkl. moms',
+                'Offert godkänd',
+                'Offert godkänd av',
             ], ';', '"', '\\');
 
             foreach ($projects as $project) {
@@ -73,6 +79,8 @@ class WorkshopExportController extends Controller
         $created = ($sash?->created_at ?? $project->created_at)?->copy()->timezone('Europe/Stockholm');
         $updated = ($sash?->updated_at ?? $project->updated_at)?->copy()->timezone('Europe/Stockholm');
 
+        $quote = $project->quote;
+
         return [
             $this->cell($project->name),
             $this->cell($project->customerLabel() ?? ''),
@@ -87,7 +95,20 @@ class WorkshopExportController extends Controller
             $this->cell(SwedishDate::format($updated)),
             $this->cell($sash instanceof WindowSash ? (string) $sash->timeMinutes() : ''),
             $this->cell($sash instanceof WindowSash ? $sash->materialSummary() : ''),
+            $this->cell($quote instanceof Quote ? $this->quoteStatusLabel($quote) : ''),
+            $this->cell($quote instanceof Quote ? Kronor::format($quote->subtotalOre()) : ''),
+            $this->cell(SwedishDate::formatDateTime($quote?->accepted_at)),
+            $this->cell($quote?->accepted_name ?? ''),
         ];
+    }
+
+    private function quoteStatusLabel(Quote $quote): string
+    {
+        return match ($quote->status) {
+            Quote::STATUS_ACCEPTED => 'Godkänd',
+            Quote::STATUS_SENT => 'Skickad',
+            default => 'Utkast',
+        };
     }
 
     private function cell(string $value): string

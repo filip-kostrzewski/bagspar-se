@@ -77,6 +77,8 @@ class HomePageTest extends TestCase
         $response->assertSee('href="'.route('guides.document-renovation').'"', false);
         $response->assertSee('href="'.route('terms').'"', false);
         $response->assertSee('>Villkor</a>', false);
+        $response->assertSee('href="'.route('dpa').'"', false);
+        $response->assertSee('>Personuppgiftsbiträdesavtal</a>', false);
         $response->assertSee('images/product/arbetskort.webp', false);
         $response->assertSee('alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning och stegen Mottagen till Klar"', false);
         $response->assertSee('width="2560"', false);

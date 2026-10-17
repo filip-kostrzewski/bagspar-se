@@ -37,6 +37,9 @@ class AuthAccountTest extends TestCase
             ->assertDontSee('kortnummer', false)
             ->assertDontSee('3 månader', false)
             ->assertSee('href="'.route('terms').'"', false)
+            ->assertSee('href="'.route('dpa').'"', false)
+            ->assertSee('villkoren</a> och <a class="workshop-text-link" href="'.route('dpa').'">personuppgiftsbiträdesavtalet</a>', false)
+            ->assertSee('name="terms"', false)
             ->assertSee('data-password-toggle="password"', false)
             ->assertDontSee('Betalning kan börja först när den aktiveras manuellt', false);
     }
@@ -230,7 +233,7 @@ class AuthAccountTest extends TestCase
             'email' => 'anna@example.test',
             'password' => 'correct-horse-5',
             'password_confirmation' => 'correct-horse-5',
-        ])->assertSessionHasErrors(['terms' => 'Godkänn villkoren för att skapa kontot.']);
+        ])->assertSessionHasErrors(['terms' => 'Godkänn villkoren och personuppgiftsbiträdesavtalet för att skapa kontot.']);
 
         $this->assertDatabaseCount('users', 0);
         $this->assertGuest();

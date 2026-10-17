@@ -64,6 +64,7 @@
             <li>faktureringsuppgifter när verkstaden beställer abonnemang: organisationsnummer, fakturamejl, vald betalningsperiod och en eventuell referens</li>
         </ul>
         <p>Uppgifterna används för att visa och hantera projekt, arbetskort, bilder och projektrapporter i Bågspår, och faktureringsuppgifterna för att skicka fakturan. Fakturor bokförs hos vår redovisningsleverantör och sparas så länge bokföringslagen kräver. Kontots uppgifter och bilder hör till verkstaden. De visas efter inloggning för användare med åtkomst till verkstadens konto. Bildfilerna är privata och visas via en skyddad appfunktion, inte som publika bildlänkar. Om verkstaden slår på en statuslänk för ett projekt kan den som har länken se bågarnas etapp och bilder märkta före eller efter. Anteckningar ingår inte, och länken kan stängas av. Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet. Om kunden godkänner en offert via länken sparas namnet och tidpunkten på offerten.</p>
+        <p>För uppgifterna om verkstadens kunder är Prodi Digital AB personuppgiftsbiträde enligt <a href="{{ route('dpa') }}">personuppgiftsbiträdesavtalet</a>. Verkstaden är personuppgiftsansvarig, så kontakta verkstaden om dessa uppgifter.</p>
         <p>Om du vill få uppgifter i ett konto raderade, kontakta oss via e-postadressen nedan. Appen har för närvarande ingen egen funktion för att radera konto eller enskilda arbetskort.</p>
 
         <h2>Dina rättigheter</h2>

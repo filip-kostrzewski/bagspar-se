@@ -64,7 +64,7 @@ class RegisteredUserController extends Controller
             'password.string' => 'Ange ett giltigt lösenord.',
             'password.confirmed' => 'Lösenorden stämmer inte överens.',
             'password.min' => 'Lösenordet måste innehålla minst 12 tecken.',
-            'terms.accepted' => 'Godkänn villkoren för att skapa kontot.',
+            'terms.accepted' => 'Godkänn villkoren och personuppgiftsbiträdesavtalet för att skapa kontot.',
         ]);
 
         $user = DB::transaction(function () use ($validated): User {

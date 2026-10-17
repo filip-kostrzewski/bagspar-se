@@ -28,6 +28,7 @@ class SitemapControllerTest extends TestCase
             'https://example.test/guider/dokumentera-fonsterrenovering',
             'https://example.test/integritetspolicy',
             'https://example.test/villkor',
+            'https://example.test/personuppgiftsbitradesavtal',
             'https://example.test/kontakt',
         ]);
     }
@@ -53,6 +54,7 @@ class SitemapControllerTest extends TestCase
             'https://bagspar.se/guider/dokumentera-fonsterrenovering',
             'https://bagspar.se/integritetspolicy',
             'https://bagspar.se/villkor',
+            'https://bagspar.se/personuppgiftsbitradesavtal',
             'https://bagspar.se/kontakt',
         ]);
     }
@@ -77,6 +79,7 @@ class SitemapControllerTest extends TestCase
             'https://bagspar.se/guider/dokumentera-fonsterrenovering',
             'https://bagspar.se/integritetspolicy',
             'https://bagspar.se/villkor',
+            'https://bagspar.se/personuppgiftsbitradesavtal',
             'https://bagspar.se/kontakt',
         ]);
     }
@@ -95,6 +98,7 @@ class SitemapControllerTest extends TestCase
         $response->assertSee('href="https://bagspar.se/markning-av-fonsterbagar"', false);
         $response->assertSee('href="https://bagspar.se/integritetspolicy"', false);
         $response->assertSee('href="https://bagspar.se/villkor"', false);
+        $response->assertSee('href="https://bagspar.se/personuppgiftsbitradesavtal"', false);
         $response->assertSee('href="https://bagspar.se/kontakt"', false);
         $response->assertSee('action="https://bagspar.se/kontakt"', false);
         $response->assertSee('href="https://bagspar.se/guider"', false);
@@ -125,6 +129,7 @@ class SitemapControllerTest extends TestCase
             $appUrl.'/guider/dokumentera-fonsterrenovering',
             $appUrl.'/integritetspolicy',
             $appUrl.'/villkor',
+            $appUrl.'/personuppgiftsbitradesavtal',
             $appUrl.'/kontakt',
         ]);
     }

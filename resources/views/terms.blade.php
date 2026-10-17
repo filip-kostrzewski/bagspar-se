@@ -36,7 +36,7 @@
 
         <h2>6. Konto, innehåll och personuppgifter</h2>
         <p>Verkstadens ägare skapar kontot och kan bjuda in medarbetare. Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt. Verkstaden ansvarar för inloggningarna och för att de uppgifter, namn och bilder som läggs in i tjänsten får användas där. Arbetskort, bilder och rapporter visas efter inloggning.</p>
-        <p>Integritetspolicyn beskriver hur Prodi Digital AB hanterar kontouppgifter och uppgifter i verkstadens konto. För personuppgifter om verkstadens kunder ansvarar verkstaden för sin användning och för information till de registrerade. Om Prodi Digital AB behandlar sådana uppgifter för verkstadens räkning krävs ett separat personuppgiftsbiträdesavtal. Dessa villkor och integritetspolicyn är inte ett sådant avtal. Kontakta oss innan kontot används för sådan behandling.</p>
+        <p>Integritetspolicyn beskriver hur Prodi Digital AB hanterar kontouppgifter och uppgifter i verkstadens konto. För personuppgifter om verkstadens kunder är verkstaden personuppgiftsansvarig och ansvarar för sin användning och för information till de registrerade. Prodi Digital AB är personuppgiftsbiträde. <a href="{{ route('dpa') }}">Personuppgiftsbiträdesavtalet</a> är en del av dessa villkor och godkänns tillsammans med dem.</p>
 
         <h2>7. Avslut och kontakt</h2>
         <p>Kontot avslutas när verkstaden ber om det via kontaktadressen ovan, när ett uppsagt abonnemang har löpt ut, eller enligt punkt 2 när en provperiod har tagit slut utan beställning. När kontot avslutas tar vi bort kontouppgifter, projekt och bilder inom 30 dagar, om vi inte måste spara något enligt lag. Fakturaunderlag sparas så länge bokföringslagen kräver. Läs mer i integritetspolicyn.</p>
@@ -45,7 +45,7 @@
         <h2>8. Tillämplig lag</h2>
         <p>Svensk lag gäller för dessa villkor. Tvister som inte kan lösas genom kontakt med oss prövas av svensk allmän domstol.</p>
 
-        <p>Se även <a href="{{ route('privacy') }}">integritetspolicyn</a>.</p>
+        <p>Se även <a href="{{ route('privacy') }}">integritetspolicyn</a> och <a href="{{ route('dpa') }}">personuppgiftsbiträdesavtalet</a>.</p>
     </div>
 </main>
 @endsection

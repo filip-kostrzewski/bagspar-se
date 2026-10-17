@@ -3,6 +3,8 @@
 namespace Tests\Feature\Workshop;
 
 use App\Models\Project;
+use App\Models\Quote;
+use App\Models\QuoteLine;
 use App\Models\User;
 use App\Models\WindowSash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,5 +67,42 @@ class WorkshopExportTest extends TestCase
         $this->assertStringNotContainsString('2026-10-16', $csv);
         $this->assertStringNotContainsString('Annat företags projekt', $csv);
         $this->assertStringNotContainsString('Hemlig kund', $csv);
+    }
+
+    public function test_the_export_lists_the_quote_status_total_and_acceptance_per_project(): void
+    {
+        $owner = User::factory()->create();
+        $accepted = Project::factory()->create(['workshop_id' => $owner->workshop_id, 'name' => 'Med offert']);
+        $quote = Quote::factory()->accepted()->create([
+            'project_id' => $accepted->getKey(),
+            'accepted_at' => '2026-10-16 08:30:00',
+            'accepted_name' => 'Ada Ek',
+        ]);
+        QuoteLine::factory()->create(['quote_id' => $quote->getKey(), 'quantity' => 2, 'unit_price_ore' => 450000]);
+        $sent = Project::factory()->create(['workshop_id' => $owner->workshop_id, 'name' => 'Skickad offert']);
+        $sentQuote = Quote::factory()->sent()->create(['project_id' => $sent->getKey()]);
+        QuoteLine::factory()->create(['quote_id' => $sentQuote->getKey(), 'unit_price_ore' => 100000]);
+        Project::factory()->create(['workshop_id' => $owner->workshop_id, 'name' => 'Utan offert']);
+
+        $csv = $this->actingAs($owner)->get(route('app.export'))->streamedContent();
+        $csv = preg_replace('/^\xEF\xBB\xBF/', '', $csv) ?? $csv;
+
+        $handle = fopen('php://temp', 'w+b');
+        $this->assertNotFalse($handle);
+        fwrite($handle, $csv);
+        rewind($handle);
+        $rows = [];
+        while (($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+            $rows[$row[0]] = $row;
+        }
+        fclose($handle);
+
+        $this->assertSame(
+            ['Offertstatus', 'Offert exkl. moms', 'Offert godkänd', 'Offert godkänd av'],
+            array_slice($rows['Projekt'], -4),
+        );
+        $this->assertSame(['Godkänd', '9 000 kr', '16 okt 2026 10:30', 'Ada Ek'], array_slice($rows['Med offert'], -4));
+        $this->assertSame(['Skickad', '1 000 kr', '', ''], array_slice($rows['Skickad offert'], -4));
+        $this->assertSame(['', '', '', ''], array_slice($rows['Utan offert'], -4));
     }
 }

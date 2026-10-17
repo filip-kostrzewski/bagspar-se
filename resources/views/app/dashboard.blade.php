@@ -61,7 +61,14 @@
                     </li>
                 </ol>
 
-                <a class="workshop-button workshop-button--primary dashboard-empty__action" href="{{ route('app.projects.create') }}">Skapa första projektet</a>
+                <div class="dashboard-empty__actions">
+                    <a class="workshop-button workshop-button--primary dashboard-empty__action" href="{{ route('app.projects.create') }}">Skapa första projektet</a>
+                    <form class="dashboard-empty__sample" method="POST" action="{{ route('app.sample-project.store') }}">
+                        @csrf
+                        <button class="workshop-button workshop-button--quiet" type="submit" aria-describedby="sample-project-hint">Visa ett exempelprojekt</button>
+                        <p class="dashboard-empty__hint" id="sample-project-hint">Sex bågar med steg, anteckningar, tid och material. Går att ta bort.</p>
+                    </form>
+                </div>
             </section>
         @else
             <section class="workshop-stat-grid" aria-label="Översikt">

@@ -72,7 +72,7 @@
 
             <label class="workshop-checkbox" for="terms">
                 <input id="terms" name="terms" type="checkbox" value="1" required @checked(old('terms')) @if ($errors->has('terms')) aria-invalid="true" aria-describedby="terms-error" @endif>
-                <span>Jag godkänner <a class="workshop-text-link" href="{{ route('terms') }}">villkoren</a>.</span>
+                <span>Jag godkänner <a class="workshop-text-link" href="{{ route('terms') }}">villkoren</a> och <a class="workshop-text-link" href="{{ route('dpa') }}">personuppgiftsbiträdesavtalet</a>.</span>
             </label>
             @error('terms')
                 <p class="form-field__error" id="terms-error">{{ $message }}</p>

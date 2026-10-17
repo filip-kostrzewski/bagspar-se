@@ -5,6 +5,8 @@ namespace App\Support;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectEvent;
+use App\Models\Quote;
+use App\Models\QuoteLine;
 use App\Models\SashEvent;
 use App\Models\SashMaterial;
 use App\Models\SashPhoto;
@@ -29,6 +31,7 @@ final class CustomerDataExport
                 'windowSashes.timeEntries',
                 'windowSashes.materials',
                 'events',
+                'quote.lines',
             ])
             ->orderBy('id')
             ->get();
@@ -54,6 +57,7 @@ final class CustomerDataExport
                         ->values()
                         ->map(fn (WindowSash $sash): array => $this->sash($project, $sash))
                         ->all(),
+                    'offert' => $project->quote instanceof Quote ? $this->quote($project->quote) : null,
                     'historik' => $project->events
                         ->sortBy('id')
                         ->values()
@@ -175,6 +179,41 @@ final class CustomerDataExport
                 }
             }
 
+            if (is_array($project['offert'] ?? null)) {
+                $quote = $project['offert'];
+
+                foreach ([
+                    'Status' => $quote['status'] ?? null,
+                    'Inledning' => $quote['inledning'] ?? null,
+                    'Giltig till' => $this->swedishDay(is_string($quote['giltig_till'] ?? null) ? $quote['giltig_till'] : null),
+                    'Skickad' => $quote['skickad'] ?? null,
+                    'Godkänd' => $quote['godkand'] ?? null,
+                    'Godkänd av' => $quote['godkand_av'] ?? null,
+                ] as $label => $value) {
+                    $this->put($handle, ['Offert', $customerName, $projectName, '', '', $label, $this->text($value)]);
+                }
+
+                foreach ($quote['rader'] ?? [] as $line) {
+                    $this->put($handle, [
+                        'Offertrad',
+                        $customerName,
+                        $projectName,
+                        '',
+                        '',
+                        $this->text($line['beskrivning'] ?? null),
+                        $this->text($line['antal'] ?? null).' x '.$this->text($line['styckpris'] ?? null).' = '.$this->text($line['radsumma'] ?? null),
+                    ]);
+                }
+
+                foreach ([
+                    'Summa exkl. moms' => $quote['summa_exkl_moms'] ?? null,
+                    'Moms' => $quote['moms'] ?? null,
+                    'Summa inkl. moms' => $quote['summa_inkl_moms'] ?? null,
+                ] as $label => $value) {
+                    $this->put($handle, ['Offert', $customerName, $projectName, '', '', $label, $this->text($value)]);
+                }
+            }
+
             foreach ($project['historik'] as $event) {
                 $this->put($handle, [
                     'Historik',
@@ -193,6 +232,37 @@ final class CustomerDataExport
         fclose($handle);
 
         return is_string($csv) ? $csv : '';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function quote(Quote $quote): array
+    {
+        return [
+            'status' => match ($quote->status) {
+                Quote::STATUS_ACCEPTED => 'Godkänd',
+                Quote::STATUS_SENT => 'Skickad',
+                default => 'Utkast',
+            },
+            'inledning' => $quote->introduction,
+            'giltig_till' => $quote->valid_until?->toDateString(),
+            'skickad' => $quote->sent_at instanceof Carbon ? SwedishDate::formatDateTime($quote->sent_at) : null,
+            'godkand' => $quote->accepted_at instanceof Carbon ? SwedishDate::formatDateTime($quote->accepted_at) : null,
+            'godkand_av' => $quote->accepted_name,
+            'rader' => $quote->lines
+                ->values()
+                ->map(fn (QuoteLine $line): array => [
+                    'beskrivning' => $line->description,
+                    'antal' => $line->quantity,
+                    'styckpris' => Kronor::format((int) $line->unit_price_ore),
+                    'radsumma' => Kronor::format($line->lineTotalOre()),
+                ])
+                ->all(),
+            'summa_exkl_moms' => Kronor::format($quote->subtotalOre()),
+            'moms' => Kronor::format($quote->vatOre()),
+            'summa_inkl_moms' => Kronor::format($quote->totalOre()),
+        ];
     }
 
     /**
@@ -277,6 +347,9 @@ final class CustomerDataExport
             SashEvent::KIND_TIME => 'tid',
             SashEvent::KIND_MATERIAL => 'material',
             ProjectEvent::KIND_SASH_REMOVED => 'båge borttagen',
+            ProjectEvent::KIND_QUOTE_SENT => 'offert skickad',
+            ProjectEvent::KIND_QUOTE_ACCEPTED => 'offert godkänd',
+            ProjectEvent::KIND_STATUS_LINK_SENT => 'statuslänk skickad',
             default => $kind,
         };
     }
