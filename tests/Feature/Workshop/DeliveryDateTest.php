@@ -179,6 +179,8 @@ class DeliveryDateTest extends TestCase
         $kommandeHtml = $kommande->getContent();
         $this->assertIsString($kommandeHtml);
         $this->assertStringNotContainsString('id="overdue-title"', $kommandeHtml);
+        $this->assertStringNotContainsString('id="upcoming-title"', $kommandeHtml);
+        $this->assertSame(1, substr_count($kommandeHtml, 'Villa Idag'));
         $week = $this->after($kommandeHtml, 'id="projects-title"');
         $this->assertStringContainsString('Villa Idag', $week);
         $this->assertStringContainsString('Villa Söndag', $week);

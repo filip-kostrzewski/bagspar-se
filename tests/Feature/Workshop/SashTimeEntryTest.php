@@ -84,6 +84,9 @@ class SashTimeEntryTest extends TestCase
         $this->get(route('app.projects.report', $project).'?arbetstid=1')
             ->assertOk()
             ->assertSee('Arbetstid totalt', false)
+            ->assertSee('Arbetstid per person', false)
+            ->assertSee('<th scope="col">Person</th>', false)
+            ->assertSee('<th scope="col">Tid</th>', false)
             ->assertSee('2 tim 15 min', false)
             ->assertSee('Bo Berg: 1 tim 30 min', false)
             ->assertSee('Ada Ek: 45 min', false);

@@ -53,15 +53,17 @@ class DashboardController extends Controller
             ->withCount('windowSashes')
             ->latest()
             ->get();
+        $hasActiveFilters = $filters['kund'] !== '' || $filters['rum'] !== '' || $filters['etapp'] !== '' || $filters['leverans'] !== '';
+        $showDeliveryHighlights = ! $showingArchived && ! $hasActiveFilters;
 
         return view('app.dashboard', [
             'workshop' => $workshop,
             'projects' => $projects,
             'showingArchived' => $showingArchived,
             'filters' => $filters,
-            'hasActiveFilters' => $filters['kund'] !== '' || $filters['rum'] !== '' || $filters['etapp'] !== '' || $filters['leverans'] !== '',
-            'overdueProjects' => $showingArchived || $filters['leverans'] === 'kommande' ? collect() : $this->deliveryProjects($workshop)->deliveryOverdue($today)->get(),
-            'upcomingProjects' => $showingArchived ? collect() : $this->deliveryProjects($workshop)->deliveryDuring($today, $upcomingEnd)->get(),
+            'hasActiveFilters' => $hasActiveFilters,
+            'overdueProjects' => $showDeliveryHighlights ? $this->deliveryProjects($workshop)->deliveryOverdue($today)->get() : collect(),
+            'upcomingProjects' => $showDeliveryHighlights ? $this->deliveryProjects($workshop)->deliveryDuring($today, $upcomingEnd)->get() : collect(),
             'archivedCount' => $workshop->projects()->archived()->count(),
             'hasAnyProjects' => $workshop->projects()->exists(),
             'activeProjectsCount' => (clone $currentProjects)->where('status', 'active')->count(),

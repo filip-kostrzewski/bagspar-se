@@ -229,13 +229,13 @@ class WorkshopWorkspaceTest extends TestCase
         $this->actingAs($owner)
             ->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
-            ->assertSee('<span>2026-10-16</span>', false);
+            ->assertSee('<span>16 okt 2026</span>', false);
 
         $this->get(route('app.projects.report', $project))
             ->assertOk()
             ->assertSee('<dd>16 okt 2026 00:30</dd>', false)
             ->assertSee('class="report-footer__product">Bågspår</span>', false)
-            ->assertSee('2026-10-16', false)
+            ->assertSee('Före · 16 okt 2026', false)
             ->assertDontSee('window.webp', false)
             ->assertDontSee('Rapport från Bågspår', false);
     }

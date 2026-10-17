@@ -757,6 +757,14 @@ svg {
     font-size: 14px;
 }
 
+.form-field input[type='file'].visually-hidden {
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+}
+
 .form-field input[type='file']::file-selector-button {
     min-height: 32px;
     margin-right: 10px;
@@ -1851,6 +1859,42 @@ svg {
 .report-facts dd {
     margin: 0;
     font-size: 14px;
+    font-weight: 700;
+}
+
+.report-time {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 22px;
+    border-collapse: collapse;
+}
+
+.report-time caption {
+    margin-bottom: 8px;
+    caption-side: top;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+}
+
+.report-time th,
+.report-time td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    font-size: 14px;
+}
+
+.report-time thead th {
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.report-time tbody th {
     font-weight: 700;
 }
 

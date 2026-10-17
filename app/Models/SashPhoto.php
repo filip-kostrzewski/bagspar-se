@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\SwedishDate;
 use Database\Factories\SashPhotoFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class SashPhoto extends Model
 {
@@ -56,10 +58,12 @@ class SashPhoto extends Model
 
     public function documentCaption(): string
     {
-        $date = $this->created_at?->timezone('Europe/Stockholm')->format('Y-m-d');
+        $local = $this->created_at?->copy()->timezone('Europe/Stockholm');
 
-        return collect([$this->documentMomentLabel(), $date])
-            ->filter(fn (?string $part): bool => is_string($part) && $part !== '')
+        return collect([
+            $this->documentMomentLabel(),
+            $local instanceof Carbon ? SwedishDate::format($local) : null,
+        ])->filter(fn (?string $part): bool => is_string($part) && $part !== '')
             ->implode(' · ');
     }
 }

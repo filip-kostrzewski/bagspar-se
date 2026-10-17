@@ -446,7 +446,7 @@
                             </a>
                             <figcaption>
                                 <strong>{{ $photo->documentMomentLabel() ?? 'Foto' }}</strong>
-                                <span>{{ $photo->created_at?->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
+                                <span>{{ \App\Support\SwedishDate::format($photo->created_at?->copy()->timezone('Europe/Stockholm')) }}</span>
                                 <form method="POST" action="{{ route('app.sashes.photos.update', [$project, $sash, $photo]) }}">
                                     @csrf
                                     @method('PATCH')

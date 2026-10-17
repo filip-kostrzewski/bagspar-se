@@ -93,8 +93,8 @@ class ClientStatusTest extends TestCase
             ->assertSee('B-24', false)
             ->assertSee('Kök', false)
             ->assertSee('Glasning', false)
-            ->assertSee('Före · 2026-10-16', false)
-            ->assertSee('Efter · 2026-10-16', false)
+            ->assertSee('Före · 16 okt 2026', false)
+            ->assertSee('Efter · 16 okt 2026', false)
             ->assertSee('loading="lazy"', false)
             ->assertSee('data-enlarge', false)
             ->assertSeeInOrder([

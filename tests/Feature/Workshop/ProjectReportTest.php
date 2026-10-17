@@ -66,7 +66,7 @@ class ProjectReportTest extends TestCase
             ->assertSee('Storgatan 1, Uppsala', false)
             ->assertSee(route('app.settings.logo'), false)
             ->assertSee('<img src="'.route('app.sashes.photos.show', [$project, $sash, $photo]).'"', false)
-            ->assertSee('Före · 2026-10-16', false)
+            ->assertSee('Före · 16 okt 2026', false)
             ->assertSee('Målning', false)
             ->assertSee('class="report-footer__product">Bågspår</span>', false)
             ->assertDontSee('IMG_4481.jpg', false)
@@ -90,6 +90,6 @@ class ProjectReportTest extends TestCase
             ->assertSee('Arbetsanteckningar', false)
             ->assertSee('kittet löst i nederkant', false)
             ->assertSee('HEMLIG PROJEKTANTECKNING', false)
-            ->assertSee('Före · 2026-10-16', false);
+            ->assertSee('Före · 16 okt 2026', false);
     }
 }

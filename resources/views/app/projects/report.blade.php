@@ -80,15 +80,31 @@
                 @endif
                 @if ($includeWorkTime)
                     <div><dt>Arbetstid totalt</dt><dd>{{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</dd></div>
-                    @foreach ($timeByPerson as $name => $minutes)
-                        <div><dt>{{ $name }}</dt><dd>{{ \App\Support\WorkDuration::label($minutes) }}</dd></div>
-                    @endforeach
                 @endif
                 <div><dt>Antal bågar</dt><dd>{{ $sashCount }}</dd></div>
                 @if ($project->created_at)
                     <div><dt>Skapat</dt><dd>{{ \App\Support\SwedishDate::formatDateTime($project->created_at) }}</dd></div>
                 @endif
             </dl>
+            @if ($includeWorkTime && $timeByPerson->isNotEmpty())
+                <table class="report-time">
+                    <caption>Arbetstid per person</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Person</th>
+                            <th scope="col">Tid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($timeByPerson as $name => $minutes)
+                            <tr>
+                                <th scope="row">{{ $name }}</th>
+                                <td>{{ \App\Support\WorkDuration::label($minutes) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
             @if ($includeWorkNotes && $project->notes)
                 <div class="report-project__notes">
                     <h2>Projektanteckningar</h2>
