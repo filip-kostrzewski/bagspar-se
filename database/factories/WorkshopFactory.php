@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Workshop;
+use App\Support\PilotPeriod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +20,7 @@ class WorkshopFactory extends Factory
     {
         return [
             'name' => fake()->company(),
-            'trial_ends_at' => now()->addMonths(3),
+            'trial_ends_at' => PilotPeriod::forAccountCreatedAt(now()),
         ];
     }
 }

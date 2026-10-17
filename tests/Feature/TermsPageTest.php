@@ -18,7 +18,9 @@ class TermsPageTest extends TestCase
         $response->assertSee('559214-9370', false);
         $response->assertSee('Tegelbrukets väg 41', false);
         $response->assertSee('195 59 Märsta', false);
-        $response->assertSee('kostnadsfritt i 3 månader', false);
+        $response->assertSee('kostnadsfritt till 31 december 2026', false);
+        $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
+        $response->assertDontSee('3 månader', false);
         $response->assertSee('Ingen betalning dras automatiskt', false);
         $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
         $response->assertSee('Ingen bindningstid och ingen uppsägningstid.', false);

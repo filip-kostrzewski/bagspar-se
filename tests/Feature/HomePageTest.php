@@ -17,8 +17,12 @@ class HomePageTest extends TestCase
         $response->assertSee('href="'.route('register').'"', false);
         $response->assertSee('Logga in', false);
         $response->assertSee('href="'.route('login').'"', false);
-        $response->assertSee('Gratis pilot i 3 månader', false);
+        $response->assertSee('Gratis pilot till 31 december', false);
+        $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
+        $response->assertSee('Vad kostar Bågspår efter piloten?', false);
         $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+        $response->assertDontSee('3 månader', false);
+        $response->assertDontSee('tre månader', false);
         $response->assertDontSee('Efter pilotperioden', false);
         $response->assertSee('Mottagen', false);
         $response->assertSee('Skrapning', false);
@@ -119,6 +123,7 @@ class HomePageTest extends TestCase
         $response->assertOk();
         $response->assertSee('Eget erbjudande för testet', false);
         $response->assertDontSee('Gratis pilot i 3 månader', false);
+        $response->assertDontSee('Gratis pilot till 31 december', false);
         $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
     }
 
@@ -130,5 +135,38 @@ class HomePageTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('mailto:kontakt@example.test', false);
+    }
+
+    public function test_each_workflow_step_maps_to_a_unique_photo(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+
+        preg_match_all(
+            '/data-workflow-step\b[^>]*data-image="([^"]+)"[^>]*data-image-small="([^"]+)"[^>]*data-image-alt="([^"]+)"/',
+            $html,
+            $matches,
+            PREG_SET_ORDER,
+        );
+
+        $this->assertCount(6, $matches);
+
+        $full = array_column($matches, 1);
+        $small = array_column($matches, 2);
+        $alts = array_column($matches, 3);
+
+        $this->assertSame($full, array_values(array_unique($full)));
+        $this->assertSame($small, array_values(array_unique($small)));
+        $this->assertSame($alts, array_values(array_unique($alts)));
+
+        $hashes = [];
+
+        foreach ([...$full, ...$small] as $url) {
+            $path = public_path((string) parse_url($url, PHP_URL_PATH));
+            $this->assertFileExists($path);
+            $hashes[] = hash_file('sha256', $path);
+        }
+
+        $this->assertSame($hashes, array_values(array_unique($hashes)));
+        $this->assertCount(12, $hashes);
     }
 }

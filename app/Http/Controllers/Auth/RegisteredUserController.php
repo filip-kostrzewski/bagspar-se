@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Workshop;
+use App\Support\PilotPeriod;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -69,7 +70,7 @@ class RegisteredUserController extends Controller
         $user = DB::transaction(function () use ($validated): User {
             $workshop = Workshop::query()->create([
                 'name' => $validated['company'],
-                'trial_ends_at' => now()->addMonths(3),
+                'trial_ends_at' => PilotPeriod::forAccountCreatedAt(now()),
             ]);
 
             return $workshop->users()->create([

@@ -61,7 +61,7 @@
                         '@type' => 'Offer',
                         'price' => '790',
                         'priceCurrency' => 'SEK',
-                        'description' => (string) config('bagspar.pilot_price_line'),
+                        'description' => config('bagspar.pilot_offer').'. '.config('bagspar.pilot_follow_up'),
                         'url' => $configuredAppUrl.'/#pilot',
                     ],
                 ],

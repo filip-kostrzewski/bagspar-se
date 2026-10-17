@@ -12,8 +12,8 @@
             'answer' => 'Skapa ett verkstadskonto för att börja. Ägaren kan bjuda in medarbetare till samma verkstad.',
         ],
         [
-            'question' => 'Vad kostar Bågspår efter tre månader?',
-            'answer' => 'Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.',
+            'question' => 'Vad kostar Bågspår efter piloten?',
+            'answer' => 'Piloten är gratis till 31 december 2026. Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.',
         ],
         [
             'question' => 'Kan jag prova arbetskortet först?',
@@ -62,7 +62,7 @@
                     @include('partials.icon', ['name' => 'arrow-right'])
                 </a>
             </div>
-            <p class="home-hero__offer">{{ config('bagspar.pilot_offer') }} <span aria-hidden="true">·</span> {{ config('bagspar.pilot_price_line') }}</p>
+            <p class="home-hero__offer">{{ config('bagspar.pilot_offer') }} <span aria-hidden="true">·</span> {{ config('bagspar.pilot_follow_up') }}</p>
             <ul class="hero-benefits" aria-label="Det här samlar arbetskortet">
                 <li>
                     @include('partials.icon', ['name' => 'tag'])
@@ -133,12 +133,12 @@
 
                 @php
                     $workflowSteps = [
-                        ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
-                        ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
-                        ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
-                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
-                        ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
-                        ['key' => 'ready', 'number' => '06', 'label' => 'Klar', 'description' => 'Bågen är klar i verkstaden. Rapporten samlar nummer, rum, steg och bilder.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
+                        ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'height' => 1402, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
+                        ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-scraping', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Färg skrapas av en äldre träbåge'],
+                        ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-repair', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Trä lagas i en fönsterbåge'],
+                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
+                        ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-painting', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En träbåge målas med pensel'],
+                        ['key' => 'ready', 'number' => '06', 'label' => 'Klar', 'description' => 'Bågen är klar i verkstaden. Rapporten samlar nummer, rum, steg och bilder.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
                     ];
                 @endphp
                 <div class="atelier-steps" role="group" aria-label="Välj arbetssteg" data-workflow-controls hidden>
@@ -154,6 +154,7 @@
                             data-image-small="{{ asset('images/'.$workflowStep['image'].'-small.webp') }}"
                             data-image-small-width="{{ $workflowStep['smallWidth'] }}"
                             data-image-width="{{ $workflowStep['width'] }}"
+                            data-image-height="{{ $workflowStep['height'] }}"
                             data-image-alt="{{ $workflowStep['alt'] }}"
                             aria-controls="workflow-example"
                             aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
@@ -263,6 +264,7 @@
         <div class="pilot-pricing__copy" data-reveal>
             <p class="eyebrow">BÖRJA I LUGN OCH RO</p>
             <h2 id="pilot-title" class="section-heading">{{ config('bagspar.pilot_offer') }}</h2>
+            <p class="body-copy">{{ config('bagspar.pilot_follow_up') }}</p>
             <ul class="pilot-features" aria-label="Det här ingår i piloten">
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>

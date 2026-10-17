@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Allmänna villkor — Bågspår')
-@section('meta_description', 'Villkor för Bågspår: kostnadsfri pilot i 3 månader utan automatisk betalning, därefter 790 kr per månad exklusive moms, utan bindningstid och utan uppsägningstid.')
+@section('meta_description', 'Villkor för Bågspår: kostnadsfri pilot till 31 december 2026 utan automatisk betalning, därefter 790 kr per månad exklusive moms, utan bindningstid och utan uppsägningstid.')
 
 @section('content')
 <main id="main" class="privacy-page page-shell">
@@ -19,7 +19,7 @@
         <p>Villkoren gäller mellan Prodi Digital AB och den verkstad som skapar och använder kontot. Personen som skapar kontot ska ha rätt att företräda verkstaden.</p>
 
         <h2>2. Kostnadsfri pilot</h2>
-        <p>Verkstaden får prova Bågspår kostnadsfritt i 3 månader. Ingen betalning krävs för att starta piloten.</p>
+        <p>Verkstaden får prova Bågspår kostnadsfritt till 31 december 2026. Ingen betalning krävs för att starta piloten. Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.</p>
         <p>Ingen betalning dras automatiskt under piloten, och ingen betalning startar automatiskt när piloten tar slut. Vill verkstaden inte fortsätta behöver den inte säga upp en betalning som inte har börjat.</p>
 
         <h2>3. Pris efter piloten</h2>

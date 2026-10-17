@@ -9,8 +9,8 @@
         <p class="auth-page__intro">Börja med verkstaden. Lägg sedan till projekt och bågar när arbetet tar form.</p>
 
         <aside class="registration-terms" aria-label="Pilot och pris">
-            <strong>3 månaders kostnadsfri pilot</strong>
-            <p>Därefter 790 kr/mån per verkstad, exkl. moms. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
+            <strong>Gratis pilot till 31 december</strong>
+            <p>Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
         </aside>
 
         @if ($errors->any())

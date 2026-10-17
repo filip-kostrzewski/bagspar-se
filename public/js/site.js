@@ -75,6 +75,7 @@ if (workflow instanceof HTMLElement) {
                 const smallImageWidth = Number(step.dataset.imageSmallWidth);
                 const imageAlt = step.dataset.imageAlt;
                 const imageWidth = Number(step.dataset.imageWidth);
+                const imageHeight = Number(step.dataset.imageHeight);
                 const stepLabel = step.querySelector('span:not(.atelier-step__number)')?.textContent?.trim();
 
                 if (!stepName || !fullImage || !smallImage || !imageAlt || !stepLabel) {
@@ -111,8 +112,16 @@ if (workflow instanceof HTMLElement) {
 
                 image.addEventListener('load', finishImageTransition, { once: true });
                 image.addEventListener('error', finishImageTransition, { once: true });
-                image.srcset = `${smallImage} ${smallImageWidth || 600}w, ${fullImage} ${imageWidth}w`;
+                image.loading = 'eager';
+                if (imageWidth > 0) {
+                    image.width = imageWidth;
+                }
+                if (imageHeight > 0) {
+                    image.height = imageHeight;
+                }
+                image.srcset = '';
                 image.src = fullImage;
+                image.srcset = `${smallImage} ${smallImageWidth || 600}w, ${fullImage} ${imageWidth}w`;
 
                 if (image.complete && image.naturalWidth > 0) {
                     finishImageTransition();

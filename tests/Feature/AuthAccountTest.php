@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\PilotPeriod;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -29,7 +31,11 @@ class AuthAccountTest extends TestCase
         $this->get(route('register'))
             ->assertOk()
             ->assertSee('Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.', false)
-            ->assertSee('3 månaders kostnadsfri pilot', false)
+            ->assertSee('Gratis pilot till 31 december', false)
+            ->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false)
+            ->assertDontSee('stripe', false)
+            ->assertDontSee('kortnummer', false)
+            ->assertDontSee('3 månader', false)
             ->assertSee('href="'.route('terms').'"', false)
             ->assertSee('data-password-toggle="password"', false)
             ->assertDontSee('provperiod', false)
@@ -55,10 +61,33 @@ class AuthAccountTest extends TestCase
         $this->assertAuthenticatedAs($user);
         $this->assertNotNull($user->terms_accepted_at);
         $this->assertSame('Fönsterverkstan', $user->workshop->name);
-        $this->assertTrue($user->workshop->trial_ends_at->between(now()->addMonths(3)->subMinute(), now()->addMonths(3)->addMinute()));
+        $this->assertSame(
+            PilotPeriod::endsAt()->utc()->format('Y-m-d H:i:s'),
+            $user->workshop->trial_ends_at->utc()->format('Y-m-d H:i:s'),
+        );
         $this->assertTrue(Hash::check('correct-horse-5', $user->password));
         $this->assertNull($user->email_verified_at);
         Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_registration_after_the_pilot_does_not_grant_more_free_time(): void
+    {
+        Notification::fake();
+        $this->travelTo(Carbon::parse('2027-01-02 12:00:00', 'Europe/Stockholm'));
+
+        $this->post(route('auth.register.store'), [
+            'name' => 'Anna Andersson',
+            'company' => 'Fönsterverkstan',
+            'email' => 'anna@example.test',
+            'password' => 'correct-horse-5',
+            'password_confirmation' => 'correct-horse-5',
+            'terms' => '1',
+        ])->assertRedirect(route('app.dashboard'));
+
+        $user = User::query()->where('email', 'anna@example.test')->firstOrFail();
+
+        $this->assertTrue($user->workshop->trial_ends_at->equalTo(now()));
+        $this->assertTrue($user->workshop->trial_ends_at->greaterThan(PilotPeriod::endsAt()));
     }
 
     public function test_registration_rejects_short_and_overlong_byte_passwords(): void
