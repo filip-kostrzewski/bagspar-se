@@ -74,6 +74,7 @@ Route::post('/intresse', PilotLeadController::class)
     ->name('pilot-leads.store');
 
 Route::permanentRedirect('/login', '/logga-in');
+Route::redirect('/logga-ut', '/logga-in');
 
 Route::get('/inbjudan/{token}', [AcceptWorkshopInvitationController::class, 'create'])
     ->where('token', '[A-Za-z0-9]{64}')

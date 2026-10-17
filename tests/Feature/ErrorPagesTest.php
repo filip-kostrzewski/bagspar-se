@@ -41,6 +41,15 @@ class ErrorPagesTest extends TestCase
         $this->assertModelExists($project);
     }
 
+    public function test_a_wrong_method_gives_a_swedish_405_and_a_typed_logout_address_redirects(): void
+    {
+        $this->get('/logga-ut')->assertRedirect('/logga-in');
+
+        $this->get('/intresse')
+            ->assertStatus(405)
+            ->assertSee('Den här adressen tar inte emot det', false);
+    }
+
     public function test_a_post_without_a_csrf_token_gives_a_swedish_419(): void
     {
         Route::post('/csrf-probe', fn (): string => 'ok')->middleware('web');
