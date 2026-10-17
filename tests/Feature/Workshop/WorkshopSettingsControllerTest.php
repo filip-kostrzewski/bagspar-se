@@ -251,6 +251,51 @@ class WorkshopSettingsControllerTest extends TestCase
         $this->assertStringStartsWith("\xFF\xD8\xFF", (string) $response->getContent());
     }
 
+    public function test_settings_logo_preview_shows_the_stored_image(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $image = imagecreatetruecolor(40, 24);
+        $green = imagecolorallocate($image, 20, 120, 60);
+        imagefilledrectangle($image, 0, 0, 40, 24, $green === false ? 0 : $green);
+        ob_start();
+        imagepng($image);
+        $png = ob_get_clean();
+        imagedestroy($image);
+        $this->assertIsString($png);
+
+        $path = 'workshop-logos/'.$owner->workshop->getKey().'/logo.png';
+        Storage::disk('local')->put($path, $png);
+        $owner->workshop->update(['logo_path' => $path]);
+
+        $preview = 'data:image/png;base64,'.base64_encode($png);
+
+        $page = $this->actingAs($owner)->get(route('app.settings.edit'));
+
+        $page->assertOk()
+            ->assertSee('<img class="settings-logo-preview" src="'.$preview.'"', false)
+            ->assertSee('alt="Nuvarande logotyp för '.$owner->workshop->name.'"', false)
+            ->assertSee('width="72"', false)
+            ->assertSee('height="72"', false)
+            ->assertDontSee('src="'.route('app.settings.logo').'"', false)
+            ->assertDontSee('Ingen logotyp', false);
+
+        $this->assertSame(1, preg_match('/<img class="settings-logo-preview" src="([^"]+)"/', (string) $page->getContent(), $matches));
+        $decoded = base64_decode(substr(html_entity_decode($matches[1], ENT_QUOTES), strlen('data:image/png;base64,')), true);
+        $this->assertIsString($decoded);
+        $rendered = imagecreatefromstring($decoded);
+        $this->assertNotFalse($rendered);
+        $color = imagecolorsforindex($rendered, imagecolorat($rendered, 1, 1));
+        imagedestroy($rendered);
+        $this->assertSame(20, $color['red']);
+        $this->assertSame(120, $color['green']);
+        $this->assertSame(60, $color['blue']);
+
+        $css = file_get_contents(public_path('css/workshop.css'));
+        $this->assertIsString($css);
+        $this->assertMatchesRegularExpression('/\.settings-logo-preview\s*\{[^}]*object-fit:\s*contain;/s', $css);
+    }
+
     public function test_owner_can_save_and_clear_an_optional_hourly_rate(): void
     {
         $owner = User::factory()->create();

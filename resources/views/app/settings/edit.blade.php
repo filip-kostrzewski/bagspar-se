@@ -83,8 +83,8 @@
 
             <div class="form-field">
                 <span id="logo-label">Logotyp</span>
-                @if ($workshop->hasLogo())
-                    <img class="settings-logo-preview" src="{{ route('app.settings.logo') }}" alt="Nuvarande logotyp för {{ $workshop->name }}" width="72" height="72">
+                @if (is_string($logoPreview))
+                    <img class="settings-logo-preview" src="{{ $logoPreview }}" alt="Nuvarande logotyp för {{ $workshop->name }}" width="72" height="72">
                 @else
                     <p class="settings-logo-empty">Ingen logotyp</p>
                 @endif
@@ -100,7 +100,7 @@
                 @enderror
             </div>
 
-            @if ($workshop->hasLogo())
+            @if (is_string($logoPreview))
                 <label class="workshop-checkbox" for="remove_logo">
                     <input id="remove_logo" name="remove_logo" type="checkbox" value="1" @checked(old('remove_logo'))>
                     <span>Ta bort nuvarande logotyp</span>

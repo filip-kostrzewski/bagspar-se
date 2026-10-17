@@ -45,6 +45,24 @@ final class WorkshopLogo
         ];
     }
 
+    /**
+     * Inline the logo so the settings preview does not depend on a second request.
+     *
+     * An authenticated image URL can fail to paint (other host, missing session
+     * cookie, or a redirect the browser will not draw), which leaves the empty
+     * preview box. The data URI is the same bytes the status page and the PDF use.
+     */
+    public static function dataUri(Workshop $workshop): ?string
+    {
+        $image = self::visible($workshop);
+
+        if ($image === null) {
+            return null;
+        }
+
+        return 'data:'.$image['mime'].';base64,'.base64_encode($image['bytes']);
+    }
+
     private static function hasVisiblePixel(GdImage $image): bool
     {
         $width = imagesx($image);

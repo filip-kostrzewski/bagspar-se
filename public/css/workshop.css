@@ -3388,8 +3388,9 @@ body.label-print-sheet {
     height: 72px;
     margin-bottom: 10px;
     border: 1px solid var(--rule);
-    background: #fff;
+    background: transparent;
     object-fit: contain;
+    object-position: center;
 }
 
 .settings-logo-empty {

@@ -29,6 +29,7 @@ class WorkshopSettingsController extends Controller
             'workshop' => $workshop,
             'members' => $workshop->users()->orderBy('name')->orderBy('id')->get(),
             'invitations' => $workshop->invitations()->pending()->orderBy('id')->get(),
+            'logoPreview' => WorkshopLogo::dataUri($workshop),
         ]);
     }
 
