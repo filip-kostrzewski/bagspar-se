@@ -27,7 +27,7 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('Meddelanden via kontaktformuläret', false);
         $response->assertSee('Företag och telefonnummer sparas bara om du fyller i dem.', false);
         $response->assertDontSee('Vi ber inte om telefonnummer', false);
-        $response->assertSee('14 dagar', false);
+        $response->assertSee('30 dagar', false);
         $response->assertSee('Uppgifter i verkstadens konto', false);
         $response->assertSee('Bildfilerna är privata och visas via en skyddad appfunktion', false);
         $response->assertSee('Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet.', false);

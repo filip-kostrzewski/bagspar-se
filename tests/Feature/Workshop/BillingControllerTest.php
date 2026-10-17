@@ -38,7 +38,7 @@ class BillingControllerTest extends TestCase
             ->assertOk()
             ->assertSee('Beställ abonnemang', false)
             ->assertSee('name="plan"', false)
-            ->assertSee('1 490 kr/mån', false)
+            ->assertSee('590 kr/mån', false)
             ->assertSee('>Abonnemang</a>', false);
     }
 
@@ -50,7 +50,7 @@ class BillingControllerTest extends TestCase
         $this->actingAs($owner)
             ->get(route('app.billing.edit'))
             ->assertOk()
-            ->assertSee('Per månad · 2 188 kr/mån', false)
+            ->assertSee('Per månad · 888 kr/mån', false)
             ->assertSee('5 av 3 som ingår · 2 extra', false);
     }
 
@@ -75,13 +75,13 @@ class BillingControllerTest extends TestCase
 
         Mail::assertSent(SubscriptionOrderNotification::class, function (SubscriptionOrderNotification $mail) use ($workshop): bool {
             $mail->assertSeeInHtml($workshop->name);
-            $mail->assertSeeInHtml('14 900 kr/år');
+            $mail->assertSeeInHtml('5 900 kr/år');
             $mail->assertSeeInHtml('559214-9370');
 
             return $mail->hasTo('faktura@example.test') && $mail->isFirstOrder;
         });
         Mail::assertSent(SubscriptionOrderConfirmation::class, function (SubscriptionOrderConfirmation $mail): bool {
-            $mail->assertSeeInHtml('14 900 kr/år');
+            $mail->assertSeeInHtml('5 900 kr/år');
 
             return $mail->hasTo('faktura@example.test')
                 && $mail->envelope()->subject === 'Tack för din beställning av Bågspår';

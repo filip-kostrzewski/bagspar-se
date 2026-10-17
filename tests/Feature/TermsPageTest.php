@@ -18,9 +18,9 @@ class TermsPageTest extends TestCase
         $response->assertSee('559214-9370', false);
         $response->assertSee('Tegelbrukets väg 41', false);
         $response->assertSee('195 59 Märsta', false);
-        $response->assertSee('kostnadsfritt i 14 dagar', false);
-        $response->assertSee('1 490 kr/mån exkl. moms per verkstad', false);
-        $response->assertSee('14 900 kr/år', false);
+        $response->assertSee('kostnadsfritt i 30 dagar', false);
+        $response->assertSee('590 kr/mån exkl. moms per verkstad', false);
+        $response->assertSee('5 900 kr/år', false);
         $response->assertSee('30 dagars betalningsvillkor', false);
         $response->assertSee('Ingen bindningstid utöver den betalningsperiod', false);
         $response->assertSee('dröjsmålsränta', false);

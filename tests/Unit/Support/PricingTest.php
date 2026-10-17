@@ -9,22 +9,22 @@ class PricingTest extends TestCase
 {
     public function test_kronor_use_a_space_as_the_thousands_separator(): void
     {
-        $this->assertSame('1 490', Pricing::kr(1490));
-        $this->assertSame('14 900', Pricing::kr(14900));
-        $this->assertSame('349', Pricing::kr(349));
+        $this->assertSame('590', Pricing::kr(590));
+        $this->assertSame('5 900', Pricing::kr(5900));
+        $this->assertSame('149', Pricing::kr(149));
     }
 
     public function test_the_default_price_list(): void
     {
-        $this->assertSame(14, Pricing::trialDays());
-        $this->assertSame(1490, Pricing::monthlyKr());
-        $this->assertSame(14900, Pricing::yearlyKr());
+        $this->assertSame(30, Pricing::trialDays());
+        $this->assertSame(590, Pricing::monthlyKr());
+        $this->assertSame(5900, Pricing::yearlyKr());
         $this->assertSame(3, Pricing::includedSeats());
-        $this->assertSame(349, Pricing::extraSeatKr());
+        $this->assertSame(149, Pricing::extraSeatKr());
         $this->assertSame(30, Pricing::invoiceDays());
-        $this->assertSame('1 490 kr/mån', Pricing::monthlyLabel());
-        $this->assertSame('14 900 kr/år', Pricing::yearlyLabel());
-        $this->assertSame('349 kr/mån', Pricing::extraSeatLabel());
+        $this->assertSame('590 kr/mån', Pricing::monthlyLabel());
+        $this->assertSame('5 900 kr/år', Pricing::yearlyLabel());
+        $this->assertSame('149 kr/mån', Pricing::extraSeatLabel());
     }
 
     public function test_paying_yearly_is_worth_two_free_months(): void
@@ -34,14 +34,14 @@ class PricingTest extends TestCase
 
     public function test_the_public_sentences(): void
     {
-        $this->assertSame('Prova gratis i 14 dagar', Pricing::trialHeadline());
-        $this->assertSame('Tre användare ingår, varje ytterligare användare kostar 349 kr/mån.', Pricing::seatsSentence());
+        $this->assertSame('Prova gratis i 30 dagar', Pricing::trialHeadline());
+        $this->assertSame('Tre användare ingår, varje ytterligare användare kostar 149 kr/mån.', Pricing::seatsSentence());
         $this->assertSame(
-            'Därefter 1 490 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.',
+            'Därefter 590 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.',
             Pricing::offerSentence(),
         );
         $this->assertSame(
-            'Betala per år: 14 900 kr/år exkl. moms, vilket motsvarar två månader gratis.',
+            'Betala per år: 5 900 kr/år exkl. moms, vilket motsvarar två månader gratis.',
             Pricing::yearlySentence(),
         );
         $this->assertSame(

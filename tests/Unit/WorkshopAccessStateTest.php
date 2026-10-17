@@ -137,9 +137,9 @@ class WorkshopAccessStateTest extends TestCase
     public static function seatPrices(): array
     {
         return [
-            'one user' => [1, 0, 1490, 14900],
-            'three users' => [3, 0, 1490, 14900],
-            'five users' => [5, 2, 2188, 14900 + 2 * 349 * 12],
+            'one user' => [1, 0, 590, 5900],
+            'three users' => [3, 0, 590, 5900],
+            'five users' => [5, 2, 888, 5900 + 2 * 149 * 12],
         ];
     }
 

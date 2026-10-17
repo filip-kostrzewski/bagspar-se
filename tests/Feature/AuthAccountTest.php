@@ -30,8 +30,8 @@ class AuthAccountTest extends TestCase
     {
         $this->get(route('register'))
             ->assertOk()
-            ->assertSee('Prova gratis i 14 dagar – inget kort behövs', false)
-            ->assertSee('Därefter 1 490 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.', false)
+            ->assertSee('Prova gratis i 30 dagar – inget kort behövs', false)
+            ->assertSee('Därefter 590 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.', false)
             ->assertSee('Vi skickar faktura först när ägaren beställer abonnemanget i appen.', false)
             ->assertDontSee('stripe', false)
             ->assertDontSee('kortnummer', false)
@@ -70,7 +70,7 @@ class AuthAccountTest extends TestCase
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 
-    public function test_registration_starts_a_fourteen_day_trial_that_ends_at_the_end_of_the_last_day(): void
+    public function test_registration_starts_a_thirty_day_trial_that_ends_at_the_end_of_the_last_day(): void
     {
         Notification::fake();
         $this->travelTo(Carbon::parse('2027-01-02 12:00:00', 'Europe/Stockholm'));
@@ -87,7 +87,7 @@ class AuthAccountTest extends TestCase
         $user = User::query()->where('email', 'anna@example.test')->firstOrFail();
 
         $this->assertSame(
-            Carbon::parse('2027-01-16 23:59:59', 'Europe/Stockholm')->utc()->format('Y-m-d H:i:s'),
+            Carbon::parse('2027-02-01 23:59:59', 'Europe/Stockholm')->utc()->format('Y-m-d H:i:s'),
             $user->workshop->trial_ends_at->utc()->format('Y-m-d H:i:s'),
         );
     }

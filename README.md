@@ -12,8 +12,8 @@ Workshops that take wooden sashes out, restore them, and put each sash back in t
 
 Numbers live in `config/bagspar.php` and every public sentence about them is built by `App\Support\Pricing`:
 
-- 14-day free trial from registration (`trial_days`). No card.
-- 1 490 kr/month excluding VAT per workshop, 3 users included, 349 kr/month per extra user. 14 900 kr/year when paid annually.
+- 30-day free trial from registration (`trial_days`). No card.
+- 590 kr/month excluding VAT per workshop, 3 users included, 149 kr/month per extra user. 5 900 kr/year when paid annually.
 - The owner orders under `/app/abonnemang`, choosing monthly or yearly, and gives the organization number and an invoice address. The order mails `LEAD_NOTIFICATION_EMAIL` with everything needed for the invoice and sends the workshop a confirmation. Invoices are issued by hand (Fortnox); there is no card payment and no Stripe.
 - Access is the latest of `trial_ends_at`, `paid_until`, and `subscription_ordered_at` plus `order_grace_days` (30). When it has passed, the `workshop.access` middleware sends every `/app` request to the billing page. Exports stay open so no data is held hostage. The admin records `paid_until` under `/admin/verkstader` once an invoice is sent or paid.
 - Workshops created before this change keep the `trial_ends_at` they were given.

@@ -51,7 +51,7 @@ class AccessReminderCommandTest extends TestCase
             $this->assertStringContainsString('19 okt 2026', $html);
             $this->assertStringContainsString('Provperioden tar snart slut', $html);
             $this->assertStringContainsString('Beställ abonnemang', $html);
-            $this->assertStringContainsString('1 490 kr/mån exkl. moms', $html);
+            $this->assertStringContainsString('590 kr/mån exkl. moms', $html);
             $this->assertStringContainsString(route('app.billing.edit'), $html);
 
             return true;

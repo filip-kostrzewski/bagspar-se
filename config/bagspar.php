@@ -42,7 +42,7 @@ return [
     /*
      * Free trial for a new workshop account, in days from registration.
      */
-    'trial_days' => 14,
+    'trial_days' => 30,
 
     /*
      * Days a workshop keeps its access after ordering a subscription, so the
@@ -55,10 +55,10 @@ return [
      * into the sentences shown on the public pages and in the app.
      */
     'pricing' => [
-        'monthly_kr' => 1490,
-        'yearly_kr' => 14900,
+        'monthly_kr' => 590,
+        'yearly_kr' => 5900,
         'included_seats' => 3,
-        'extra_seat_kr' => 349,
+        'extra_seat_kr' => 149,
         'invoice_days' => 30,
     ],
 

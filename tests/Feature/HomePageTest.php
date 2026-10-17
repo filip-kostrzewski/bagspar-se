@@ -13,15 +13,15 @@ class HomePageTest extends TestCase
         $response->assertOk();
         $response->assertSee('Prova exempel', false);
         $response->assertSee('href="'.route('demo').'"', false);
-        $response->assertSee('Prova gratis i 14 dagar', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
         $response->assertSee('href="'.route('register').'"', false);
         $response->assertSee('Logga in', false);
         $response->assertSee('href="'.route('login').'"', false);
-        $response->assertSee('1 490', false);
+        $response->assertSee('590', false);
         $response->assertSee('kr/mån', false);
         $response->assertSee('id="pris"', false);
-        $response->assertSee('Därefter 1 490 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.', false);
-        $response->assertSee('Betala per år: 14 900 kr/år exkl. moms, vilket motsvarar två månader gratis.', false);
+        $response->assertSee('Därefter 590 kr/mån exkl. moms per verkstad. Tre användare ingår. Faktura varje månad, ingen bindningstid.', false);
+        $response->assertSee('Betala per år: 5 900 kr/år exkl. moms, vilket motsvarar två månader gratis.', false);
         $response->assertSee('Vad kostar Bågspår?', false);
         $response->assertSee('Vad händer när provperioden tar slut?', false);
         $response->assertDontSee('3 månader', false);
@@ -102,7 +102,7 @@ class HomePageTest extends TestCase
         $response->assertSee('property="og:image"', false);
         $response->assertSee('name="twitter:card"', false);
         $response->assertSee('"@type":"Organization"', false);
-        $response->assertSee('"price":"1490"', false);
+        $response->assertSee('"price":"590"', false);
         $response->assertDontSee('aggregateRating', false);
         $response->assertDontSee('tel:', false);
         $response->assertDontSee('bekräftelse', false);

@@ -12,17 +12,17 @@ final class Pricing
 {
     public static function trialDays(): int
     {
-        return max(1, (int) config('bagspar.trial_days', 14));
+        return max(1, (int) config('bagspar.trial_days', 30));
     }
 
     public static function monthlyKr(): int
     {
-        return (int) config('bagspar.pricing.monthly_kr', 1490);
+        return (int) config('bagspar.pricing.monthly_kr', 590);
     }
 
     public static function yearlyKr(): int
     {
-        return (int) config('bagspar.pricing.yearly_kr', 14900);
+        return (int) config('bagspar.pricing.yearly_kr', 5900);
     }
 
     public static function includedSeats(): int
@@ -32,7 +32,7 @@ final class Pricing
 
     public static function extraSeatKr(): int
     {
-        return (int) config('bagspar.pricing.extra_seat_kr', 349);
+        return (int) config('bagspar.pricing.extra_seat_kr', 149);
     }
 
     public static function invoiceDays(): int

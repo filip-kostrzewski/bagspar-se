@@ -53,7 +53,7 @@ class DemoPageTest extends TestCase
         $this->assertStringContainsString("event.key !== 'Tab'", $demoScript);
         $this->assertStringNotContainsString('window.confirm', $demoScript);
         $response->assertSee('Börja med ett eget konto', false);
-        $response->assertSee('Prova gratis i 14 dagar', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
         $response->assertSee('Ditt verkstadskonto kräver internetanslutning', false);
         $response->assertSee('demo-page__layout', false);
         $response->assertSee('data-sync-url="/demo/synk"', false);
