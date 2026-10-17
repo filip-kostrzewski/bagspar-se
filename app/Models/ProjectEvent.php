@@ -11,6 +11,10 @@ class ProjectEvent extends Model
 {
     public const KIND_SASH_REMOVED = 'sash-removed';
 
+    public const KIND_QUOTE_SENT = 'quote-sent';
+
+    public const KIND_QUOTE_ACCEPTED = 'quote-accepted';
+
     public const UPDATED_AT = null;
 
     /** @use HasFactory<ProjectEventFactory> */

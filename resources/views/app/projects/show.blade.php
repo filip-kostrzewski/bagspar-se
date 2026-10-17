@@ -123,6 +123,30 @@
             @endif
         </section>
 
+        @php
+            $quote = $project->quote;
+        @endphp
+        <section class="client-status-share quote-share" aria-labelledby="quote-title">
+            <p class="workshop-eyebrow">TILL KUNDEN</p>
+            <h2 class="workshop-section-heading" id="quote-title">Offert</h2>
+            @if ($quote?->isAccepted())
+                <p class="quote-share__state">Godkänd {{ \App\Support\SwedishDate::formatDateTime($quote->accepted_at) }} av {{ $quote->accepted_name }}. Summa {{ \App\Support\Kronor::format($quote->totalOre()) }} inkl. moms.</p>
+            @elseif ($quote?->isSent())
+                <p class="quote-share__state">Skickad {{ \App\Support\SwedishDate::formatDateTime($quote->sent_at) }}. Summa {{ \App\Support\Kronor::format($quote->totalOre()) }} inkl. moms.</p>
+                <div class="copy-link-control">
+                    <label class="visually-hidden" for="quote-url">Länk till offerten</label>
+                    <input id="quote-url" type="url" value="{{ route('quote.show', ['token' => $quote->token]) }}" readonly>
+                    <button class="workshop-button workshop-button--quiet" type="button" data-copy-link="quote-url">Kopiera</button>
+                </div>
+                <p class="copy-link-control__status" aria-live="polite" data-copy-status></p>
+            @else
+                <p class="quote-share__state">Utkast. Skriv offerten rad för rad och skicka länken till kunden, som godkänner med sitt namn.</p>
+            @endif
+            <div class="client-status-share__actions">
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.quote.edit', $project) }}">{{ $quote === null || $quote->isDraft() ? 'Skriv offert' : ($quote->isAccepted() ? 'Visa offerten' : 'Öppna offerten') }}</a>
+            </div>
+        </section>
+
         <details class="edit-details-panel" @if (old('form_context') === 'project') open @endif>
             <summary>Redigera projektuppgifter</summary>
             <div class="edit-details-panel__body">

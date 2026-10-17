@@ -70,7 +70,7 @@ class ProjectController extends Controller
             ->get();
         $customers = $workshop->customers()->orderBy('name')->orderBy('id')->get();
         $projectEvents = $project->events()->orderBy('id')->get();
-        $project->load('customer');
+        $project->load(['customer', 'quote.lines']);
         $timeEntries = SashTimeEntry::query()
             ->whereHas('sash', fn ($query) => $query->where('project_id', $project->getKey()))
             ->orderBy('user_name')

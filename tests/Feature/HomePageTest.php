@@ -50,6 +50,10 @@ class HomePageTest extends TestCase
         $response->assertSee('Hjälper Bågspår med ROT?', false);
         $response->assertSee('Statuslänk till kunden', false);
         $response->assertSee('kan godkänna leveransen med namn och tid', false);
+        $response->assertSee('Offert med godkännande via länk', false);
+        $response->assertSee('Skriv offerten per båge, skicka länken, och kunden godkänner med sitt namn.', false);
+        $response->assertSee('Kan jag skicka offerter?', false);
+        $response->assertSee('Bågspår räknar inte ut något ROT-avdrag', false);
         $response->assertSee('inte skatterådgivning', false);
         $response->assertDontSee('Godkänn leverans', false);
         $response->assertDontSee('Fortsättning avtalas separat', false);

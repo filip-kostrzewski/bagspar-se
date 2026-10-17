@@ -20,6 +20,10 @@
             'answer' => 'Ja. Tid och material som skrivs på arbetskorten summeras per projekt till ett ROT-underlag som du laddar ner som PDF eller CSV. Själva avdraget räknar du som vanligt på fakturan; underlaget är en sammanställning av verkstadens egna uppgifter, inte skatterådgivning.',
         ],
         [
+            'question' => 'Kan jag skicka offerter?',
+            'answer' => 'Ja. Du skriver offerten i projektet och mejlar en länk till kunden, som godkänner med sitt namn. Bågspår räknar inte ut något ROT-avdrag; det görs på fakturan.',
+        ],
+        [
             'question' => 'Vad händer när provperioden tar slut?',
             'answer' => 'Kontot låses tills ägaren beställer abonnemanget i appen. Projekt, bågar och bilder finns kvar, och verkstadens data kan alltid laddas ner. Ingen faktura skickas utan en beställning.',
         ],
@@ -297,6 +301,10 @@
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
                     <span><strong>Statuslänk till kunden</strong><small>Kunden ser etapp och bilder utan inloggning och kan godkänna leveransen med namn och tid.</small></span>
+                </li>
+                <li class="pilot-feature">
+                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
+                    <span><strong>Offert med godkännande via länk</strong><small>Skriv offerten per båge, skicka länken, och kunden godkänner med sitt namn. Samma projekt följer sedan hela vägen till leverans.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>

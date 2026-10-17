@@ -28,6 +28,7 @@ class TermsPageTest extends TestCase
         $response->assertSee('ladda ner eller skriva ut en projektrapport', false);
         $response->assertSee('ROT-underlag', false);
         $response->assertSee('inte skatterådgivning', false);
+        $response->assertSee('skicka en offert som kunden godkänner via en länk; offerten är verkstadens eget dokument', false);
         $response->assertDontSee('Godkänn leverans', false);
         $response->assertSee('Verkstadens ägare skapar kontot och kan bjuda in medarbetare.', false);
         $response->assertSee('Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt.', false);

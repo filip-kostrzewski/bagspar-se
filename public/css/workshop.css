@@ -3754,3 +3754,107 @@ body.label-print-sheet {
     color: var(--ink-soft);
     font-size: 14px;
 }
+
+.quote-page__state,
+.quote-page__note,
+.quote-share__state {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    line-height: 1.45;
+}
+
+.quote-intro {
+    max-width: 68ch;
+    margin: 16px 0 0;
+    white-space: pre-line;
+    line-height: 1.5;
+}
+
+.quote-form {
+    margin-top: 20px;
+}
+
+.quote-lines-wrap {
+    overflow-x: auto;
+}
+
+.quote-lines caption {
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+}
+
+.quote-lines__num,
+.quote-lines__sum {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.quote-lines--edit input {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+}
+
+.quote-lines--edit input[aria-invalid='true'] {
+    border-color: var(--danger);
+}
+
+.quote-lines--edit th:first-child {
+    min-width: 240px;
+}
+
+.quote-lines--edit td:nth-child(2) {
+    width: 90px;
+}
+
+.quote-lines--edit td:nth-child(3) {
+    width: 150px;
+}
+
+.quote-totals {
+    max-width: 360px;
+    margin: 16px 0 0 auto;
+}
+
+.quote-totals div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.quote-totals dt,
+.quote-totals dd {
+    margin: 0;
+}
+
+.quote-totals__total {
+    font-weight: 800;
+}
+
+.quote-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.quote-accepted {
+    margin-top: 20px;
+}
+
+.quote-public__lines {
+    margin-top: 24px;
+}
+
+.quote-public__lines .basis-notice {
+    margin-top: 20px;
+}

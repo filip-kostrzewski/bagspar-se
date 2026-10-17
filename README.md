@@ -38,6 +38,7 @@ This repository is the public site and the example card.
 | `POST /intresse` | Saves an interest signup and sends mail when configured |
 | `/admin/anmalningar` | Signup list. `/admin/anmalningar.csv` downloads the same rows |
 | `/admin/verkstader` | Workshop list with trial, order, and paid period. `PATCH /admin/verkstader/{id}` records `paid_until` and the plan |
+| `/app/projekt/{id}/offert` and `/offert/{token}` | The workshop writes, sends, and downloads a quote. The customer opens the public link and accepts with a name |
 | `/app/abonnemang` | Billing page inside the workshop app. The owner orders or changes the subscription |
 | `/up` | Laravel health check |
 

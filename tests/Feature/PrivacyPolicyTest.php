@@ -31,6 +31,7 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('Uppgifter i verkstadens konto', false);
         $response->assertSee('Bildfilerna är privata och visas via en skyddad appfunktion', false);
         $response->assertSee('Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet.', false);
+        $response->assertSee('Om kunden godkänner en offert via länken sparas namnet och tidpunkten på offerten.', false);
         $response->assertDontSee('ROT-underlag', false);
         $response->assertSee('artikel 6.1 b', false);
         $response->assertSee('Integritetsskyddsmyndigheten', false);

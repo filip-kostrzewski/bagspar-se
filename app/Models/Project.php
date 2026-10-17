@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Project extends Model
@@ -59,11 +60,27 @@ class Project extends Model
         return $this->hasMany(ProjectEvent::class);
     }
 
+    /** @return HasOne<Quote, $this> */
+    public function quote(): HasOne
+    {
+        return $this->hasOne(Quote::class);
+    }
+
     public function recordEvent(User $user, string $kind, ?string $body = null): ProjectEvent
     {
         return $this->events()->create([
             'user_id' => $user->getKey(),
             'user_name' => $user->name,
+            'kind' => $kind,
+            'body' => $body,
+        ]);
+    }
+
+    public function recordCustomerEvent(string $customerName, string $kind, ?string $body = null): ProjectEvent
+    {
+        return $this->events()->create([
+            'user_id' => null,
+            'user_name' => $customerName,
             'kind' => $kind,
             'body' => $body,
         ]);

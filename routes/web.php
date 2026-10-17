@@ -12,6 +12,7 @@ use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DemoSyncController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
+use App\Http\Controllers\QuotePublicController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Workshop\BillingController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\ProjectMaterialController;
 use App\Http\Controllers\Workshop\ProjectReportPdfController;
 use App\Http\Controllers\Workshop\ProjectRotController;
+use App\Http\Controllers\Workshop\QuoteController;
 use App\Http\Controllers\Workshop\SashMaterialController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
@@ -96,6 +98,19 @@ Route::post('/status/{token}/godkann', [ClientStatusApprovalController::class, '
     ->middleware('throttle:10,1')
     ->name('client-status.approve');
 
+Route::get('/offert/{token}', [QuotePublicController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{48}')
+    ->middleware('throttle:60,1')
+    ->name('quote.show');
+Route::get('/offert/{token}/logotyp', [QuotePublicController::class, 'logo'])
+    ->where('token', '[A-Za-z0-9]{48}')
+    ->middleware('throttle:60,1')
+    ->name('quote.logo');
+Route::post('/offert/{token}/godkann', [QuotePublicController::class, 'accept'])
+    ->where('token', '[A-Za-z0-9]{48}')
+    ->middleware('throttle:10,1')
+    ->name('quote.accept');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/registrera', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1')->name('auth.register.store');
@@ -154,6 +169,11 @@ Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.acce
     Route::get('/projekt/{project}/ta-bort', [ProjectController::class, 'confirmDestroy'])->whereNumber('project')->name('projects.confirm-destroy');
     Route::delete('/projekt/{project}', [ProjectController::class, 'destroy'])->whereNumber('project')->name('projects.destroy');
     Route::post('/projekt/{project}/statuslank', [ProjectClientStatusController::class, 'update'])->whereNumber('project')->name('projects.client-status.update');
+    Route::get('/projekt/{project}/offert', [QuoteController::class, 'edit'])->whereNumber('project')->name('projects.quote.edit');
+    Route::patch('/projekt/{project}/offert', [QuoteController::class, 'update'])->whereNumber('project')->name('projects.quote.update');
+    Route::post('/projekt/{project}/offert/rader', [QuoteController::class, 'fill'])->whereNumber('project')->name('projects.quote.fill');
+    Route::post('/projekt/{project}/offert/skicka', [QuoteController::class, 'send'])->middleware('throttle:10,1')->whereNumber('project')->name('projects.quote.send');
+    Route::get('/projekt/{project}/offert.pdf', [QuoteController::class, 'pdf'])->whereNumber('project')->name('projects.quote.pdf');
     Route::get('/projekt/{project}/etiketter', [LabelPrintController::class, 'sheet'])->whereNumber('project')->name('projects.labels');
     Route::get('/projekt/{project}', [ProjectController::class, 'show'])->whereNumber('project')->name('projects.show');
     Route::patch('/projekt/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('projects.update');
