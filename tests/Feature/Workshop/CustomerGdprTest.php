@@ -50,7 +50,13 @@ class CustomerGdprTest extends TestCase
             'location' => 'Höger',
             'stage' => 'glazing',
             'notes' => 'Kitt saknas.',
+            'intake_notes' => 'Spricka i nedre rutan.',
         ]);
+        $project->forceFill([
+            'intake_approved_at' => '2026-10-16 08:45:00',
+            'intake_approved_name' => 'Ada Ek',
+            'intake_approved_via' => 'on-site',
+        ])->save();
         $note = SashEvent::factory()->create([
             'sash_id' => $sash->getKey(),
             'user_id' => $member->getKey(),
@@ -122,6 +128,10 @@ class CustomerGdprTest extends TestCase
         $json->assertJsonPath('projekt.0.anteckningar', 'Behåll originalglaset.');
         $json->assertJsonPath('projekt.0.bagar.0.kod', 'V2-H');
         $json->assertJsonPath('projekt.0.bagar.0.etapp', 'Glasning');
+        $json->assertJsonPath('projekt.0.bagar.0.skick_vid_mottagning', 'Spricka i nedre rutan.');
+        $json->assertJsonPath('projekt.0.mottagning.godkand', '16 okt 2026 10:45');
+        $json->assertJsonPath('projekt.0.mottagning.godkand_av', 'Ada Ek');
+        $json->assertJsonPath('projekt.0.mottagning.godkand_via', 'på plats');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.text', 'Nytt kitt.');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.anvandare', 'Bo Berg');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.slag', 'anteckning');
@@ -142,6 +152,9 @@ class CustomerGdprTest extends TestCase
         $this->assertStringContainsString('Villa Ek', $csv);
         $this->assertStringContainsString('V2-H', $csv);
         $this->assertStringContainsString('Nytt kitt.', $csv);
+        $this->assertStringContainsString('"Skick vid mottagning";"Spricka i nedre rutan."', $csv);
+        $this->assertStringContainsString('Mottagning godkänd av', $csv);
+        $this->assertStringContainsString('"Mottagning godkänd via";"på plats"', $csv);
         $this->assertStringContainsString('16 okt 2026 10:30', $csv);
         $this->assertStringContainsString('Bågen B-1 togs bort.', $csv);
         $this->assertStringContainsString(route('app.sashes.photos.show', [$project, $sash, $photo]), $csv);

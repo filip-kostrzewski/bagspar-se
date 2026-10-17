@@ -17,6 +17,8 @@ class ProjectEvent extends Model
 
     public const KIND_STATUS_LINK_SENT = 'status-link-sent';
 
+    public const KIND_INTAKE_APPROVED = 'intake-approved';
+
     public const UPDATED_AT = null;
 
     /** @use HasFactory<ProjectEventFactory> */

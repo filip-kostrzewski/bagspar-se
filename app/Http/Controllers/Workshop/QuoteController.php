@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\ProjectEvent;
 use App\Models\Quote;
 use App\Models\User;
+use App\Support\CustomerMailLimit;
 use App\Support\Kronor;
 use App\Support\PdfDocument;
 use Closure;
@@ -130,6 +131,10 @@ class QuoteController extends Controller
 
         if (! is_string($email) || trim($email) === '') {
             return $back->withErrors(['quote' => 'Kunden saknar e-postadress. Lägg till e-posten under Kunder och försök igen.']);
+        }
+
+        if (! CustomerMailLimit::allow($project->workshop()->firstOrFail())) {
+            return $back->withErrors(['quote' => CustomerMailLimit::MESSAGE]);
         }
 
         try {

@@ -25,7 +25,7 @@ class SashPhotoController extends Controller
 {
     private const MAX_PHOTOS_PER_SASH = 20;
 
-    private const MAX_IMAGE_PIXELS = 16_000_000;
+    private const MAX_IMAGE_PIXELS = 12_000_000;
 
     public function store(Request $request, Project $project, WindowSash $sash): RedirectResponse
     {

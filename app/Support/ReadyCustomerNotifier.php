@@ -50,6 +50,14 @@ class ReadyCustomerNotifier
             return false;
         }
 
+        if (! CustomerMailLimit::allow($project->workshop()->firstOrFail())) {
+            Log::warning('Ready notification skipped: daily customer mail limit reached.', [
+                'project_id' => $project->getKey(),
+            ]);
+
+            return false;
+        }
+
         try {
             Mail::to($email)->send(new ProjectReadyMail(
                 $project,

@@ -4,6 +4,7 @@ use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\EnsureVerifiedEmailInProduction;
 use App\Http\Middleware\EnsureWorkshopAccess;
 use App\Http\Middleware\ForceProductionHttps;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 | Request::HEADER_X_FORWARDED_AWS_ELB,
         );
         $middleware->append(ForceProductionHttps::class);
+        $middleware->append(SecurityHeaders::class);
         $middleware->alias([
             'admin' => AuthenticateAdmin::class,
             'verified.production' => EnsureVerifiedEmailInProduction::class,

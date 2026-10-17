@@ -30,6 +30,7 @@ class WindowSash extends Model
         'location',
         'stage',
         'notes',
+        'intake_notes',
     ];
 
     /** @return BelongsTo<Project, $this> */

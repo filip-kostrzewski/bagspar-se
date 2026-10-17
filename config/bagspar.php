@@ -62,6 +62,12 @@ return [
         'invoice_days' => 30,
     ],
 
+    /*
+     * Mail a workshop may send to its customers per day: status links,
+     * quotes and ready notices together.
+     */
+    'customer_mail_daily_limit' => 50,
+
     'demo_sync_days' => 14,
 
     'asset_version' => $assetVersion,

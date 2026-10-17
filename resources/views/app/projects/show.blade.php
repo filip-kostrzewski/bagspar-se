@@ -91,6 +91,44 @@
             <p class="project-archived-note">Projektet är arkiverat och visas inte i den vanliga listan.</p>
         @endif
 
+        @php
+            $intakeNoteCount = $sashes->filter(fn ($sash): bool => is_string($sash->intake_notes) && trim($sash->intake_notes) !== '')->count();
+            $intakePhotoCount = $sashes->filter(fn ($sash): bool => $sash->photos->contains(fn ($photo): bool => $photo->isBefore()))->count();
+        @endphp
+        <section class="client-status-share intake-share" aria-labelledby="intake-title">
+            <p class="workshop-eyebrow">TILL KUNDEN</p>
+            <h2 class="workshop-section-heading" id="intake-title">Mottagningsprotokoll</h2>
+            <p>Skicket på varje båge när ni tog emot den, med bilderna före. Kunden godkänner via statuslänken eller på plats hos er.</p>
+            <p class="quote-share__state">{{ $intakeNoteCount }} av {{ $sashCount }} {{ $sashCount === 1 ? 'båge' : 'bågar' }} har anmärkningar vid mottagning. {{ $intakePhotoCount }} har bilder före.</p>
+            @if ($project->intakeIsApproved())
+                <p class="quote-share__state">{{ $project->intakeApprovalLabel() }}</p>
+            @else
+                <p class="quote-share__state">Inte godkänt.</p>
+            @endif
+            <div class="client-status-share__actions">
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.intake', $project) }}">Visa protokoll</a>
+                <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.intake.pdf', $project) }}">Ladda ner PDF</a>
+                @if ($project->intakeIsApproved() && auth()->user()?->isOwner())
+                    <form method="POST" action="{{ route('app.projects.intake.approval.destroy', $project) }}" data-confirm="Kundens godkännande tas bort från mottagningsprotokollet." data-confirm-title="Ta bort godkännandet?">
+                        @csrf
+                        @method('DELETE')
+                        <button class="workshop-button workshop-button--quiet" type="submit">Ta bort godkännandet</button>
+                    </form>
+                @endif
+            </div>
+            @if (! $project->intakeIsApproved())
+                <form class="workshop-form" method="POST" action="{{ route('app.projects.intake.approve', $project) }}" novalidate>
+                    @csrf
+                    <div class="form-field">
+                        <label for="intake-approve-name">Kunden godkände på plats</label>
+                        <p class="form-field__hint" id="intake-approve-hint">Skriv kundens namn. Tidpunkten sparas i protokollet.</p>
+                        <input id="intake-approve-name" name="name" type="text" maxlength="150" required aria-describedby="intake-approve-hint" value="{{ is_string(old('name')) ? old('name') : '' }}">
+                    </div>
+                    <button class="workshop-button workshop-button--secondary" type="submit">Spara godkännande</button>
+                </form>
+            @endif
+        </section>
+
         <section class="client-status-share" aria-labelledby="client-status-title">
             <p class="workshop-eyebrow">TILL KUNDEN</p>
             <h2 class="workshop-section-heading" id="client-status-title">Statuslänk</h2>

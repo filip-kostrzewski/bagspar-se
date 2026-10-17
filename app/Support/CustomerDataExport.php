@@ -51,6 +51,15 @@ final class CustomerDataExport
                     'anteckningar' => $project->notes,
                     'status' => $project->status === 'completed' ? 'Avslutad' : 'Pågår',
                     'leveransdatum' => $project->delivery_date?->toDateString(),
+                    'mottagning' => [
+                        'godkand' => $project->intake_approved_at instanceof Carbon ? SwedishDate::formatDateTime($project->intake_approved_at) : null,
+                        'godkand_av' => $project->intake_approved_name,
+                        'godkand_via' => match ($project->intake_approved_via) {
+                            'link' => 'statuslänken',
+                            'on-site' => 'på plats',
+                            default => null,
+                        },
+                    ],
                     'kundnamn' => $project->customer_name,
                     'bagar' => $project->windowSashes
                         ->sortBy('code')
@@ -114,6 +123,14 @@ final class CustomerDataExport
                 $this->put($handle, ['Projekt', $customerName, $projectName, '', '', $label, $this->text($value)]);
             }
 
+            foreach ([
+                'Mottagning godkänd' => $project['mottagning']['godkand'] ?? null,
+                'Mottagning godkänd av' => $project['mottagning']['godkand_av'] ?? null,
+                'Mottagning godkänd via' => $project['mottagning']['godkand_via'] ?? null,
+            ] as $label => $value) {
+                $this->put($handle, ['Projekt', $customerName, $projectName, '', '', $label, $this->text($value)]);
+            }
+
             foreach ($project['bagar'] as $sash) {
                 $code = $this->text($sash['kod'] ?? null);
 
@@ -122,6 +139,7 @@ final class CustomerDataExport
                     'Placering' => $sash['placering'] ?? null,
                     'Etapp' => $sash['etapp'] ?? null,
                     'Anteckningar' => $sash['anteckningar'] ?? null,
+                    'Skick vid mottagning' => $sash['skick_vid_mottagning'] ?? null,
                 ] as $label => $value) {
                     $this->put($handle, ['Båge', $customerName, $projectName, $code, '', $label, $this->text($value)]);
                 }
@@ -276,6 +294,7 @@ final class CustomerDataExport
             'placering' => $sash->location,
             'etapp' => $sash->stageLabel(),
             'anteckningar' => $sash->notes,
+            'skick_vid_mottagning' => $sash->intake_notes,
             'historik' => $sash->events
                 ->sortBy('id')
                 ->values()
@@ -350,6 +369,7 @@ final class CustomerDataExport
             ProjectEvent::KIND_QUOTE_SENT => 'offert skickad',
             ProjectEvent::KIND_QUOTE_ACCEPTED => 'offert godkänd',
             ProjectEvent::KIND_STATUS_LINK_SENT => 'statuslänk skickad',
+            ProjectEvent::KIND_INTAKE_APPROVED => 'mottagning godkänd',
             default => $kind,
         };
     }

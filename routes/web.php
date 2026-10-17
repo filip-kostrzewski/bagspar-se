@@ -19,6 +19,7 @@ use App\Http\Controllers\Workshop\BillingController;
 use App\Http\Controllers\Workshop\CustomerController;
 use App\Http\Controllers\Workshop\DashboardController;
 use App\Http\Controllers\Workshop\DeliveryApprovalController;
+use App\Http\Controllers\Workshop\IntakeProtocolController;
 use App\Http\Controllers\Workshop\LabelPrintController;
 use App\Http\Controllers\Workshop\ProjectClientStatusController;
 use App\Http\Controllers\Workshop\ProjectController;
@@ -61,7 +62,7 @@ Route::post('/kontakt', [ContactMessageController::class, 'store'])
     ->name('contact.store');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
-Route::middleware(['admin', 'throttle:30,1'])->group(function (): void {
+Route::middleware(['throttle:30,1', 'admin'])->group(function (): void {
     Route::get('/admin/anmalningar', [SignupAdminController::class, 'index'])->name('admin.signups');
     Route::get('/admin/anmalningar.csv', [SignupAdminController::class, 'export'])->name('admin.signups.export');
     Route::get('/admin/verkstader', [WorkshopAdminController::class, 'index'])->name('admin.workshops');
@@ -99,6 +100,10 @@ Route::post('/status/{token}/godkann', [ClientStatusApprovalController::class, '
     ->where('token', '[A-Za-z0-9]{40,80}')
     ->middleware('throttle:10,1')
     ->name('client-status.approve');
+Route::post('/status/{token}/mottagning/godkann', [ClientStatusApprovalController::class, 'approveIntake'])
+    ->where('token', '[A-Za-z0-9]{40,80}')
+    ->middleware('throttle:10,1')
+    ->name('client-status.intake-approve');
 
 Route::get('/offert/{token}', [QuotePublicController::class, 'show'])
     ->where('token', '[A-Za-z0-9]{48}')
@@ -166,6 +171,10 @@ Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.acce
     Route::get('/projekt/{project}/rot-underlag.csv', [ProjectRotController::class, 'csv'])->whereNumber('project')->name('projects.rot.csv');
     Route::get('/projekt/{project}/rot-underlag.pdf', [ProjectRotController::class, 'pdf'])->whereNumber('project')->name('projects.rot.pdf');
     Route::delete('/projekt/{project}/leveransgodkannande', [DeliveryApprovalController::class, 'destroy'])->whereNumber('project')->name('projects.delivery-approval.destroy');
+    Route::get('/projekt/{project}/mottagning', [IntakeProtocolController::class, 'show'])->whereNumber('project')->name('projects.intake');
+    Route::get('/projekt/{project}/mottagning.pdf', [IntakeProtocolController::class, 'pdf'])->whereNumber('project')->name('projects.intake.pdf');
+    Route::post('/projekt/{project}/mottagning/godkann', [IntakeProtocolController::class, 'approve'])->whereNumber('project')->name('projects.intake.approve');
+    Route::delete('/projekt/{project}/mottagning/godkannande', [IntakeProtocolController::class, 'destroyApproval'])->whereNumber('project')->name('projects.intake.approval.destroy');
     Route::get('/projekt/{project}/material', [ProjectMaterialController::class, 'show'])->whereNumber('project')->name('projects.materials');
     Route::post('/projekt/{project}/arkiv', [ProjectController::class, 'archive'])->whereNumber('project')->name('projects.archive');
     Route::get('/projekt/{project}/ta-bort', [ProjectController::class, 'confirmDestroy'])->whereNumber('project')->name('projects.confirm-destroy');

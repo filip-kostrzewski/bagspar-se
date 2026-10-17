@@ -44,6 +44,51 @@
             @endif
         </section>
 
+        @php
+            $hasIntakeProtocol = $sashes->contains(fn ($sash): bool => (is_string($sash->intake_notes) && trim($sash->intake_notes) !== '')
+                || $sash->photos->contains(fn ($photo): bool => $photo->isBefore()));
+            $intakeErrors = $errors->getBag('intake');
+        @endphp
+        @if ($hasIntakeProtocol)
+            <section class="delivery-approval intake-protocol" aria-labelledby="intake-title">
+                <h2 id="intake-title">Mottagningsprotokoll</h2>
+                <p>Så här såg bågarna ut när verkstaden tog emot dem. Bilderna före finns under varje båge längre ned.</p>
+                <ul class="intake-protocol__list">
+                    @foreach ($sashes as $sash)
+                        <li>
+                            <strong>{{ $sash->code }}</strong>
+                            <span>{{ collect([$sash->room, $sash->location])->filter()->join(' · ') ?: 'Plats inte angiven' }}</span>
+                            <p>{{ is_string($sash->intake_notes) && trim($sash->intake_notes) !== '' ? $sash->intake_notes : 'Ingen anmärkning' }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+                @if ($project->intakeIsApproved())
+                    <p>Mottagningsprotokollet godkändes {{ \App\Support\SwedishDate::formatDateTime($project->intake_approved_at) }}@if (is_string($project->intake_approved_name) && $project->intake_approved_name !== '') av {{ $project->intake_approved_name }}@endif.</p>
+                @else
+                    @if ($intakeErrors->any())
+                        <div class="workshop-error-summary" role="alert">
+                            <ul>
+                                @foreach ($intakeErrors->all() as $message)
+                                    <li>{{ $message }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <form class="workshop-form" method="POST" action="{{ route('client-status.intake-approve', ['token' => $token]) }}" novalidate>
+                        @csrf
+                        <div class="form-field">
+                            <label for="intake-approval-name">Godkänn mottagningsprotokollet</label>
+                            <input id="intake-approval-name" name="name" type="text" maxlength="150" required placeholder="Ditt namn" value="{{ $intakeErrors->any() && is_string(old('name')) ? old('name') : '' }}" @if ($intakeErrors->has('name')) aria-invalid="true" aria-describedby="intake-approval-name-error" @endif>
+                            @if ($intakeErrors->has('name'))
+                                <p class="form-field__error" id="intake-approval-name-error">{{ $intakeErrors->first('name') }}</p>
+                            @endif
+                        </div>
+                        <button class="workshop-button workshop-button--primary" type="submit">Godkänn mottagningsprotokollet</button>
+                    </form>
+                @endif
+            </section>
+        @endif
+
         @if ($sashes->isEmpty())
             <p>Inga bågar är inlagda i projektet ännu.</p>
         @else

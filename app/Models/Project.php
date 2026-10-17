@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\StoredSashPhoto;
+use App\Support\SwedishDate;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -163,6 +164,38 @@ class Project extends Model
             && $this->client_status_token !== '';
     }
 
+    public function intakeIsApproved(): bool
+    {
+        return $this->intake_approved_at !== null;
+    }
+
+    public function intakeApprovalLabel(): ?string
+    {
+        if ($this->intake_approved_at === null) {
+            return null;
+        }
+
+        $name = is_string($this->intake_approved_name) && $this->intake_approved_name !== ''
+            ? ' av '.$this->intake_approved_name
+            : '';
+        $via = $this->intake_approved_via === 'link' ? 'via statuslänken' : 'på plats';
+
+        return 'Godkänt '.SwedishDate::formatDateTime($this->intake_approved_at).$name.' ('.$via.').';
+    }
+
+    public function hasIntakeNotes(): bool
+    {
+        return $this->windowSashes()
+            ->where(function (Builder $sashes): void {
+                $sashes->whereNotNull('intake_notes')
+                    ->where('intake_notes', '!=', '')
+                    ->orWhereHas('photos', fn (Builder $photos): Builder => $photos->where(function (Builder $moment): void {
+                        $moment->whereNull('moment')->orWhere('moment', '!=', 'after');
+                    }));
+            })
+            ->exists();
+    }
+
     public function allSashesAreReady(): bool
     {
         $stages = $this->windowSashes()->pluck('stage');
@@ -184,6 +217,7 @@ class Project extends Model
             'customer_ready_notified_at' => 'datetime',
             'delivery_date' => 'date',
             'delivery_approved_at' => 'datetime',
+            'intake_approved_at' => 'datetime',
         ];
     }
 }

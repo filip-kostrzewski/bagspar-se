@@ -93,6 +93,7 @@ class WindowSashController extends Controller
             'location' => ['sometimes', 'nullable', 'string', 'max:160'],
             'stage' => ['sometimes', 'required', Rule::in(WindowSash::STAGES)],
             'notes' => ['sometimes', 'nullable', 'string', 'max:3000'],
+            'intake_notes' => ['sometimes', 'nullable', 'string', 'max:2000'],
         ], [
             'code.required' => 'Ange en kod för bågen.',
             'code.string' => 'Ange bågens kod som text.',
@@ -105,6 +106,8 @@ class WindowSashController extends Controller
             'stage.in' => 'Välj ett giltigt arbetssteg.',
             'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 3 000 tecken.',
+            'intake_notes.string' => 'Ange skicket vid mottagning som text.',
+            'intake_notes.max' => 'Skicket vid mottagning får vara högst 2 000 tecken.',
         ]);
 
         abort_if($validated === [], 422);
@@ -116,6 +119,8 @@ class WindowSashController extends Controller
         $stageChanged = is_string($incomingStage) && $incomingStage !== $previousStage;
         $notesChanged = array_key_exists('notes', $validated)
             && $this->normalizedNote($validated['notes']) !== $previousNotes;
+        $intakeNotesChanged = array_key_exists('intake_notes', $validated)
+            && $this->normalizedNote($validated['intake_notes']) !== $this->normalizedNote($sash->intake_notes);
         $detailsChanged = false;
 
         foreach (['code', 'room', 'location'] as $field) {
@@ -124,7 +129,7 @@ class WindowSashController extends Controller
             }
         }
 
-        if (! $stageChanged && ! $notesChanged && ! $detailsChanged) {
+        if (! $stageChanged && ! $notesChanged && ! $intakeNotesChanged && ! $detailsChanged) {
             return back()->with('status', 'Inga ändringar');
         }
 
@@ -138,6 +143,10 @@ class WindowSashController extends Controller
 
             if ($notesChanged) {
                 $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, $sash->notes);
+            }
+
+            if ($intakeNotesChanged) {
+                $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, 'Skick vid mottagning: '.($sash->intake_notes ?? 'borttaget'));
             }
         }
 

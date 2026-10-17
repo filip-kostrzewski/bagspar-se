@@ -47,6 +47,11 @@ class SashPhoto extends Model
             ->orderBy('id');
     }
 
+    public function isBefore(): bool
+    {
+        return $this->moment !== 'after';
+    }
+
     public function documentMomentLabel(): ?string
     {
         return match ($this->moment) {

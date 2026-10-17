@@ -7,6 +7,7 @@ use App\Mail\ClientStatusLinkMail;
 use App\Models\Project;
 use App\Models\ProjectEvent;
 use App\Models\User;
+use App\Support\CustomerMailLimit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -65,6 +66,10 @@ class ProjectClientStatusController extends Controller
         }
 
         $email = trim($email);
+
+        if (! CustomerMailLimit::allow($workshop)) {
+            return back()->withErrors(['client_status' => CustomerMailLimit::MESSAGE]);
+        }
 
         try {
             Mail::to($email)->send(new ClientStatusLinkMail(

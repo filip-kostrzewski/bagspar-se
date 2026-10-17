@@ -102,6 +102,16 @@
                             @endif
                         @enderror
                     </div>
+                    <div class="form-field">
+                        <label for="intake-notes">Skick vid mottagning</label>
+                        <p class="form-field__hint" id="intake-notes-hint">Sprickor, röta, saknade beslag, lösa rutor. Visas i mottagningsprotokollet.</p>
+                        <textarea id="intake-notes" name="intake_notes" rows="3" maxlength="2000" aria-describedby="intake-notes-hint{{ $errors->has('intake_notes') && old('form_context') === 'sash' ? ' intake-notes-error' : '' }}" @if ($errors->has('intake_notes') && old('form_context') === 'sash') aria-invalid="true" @endif>{{ old('form_context') === 'sash' && is_string(old('intake_notes')) ? old('intake_notes') : $sash->intake_notes }}</textarea>
+                        @error('intake_notes')
+                            @if (old('form_context') === 'sash')
+                                <p class="form-field__error" id="intake-notes-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
                     <details class="sash-form-details" @if (old('form_context') === 'sash' && ($errors->has('code') || $errors->has('room') || $errors->has('location'))) open @endif>
                         <summary>Ändra kod eller placering</summary>
                         <p>Rätta märkningen eller platsen för den här bågen.</p>

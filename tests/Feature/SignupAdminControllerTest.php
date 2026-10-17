@@ -54,6 +54,18 @@ class SignupAdminControllerTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_wrong_credentials_are_throttled_before_the_token_check(): void
+    {
+        config(['bagspar.admin_token' => 'pilot-secret']);
+
+        for ($attempt = 0; $attempt < 30; $attempt++) {
+            $this->withToken('wrong')->get(route('admin.signups'))->assertUnauthorized();
+        }
+
+        $this->withToken('wrong')->get(route('admin.signups'))->assertStatus(429);
+        $this->withToken('pilot-secret')->get(route('admin.signups'))->assertStatus(429);
+    }
+
     public function test_basic_auth_and_bearer_token_list_every_saved_signup(): void
     {
         config(['bagspar.admin_token' => 'pilot-secret']);

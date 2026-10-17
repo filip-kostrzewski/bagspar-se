@@ -307,6 +307,10 @@
                     <span><strong>Offert med godkännande via länk</strong><small>Skriv offerten per båge, skicka länken, och kunden godkänner med sitt namn. Samma projekt följer sedan hela vägen till leverans.</small></span>
                 </li>
                 <li class="pilot-feature">
+                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
+                    <span><strong>Mottagningsprotokoll</strong><small>Skick och bilder per båge när bågarna hämtas. Kunden godkänner via länken eller på plats, så ingen tvistar om sprickor i efterhand.</small></span>
+                </li>
+                <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
                     <span><strong>ROT-underlag</strong><small>Tid och material från arbetskorten summerade per projekt, som PDF eller CSV, redo för fakturan.</small></span>
                 </li>

@@ -40,6 +40,8 @@ This repository is the public site and the example card.
 | `/admin/verkstader` | Workshop list with trial, order, and paid period. `PATCH /admin/verkstader/{id}` records `paid_until` and the plan |
 | `POST /app/projekt/{id}/statuslank/skicka` | Mails the public status link to the project's customer from the project page. Needs the link switched on and a customer e-mail |
 | `/app/projekt/{id}/offert` and `/offert/{token}` | The workshop writes, sends, and downloads a quote. The customer opens the public link and accepts with a name |
+| `/app/projekt/{id}/mottagning`, `/app/projekt/{id}/mottagning.pdf`, `POST /app/projekt/{id}/mottagning/godkann` and `DELETE /app/projekt/{id}/mottagning/godkannande` | The intake protocol: sash condition and the before photos, as a page and a PDF. The workshop records an on-site approval; the owner can remove an approval |
+| `POST /status/{token}/mottagning/godkann` | The customer approves the intake protocol on the status link with a name. Stored once |
 | `/app/abonnemang` | Billing page inside the workshop app. The owner orders or changes the subscription |
 | `/up` | Laravel health check |
 
