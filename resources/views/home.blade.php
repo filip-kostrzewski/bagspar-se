@@ -96,7 +96,7 @@
             <article class="home-example-card" aria-label="Exempel på arbetskort för båge 2-KÖK-F1-B2">
                 <div class="home-example-card__topline">
                     <p>Exempel på arbetskort</p>
-                    <span class="home-example-card__status">Märkning</span>
+                    <span class="home-example-card__status">Mottagen</span>
                 </div>
                 <div class="home-example-card__main">
                     <div>
@@ -131,67 +131,41 @@
                 <h2 id="atelier-title" class="section-heading section-heading--light">Ett arbetskort. Hela vägen.</h2>
                 <p class="atelier__lead">Välj ett steg och se hur samma arbetskort följer bågen.</p>
 
+                @php
+                    $workflowSteps = [
+                        ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
+                        ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
+                        ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
+                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
+                        ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
+                        ['key' => 'ready', 'number' => '06', 'label' => 'Klar', 'description' => 'Bågen är klar i verkstaden. Rapporten samlar nummer, rum, steg och bilder.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
+                    ];
+                @endphp
                 <div class="atelier-steps" role="group" aria-label="Välj arbetssteg" data-workflow-controls hidden>
-                    <button
-                        class="atelier-step is-active"
-                        type="button"
-                        data-workflow-step
-                        data-step="mark"
-                        data-description="Ge bågen en tydlig märkning och koppla den till rätt rum och fönsteröppning."
-                        data-status="Märkning"
-                        data-image="{{ asset('images/workshop-hero.webp') }}"
-                        data-image-small="{{ asset('images/workshop-hero-small.webp') }}"
-                        data-image-small-width="640"
-                        data-image-width="1122"
-                        data-image-alt="En äldre träbåge står på arbetsbänken redo att märkas"
-                        aria-controls="workflow-example"
-                        aria-pressed="true"
-                    >
-                        <span class="atelier-step__number">01</span>
-                        <span>Märk</span>
-                        @include('partials.icon', ['name' => 'arrow-right'])
-                    </button>
-                    <button
-                        class="atelier-step"
-                        type="button"
-                        data-workflow-step
-                        data-step="restore"
-                        data-description="Samla bilder och anteckningar medan bågen skrapas, kittas och målas."
-                        data-status="Renovering"
-                        data-image="{{ asset('images/workshop-craft.webp') }}"
-                        data-image-small="{{ asset('images/workshop-craft-small.webp') }}"
-                        data-image-small-width="600"
-                        data-image-width="1200"
-                        data-image-alt="Händer lägger nytt kitt i en träbåge"
-                        aria-controls="workflow-example"
-                        aria-pressed="false"
-                    >
-                        <span class="atelier-step__number">02</span>
-                        <span>Renovera</span>
-                        @include('partials.icon', ['name' => 'arrow-right'])
-                    </button>
-                    <button
-                        class="atelier-step"
-                        type="button"
-                        data-workflow-step
-                        data-step="refit"
-                        data-description="Sätt tillbaka bågen på rätt plats. Samla projektdokumentationen i en rapport som går att skriva ut eller spara som PDF."
-                        data-status="Återmontering"
-                        data-image="{{ asset('images/workshop-restored.webp') }}"
-                        data-image-small="{{ asset('images/workshop-restored-small.webp') }}"
-                        data-image-small-width="600"
-                        data-image-width="1200"
-                        data-image-alt="En färdigrenoverad träbåge i dagsljus"
-                        aria-controls="workflow-example"
-                        aria-pressed="false"
-                    >
-                        <span class="atelier-step__number">03</span>
-                        <span>Återmontera</span>
-                        @include('partials.icon', ['name' => 'arrow-right'])
-                    </button>
+                    @foreach ($workflowSteps as $workflowStep)
+                        <button
+                            class="atelier-step @if ($loop->first) is-active @endif"
+                            type="button"
+                            data-workflow-step
+                            data-step="{{ $workflowStep['key'] }}"
+                            data-description="{{ $workflowStep['description'] }}"
+                            data-status="{{ $workflowStep['label'] }}"
+                            data-image="{{ asset('images/'.$workflowStep['image'].'.webp') }}"
+                            data-image-small="{{ asset('images/'.$workflowStep['image'].'-small.webp') }}"
+                            data-image-small-width="{{ $workflowStep['smallWidth'] }}"
+                            data-image-width="{{ $workflowStep['width'] }}"
+                            data-image-alt="{{ $workflowStep['alt'] }}"
+                            aria-controls="workflow-example"
+                            aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
+                        >
+                            <span class="atelier-step__number">{{ $workflowStep['number'] }}</span>
+                            <span>{{ $workflowStep['label'] }}</span>
+                            @include('partials.icon', ['name' => 'arrow-right'])
+                        </button>
+                    @endforeach
                 </div>
-                <p class="atelier__description" id="workflow-description" data-workflow-description aria-live="off">Ge bågen en tydlig märkning och koppla den till rätt rum och fönsteröppning.</p>
-                <p class="visually-hidden" data-workflow-live role="status" aria-live="polite">Visar Märk i exempelkortet.</p>
+                <p class="atelier__description" id="workflow-description" data-workflow-description aria-live="off">{{ $workflowSteps[0]['description'] }}</p>
+                <p class="visually-hidden" data-workflow-live role="status" aria-live="polite">Visar Mottagen i exempelkortet.</p>
                 <a class="text-link atelier__demo-link" href="{{ route('demo') }}">Prova exemplet med testuppgifter</a>
             </div>
 
@@ -219,12 +193,12 @@
                             <h3>2-KÖK-F1-B2</h3>
                             <p>Våning 2 <span aria-hidden="true">·</span> Kök <span aria-hidden="true">·</span> innerbåge</p>
                         </div>
-                        <span class="atelier-card__status" data-workflow-status>Märkning</span>
+                        <span class="atelier-card__status" data-workflow-status>Mottagen</span>
                     </div>
                     <ol class="atelier-card__progress" aria-label="Arbetssteg i exemplet">
-                        <li class="is-current" data-workflow-progress="mark"><span aria-hidden="true">01</span>Märk</li>
-                        <li data-workflow-progress="restore"><span aria-hidden="true">02</span>Renovera</li>
-                        <li data-workflow-progress="refit"><span aria-hidden="true">03</span>Återmontera</li>
+                        @foreach ($workflowSteps as $workflowStep)
+                            <li @class(['is-current' => $loop->first]) data-workflow-progress="{{ $workflowStep['key'] }}" @if ($loop->first) aria-current="step" @endif><span aria-hidden="true">{{ $workflowStep['number'] }}</span>{{ $workflowStep['label'] }}</li>
+                        @endforeach
                     </ol>
                 </article>
             </div>
@@ -253,7 +227,7 @@
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för ett exempelprojekt med två märkta bågar" width="2560" height="1800" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="1960" height="3102" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
         </div>
@@ -271,11 +245,11 @@
                 <figcaption><strong>Arbetskort</strong> Plats, anteckning och arbetssteg för en båge.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="472" height="220" loading="lazy" decoding="async">
-                <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanning kräver inloggning.</figcaption>
+                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
+                <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt med bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2, arbetssteg och anteckningar" width="2560" height="1800" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2" width="1960" height="3102" loading="lazy" decoding="async">
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
             </figure>
         </div>
@@ -310,9 +284,6 @@
             <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
         </div>
         <div class="pilot-pricing__price" data-reveal>
-            <p class="pilot-pricing__label">Efter pilotperioden</p>
-            <p class="pilot-pricing__amount"><span>790</span><span>kr/mån</span></p>
-            <p class="pilot-pricing__vat">Per verkstad · exkl. moms.</p>
             <p class="pilot-pricing__terms">{{ config('bagspar.pilot_price_line') }}</p>
         </div>
     </section>

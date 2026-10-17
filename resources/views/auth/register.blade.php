@@ -8,8 +8,8 @@
         <h1 id="page-title" class="workshop-heading">Skapa ett konto</h1>
         <p class="auth-page__intro">Börja med verkstaden. Lägg sedan till projekt och bågar när arbetet tar form.</p>
 
-        <aside class="registration-terms" aria-label="Provperiod och pris">
-            <strong>3 månaders kostnadsfri provperiod</strong>
+        <aside class="registration-terms" aria-label="Pilot och pris">
+            <strong>3 månaders kostnadsfri pilot</strong>
             <p>Därefter 790 kr/mån per verkstad, exkl. moms. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
         </aside>
 
@@ -52,7 +52,10 @@
 
             <div class="form-field">
                 <label for="password">Lösenord</label>
-                <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" aria-describedby="@if ($errors->has('password')) password-hint password-error @else password-hint @endif" required @if ($errors->has('password')) aria-invalid="true" @endif>
+                <div class="password-field">
+                    <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" aria-describedby="@if ($errors->has('password')) password-hint password-error @else password-hint @endif" required @if ($errors->has('password')) aria-invalid="true" @endif>
+                    <button class="workshop-button workshop-button--quiet" type="button" data-password-toggle="password" aria-pressed="false">Visa</button>
+                </div>
                 <p class="form-field__hint" id="password-hint">Minst 12 tecken.</p>
                 @error('password')
                     <p class="form-field__error" id="password-error">{{ $message }}</p>
@@ -61,8 +64,19 @@
 
             <div class="form-field">
                 <label for="password_confirmation">Bekräfta lösenord</label>
-                <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                <div class="password-field">
+                    <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                    <button class="workshop-button workshop-button--quiet" type="button" data-password-toggle="password_confirmation" aria-pressed="false">Visa</button>
+                </div>
             </div>
+
+            <label class="workshop-checkbox" for="terms">
+                <input id="terms" name="terms" type="checkbox" value="1" required @checked(old('terms')) @if ($errors->has('terms')) aria-invalid="true" aria-describedby="terms-error" @endif>
+                <span>Jag godkänner <a class="workshop-text-link" href="{{ route('terms') }}">villkoren</a>.</span>
+            </label>
+            @error('terms')
+                <p class="form-field__error" id="terms-error">{{ $message }}</p>
+            @enderror
 
             <p class="auth-privacy-note">Genom att skapa konto kan vi behandla uppgifterna enligt vår <a class="workshop-text-link" href="{{ route('privacy') }}">integritetspolicy</a>.</p>
             <button class="workshop-button workshop-button--primary workshop-button--wide" type="submit">Skapa verkstadskonto</button>

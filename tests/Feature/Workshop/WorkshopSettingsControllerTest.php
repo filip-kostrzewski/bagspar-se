@@ -24,7 +24,13 @@ class WorkshopSettingsControllerTest extends TestCase
             ->assertSee('name="contact_email"', false)
             ->assertSee('name="address"', false)
             ->assertDontSee('name="phone"', false)
-            ->assertDontSee('telefon', false);
+            ->assertDontSee('telefon', false)
+            ->assertSee('data-file-picker="logo"', false)
+            ->assertSee('Välj bild', false);
+
+        $css = file_get_contents(public_path('css/workshop.css'));
+        $this->assertIsString($css);
+        $this->assertDoesNotMatchRegularExpression('/\.workshop-header__workspace\s*\{[^}]*display:\s*none/', $css);
 
         $this->patch(route('app.settings.update'), [
             'name' => 'Ekens Fönster',

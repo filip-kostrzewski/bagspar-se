@@ -64,11 +64,16 @@
             </div>
 
             <div class="form-field">
-                <label for="logo">Logotyp</label>
+                <span id="logo-label">Logotyp</span>
                 @if ($workshop->hasLogo())
                     <img class="settings-logo-preview" src="{{ route('app.settings.logo') }}" alt="Nuvarande logotyp för {{ $workshop->name }}" width="72" height="72">
                 @endif
-                <input id="logo" name="logo" type="file" accept="image/jpeg,image/png,image/webp" @if ($errors->has('logo')) aria-invalid="true" aria-describedby="logo-error" @endif>
+                <div class="file-picker">
+                    <label class="visually-hidden" for="logo">Logotypfil</label>
+                    <input id="logo" class="visually-hidden" name="logo" type="file" accept="image/jpeg,image/png,image/webp" @if ($errors->has('logo')) aria-invalid="true" aria-describedby="logo-error" @endif>
+                    <button class="workshop-button workshop-button--secondary" type="button" data-file-picker="logo" aria-describedby="logo-label">Välj bild</button>
+                    <span class="file-picker__name" data-file-name>Ingen bild vald</span>
+                </div>
                 <p class="form-field__hint" id="logo-hint">JPG, PNG eller WebP. Högst 2 MB.</p>
                 @error('logo')
                     <p class="form-field__error" id="logo-error">{{ $message }}</p>

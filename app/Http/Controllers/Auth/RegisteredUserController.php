@@ -46,6 +46,7 @@ class RegisteredUserController extends Controller
                     }
                 },
             ],
+            'terms' => ['accepted'],
         ], [
             'name.required' => 'Ange ditt namn.',
             'name.string' => 'Ange ditt namn som text.',
@@ -62,6 +63,7 @@ class RegisteredUserController extends Controller
             'password.string' => 'Ange ett giltigt lösenord.',
             'password.confirmed' => 'Lösenorden stämmer inte överens.',
             'password.min' => 'Lösenordet måste innehålla minst 12 tecken.',
+            'terms.accepted' => 'Godkänn villkoren för att skapa kontot.',
         ]);
 
         $user = DB::transaction(function () use ($validated): User {
@@ -74,6 +76,7 @@ class RegisteredUserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
+                'terms_accepted_at' => now(),
             ]);
         });
 

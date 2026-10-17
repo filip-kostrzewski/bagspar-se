@@ -13,6 +13,14 @@
     <link rel="preload" href="{{ asset('fonts/fraunces-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/manrope-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/workshop.css') }}?v={{ substr(hash_file('sha256', public_path('css/workshop.css')), 0, 12) }}">
+    <style>
+        @media print {
+            @page {
+                margin: 16mm;
+                size: A4 portrait;
+            }
+        }
+    </style>
     <script src="{{ asset('js/workshop.js') }}?v={{ substr(hash_file('sha256', public_path('js/workshop.js')), 0, 12) }}" defer></script>
 </head>
 <body class="workshop-app @yield('body_class')">

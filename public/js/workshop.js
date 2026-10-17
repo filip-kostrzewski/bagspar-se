@@ -2,17 +2,41 @@ document.querySelectorAll('[data-workshop-focus]').forEach((message) => {
     message.focus({ preventScroll: true });
 });
 
-const stagePanels = document.querySelectorAll('[data-stage-panel]');
-const mobileStageLayout = window.matchMedia('(max-width: 760px)');
+document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const input = document.getElementById(button.dataset.passwordToggle ?? '');
 
-const updateStagePanelVisibility = () => {
-    stagePanels.forEach((panel) => {
-        panel.open = !mobileStageLayout.matches;
+        if (!(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        button.textContent = showing ? 'Visa' : 'Dölj';
+        button.setAttribute('aria-pressed', String(!showing));
     });
-};
+});
 
-updateStagePanelVisibility();
-mobileStageLayout.addEventListener('change', updateStagePanelVisibility);
+document.querySelectorAll('[data-file-picker]').forEach((button) => {
+    const input = document.getElementById(button.dataset.filePicker ?? '');
+    const name = button.parentElement?.querySelector('[data-file-name]');
+
+    if (!(input instanceof HTMLInputElement)) {
+        return;
+    }
+
+    button.addEventListener('click', () => {
+        input.click();
+    });
+
+    input.addEventListener('change', () => {
+        const file = input.files?.[0];
+
+        if (name) {
+            name.textContent = file ? file.name : 'Ingen bild vald';
+        }
+    });
+});
 
 document.querySelectorAll('[data-copy-link]').forEach((button) => {
     button.addEventListener('click', async () => {

@@ -4,6 +4,26 @@
 
 @section('body_class', 'label-print-sheet')
 
+@section('print_style')
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 6mm;
+        }
+
+        html.label-print-sheet {
+            page: label-a4;
+        }
+
+        @media print {
+            html.label-print-sheet .label-print-main {
+                min-height: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="label-toolbar no-print">
         <p class="workshop-eyebrow">A4 · 62 × 29 MM</p>

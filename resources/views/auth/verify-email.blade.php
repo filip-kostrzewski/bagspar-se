@@ -5,12 +5,14 @@
 @section('content')
     <section class="auth-page" aria-labelledby="page-title">
         <p class="workshop-eyebrow">EN TRYGG START</p>
-        <h1 class="workshop-heading" id="page-title">{{ $emailVerified ? 'E-postadressen är bekräftad' : 'Bekräfta din e-postadress' }}</h1>
         @if ($emailVerified)
+            <h1 class="workshop-heading" id="page-title">E-postadressen är bekräftad</h1>
             <p class="auth-page__intro">Kontot är redan bekräftat och redo att användas.</p>
             <p class="auth-page__bottom">Du är inloggad som <strong>{{ $email }}</strong>.</p>
         @else
+            <h1 class="workshop-heading auth-page__title" id="page-title">Bekräfta din <span class="auth-page__nowrap">e-postadress</span></h1>
             <p class="auth-page__intro">Följ länken i e-postmeddelandet för att bekräfta adressen och fortsätta till verkstaden. Om meddelandet inte kom fram kan du be om ett nytt.</p>
+            <p class="auth-page__hint">Hittar du inte mejlet? Kolla skräpposten.</p>
             <p class="auth-page__bottom">Verifieringslänken skickas till <strong>{{ $email }}</strong>.</p>
         @endif
 

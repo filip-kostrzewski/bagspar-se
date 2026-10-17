@@ -2746,9 +2746,9 @@ html.cookie-choice-saved .cookie-banner {
 }
 
 .atelier-card__progress {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
     margin: 13px 0 0;
     padding: 0;
     color: #6c7777;
@@ -2759,6 +2759,7 @@ html.cookie-choice-saved .cookie-banner {
 
 .atelier-card__progress li {
     display: flex;
+    flex: 1 1 30%;
     min-width: 0;
     align-items: center;
     gap: 7px;
@@ -3031,11 +3032,14 @@ html.cookie-choice-saved .cookie-banner {
 }
 
 .pilot-pricing__terms {
-    margin: 8px 0 0;
+    max-width: 28ch;
+    margin: 0;
     color: var(--ink);
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.5;
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.35;
 }
 
 .pilot-pricing__vat span {

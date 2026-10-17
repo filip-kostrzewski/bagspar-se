@@ -42,7 +42,7 @@ class EmailVerificationController extends Controller
 
             $request->fulfill();
 
-            return redirect()->route('app.dashboard')->with('status', 'E-postadressen har verifierats.');
+            return redirect()->route('app.dashboard')->with('status', 'E-postadressen är verifierad.');
         }
 
         $request->fulfill();
@@ -51,7 +51,7 @@ class EmailVerificationController extends Controller
         // so the next login returns the visitor to this link and then the workshop.
         return redirect()->guest(route('login'))->with(
             'email_verified_notice',
-            'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.',
+            'E-postadressen är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.',
         );
     }
 

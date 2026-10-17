@@ -42,6 +42,9 @@ class LabelPrintControllerTest extends TestCase
 
         $label->assertOk()
             ->assertSee('label-print-standalone label-print-single', false)
+            ->assertSee('@page {', false)
+            ->assertSee('size: 62mm 29mm;', false)
+            ->assertSee('margin: 0;', false)
             ->assertSee('class="print-label"', false)
             ->assertSee(route('app.sashes.qr', [$project, $sash]), false)
             ->assertSee('B-24', false)

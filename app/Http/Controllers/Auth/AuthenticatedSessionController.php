@@ -78,6 +78,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home')->with('status', 'Du har loggat ut.');
+        return redirect()->route('login')->with('status', 'Du har loggat ut.');
     }
 }

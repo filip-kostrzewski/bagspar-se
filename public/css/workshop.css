@@ -1961,7 +1961,9 @@ svg {
     }
 
     .workshop-header__workspace {
-        display: none;
+        display: block;
+        max-width: 34vw;
+        font-size: 12px;
     }
 
     .workshop-main {
@@ -2462,11 +2464,6 @@ svg {
 }
 
 @media print {
-    @page {
-        margin: 16mm;
-        size: A4 portrait;
-    }
-
     html {
         scroll-behavior: auto;
     }
@@ -2665,9 +2662,22 @@ svg {
     body.label-print-single .label-print-main,
     body.label-print-sheet .label-print-main,
     body.label-print-single .label-preview {
+        width: auto;
+        height: auto;
+        min-height: 0;
         margin: 0;
         padding: 0;
+        overflow: hidden;
         background: #fff;
+    }
+
+    body.label-print-single,
+    body.label-print-single .label-print-main,
+    body.label-print-single .label-preview,
+    body.label-print-single .print-label {
+        width: 62mm;
+        height: 29mm;
+        max-height: 29mm;
     }
 
     body.label-print-single .print-label {
@@ -2695,6 +2705,13 @@ body.label-print-sheet {
 .label-print-main {
     min-height: 100vh;
     padding: 28px 20px 56px;
+}
+
+@media print {
+    .label-print-main {
+        min-height: 0;
+        padding: 0;
+    }
 }
 
 .label-toolbar {
@@ -2813,6 +2830,81 @@ body.label-print-sheet {
     border: 1px solid var(--rule);
     background: #fff;
     object-fit: contain;
+}
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-field input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.file-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-picker__name {
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+.auth-page__title {
+    text-wrap: balance;
+}
+
+.auth-page__nowrap {
+    white-space: nowrap;
+}
+
+.auth-page__hint {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+.sash-history {
+    margin-top: 36px;
+}
+
+.sash-history__list {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sash-history__item {
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+}
+
+.sash-history__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin: 0 0 4px;
+    color: var(--ink-soft);
+    font-size: 13px;
+}
+
+.sash-history__note,
+.sash-history__empty {
+    margin: 0;
+}
+
+.sash-history__note {
+    white-space: pre-wrap;
+}
+
+.sash-history__empty {
+    margin-top: 8px;
+    color: var(--ink-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {

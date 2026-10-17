@@ -42,4 +42,23 @@ class WindowSash extends Model
     {
         return $this->hasMany(SashPhoto::class, 'sash_id');
     }
+
+    /** @return HasMany<SashEvent, $this> */
+    public function events(): HasMany
+    {
+        return $this->hasMany(SashEvent::class, 'sash_id');
+    }
+
+    public function recordEvent(User $user, string $kind, ?string $stage = null, ?string $body = null): SashEvent
+    {
+        $event = $this->events()->create([
+            'user_id' => $user->getKey(),
+            'user_name' => $user->name,
+            'kind' => $kind,
+            'stage' => $stage,
+            'body' => $body,
+        ]);
+
+        return $event;
+    }
 }

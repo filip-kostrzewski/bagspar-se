@@ -4,6 +4,36 @@
 
 @section('body_class', 'label-print-single')
 
+@section('print_style')
+    <style>
+        @page {
+            size: 62mm 29mm;
+            margin: 0;
+        }
+
+        html.label-print-single {
+            page: label-62x29;
+        }
+
+        @media print {
+            html.label-print-single,
+            html.label-print-single body,
+            html.label-print-single .label-print-main,
+            html.label-print-single .label-preview,
+            html.label-print-single .print-label {
+                width: 62mm;
+                height: 29mm;
+                min-height: 0 !important;
+                max-height: 29mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: #fff !important;
+            }
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="label-toolbar no-print">
         <p class="workshop-eyebrow">ETIKETT 62 × 29 MM</p>

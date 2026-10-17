@@ -45,6 +45,8 @@ Route::post('/intresse', PilotLeadController::class)
     ->middleware('throttle:5,1')
     ->name('pilot-leads.store');
 
+Route::permanentRedirect('/login', '/logga-in');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/registrera', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1')->name('auth.register.store');

@@ -137,6 +137,32 @@
                 </form>
             </section>
 
+            <section class="sash-history" aria-labelledby="history-title">
+                <p class="workshop-eyebrow">VAD SOM HÄNT</p>
+                <h2 class="workshop-section-heading" id="history-title">Historik</h2>
+                @if ($events->isEmpty())
+                    <p class="sash-history__empty">Inga steg eller anteckningar är sparade i historiken ännu.</p>
+                @else
+                    <ol class="sash-history__list">
+                        @foreach ($events as $event)
+                            <li class="sash-history__item">
+                                <p class="sash-history__meta">
+                                    <time datetime="{{ $event->created_at?->toAtomString() }}">{{ $event->created_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</time>
+                                    <span>{{ $event->user_name }}</span>
+                                </p>
+                                @if ($event->kind === 'stage')
+                                    <p>Steg: @include('partials.workshop.stage-label', ['stage' => $event->stage])</p>
+                                @elseif (is_string($event->body) && $event->body !== '')
+                                    <p class="sash-history__note">{{ $event->body }}</p>
+                                @else
+                                    <p>Anteckningen togs bort.</p>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
+            </section>
+
             <section class="work-card-link-panel" aria-labelledby="link-title">
                 <p class="workshop-eyebrow">SKANNA FÖR ARBETSKORTET</p>
                 <h2 class="workshop-section-heading" id="link-title">QR-kod för den här bågen</h2>
@@ -153,7 +179,7 @@
                         @if ($sash->room || $sash->location)
                             <span>{{ collect([$sash->room, $sash->location])->filter()->join(' · ') }}</span>
                         @endif
-                        <p>Skanning kräver inloggning till verkstaden.</p>
+                        <p>Skanningen är till för verkstadens personal och kräver inloggning. Det finns ingen publik vy.</p>
                     </div>
                 </div>
                 <p class="work-card-link-panel__fallback">Om QR-koden inte kan läsas kan du kopiera länken:</p>
@@ -226,8 +252,12 @@
                         @enderror
                     </div>
                     <div class="form-field">
-                        <label for="photo">Välj bild</label>
-                        <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required @if ($errors->has('photo')) aria-invalid="true" aria-describedby="photo-error" @endif>
+                        <label class="visually-hidden" for="photo">Bildfil</label>
+                        <div class="file-picker">
+                            <input id="photo" class="visually-hidden" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required @if ($errors->has('photo')) aria-invalid="true" aria-describedby="photo-error" @endif>
+                            <button class="workshop-button workshop-button--secondary" type="button" data-file-picker="photo">Välj bild</button>
+                            <span class="file-picker__name" data-file-name>Ingen bild vald</span>
+                        </div>
                         @error('photo')
                             @if (old('form_context') === 'photo')
                                 <p class="form-field__error" id="photo-error">{{ $message }}</p>

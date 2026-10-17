@@ -5,7 +5,6 @@
 
 @section('content')
     @php
-        $projectIsComplete = $project->status === 'completed';
         $sashCount = $sashes->count();
     @endphp
     <div class="workspace-page report-page">
@@ -45,10 +44,6 @@
                     <p class="workshop-eyebrow">PROJEKTRAPPORT</p>
                     <h1 class="workshop-heading" id="page-title">{{ $project->name }}</h1>
                 </div>
-                <span class="project-card__status @if ($projectIsComplete) project-card__status--complete @endif">
-                    <span class="status-dot" aria-hidden="true"></span>
-                    {{ $projectIsComplete ? 'Avslutat' : 'Pågår' }}
-                </span>
             </div>
             <dl class="report-facts">
                 @if ($project->customer_name)

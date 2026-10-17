@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\SashEvent;
+use App\Models\User;
 use App\Models\WindowSash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -45,6 +47,15 @@ class WindowSashController extends Controller
         ]);
 
         $sash = $project->windowSashes()->create($validated + ['stage' => 'received']);
+        $actor = $request->user();
+
+        if ($actor instanceof User) {
+            $sash->recordEvent($actor, SashEvent::KIND_STAGE, $sash->stage);
+
+            if (is_string($sash->notes) && $sash->notes !== '') {
+                $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, $sash->notes);
+            }
+        }
 
         return redirect()->route('app.sashes.show', [$project, $sash])->with('status', 'Arbetskortet har skapats.');
     }
@@ -55,8 +66,9 @@ class WindowSashController extends Controller
         $project = $this->projectForWorkshop($workshop, $project);
         $sash = $this->sashForProject($project, $sash);
         $photos = $sash->photos()->latest()->get();
+        $events = $sash->events()->orderBy('id')->get();
 
-        return view('app.sashes.show', compact('workshop', 'project', 'sash', 'photos'));
+        return view('app.sashes.show', compact('workshop', 'project', 'sash', 'photos', 'events'));
     }
 
     public function update(Request $request, Project $project, WindowSash $sash): RedirectResponse
@@ -87,7 +99,20 @@ class WindowSashController extends Controller
         ]);
 
         abort_if($validated === [], 422);
+        $previousStage = $sash->stage;
+        $previousNotes = $sash->notes;
         $sash->update($validated);
+        $actor = $request->user();
+
+        if ($actor instanceof User) {
+            if (array_key_exists('stage', $validated) && $sash->stage !== $previousStage) {
+                $sash->recordEvent($actor, SashEvent::KIND_STAGE, $sash->stage);
+            }
+
+            if (array_key_exists('notes', $validated) && $sash->notes !== $previousNotes) {
+                $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, $sash->notes);
+            }
+        }
 
         return back()->with('status', 'Arbetskortet har uppdaterats.');
     }

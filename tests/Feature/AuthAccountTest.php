@@ -29,6 +29,10 @@ class AuthAccountTest extends TestCase
         $this->get(route('register'))
             ->assertOk()
             ->assertSee('Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.', false)
+            ->assertSee('3 månaders kostnadsfri pilot', false)
+            ->assertSee('href="'.route('terms').'"', false)
+            ->assertSee('data-password-toggle="password"', false)
+            ->assertDontSee('provperiod', false)
             ->assertDontSee('Betalning kan börja först när den aktiveras manuellt', false);
     }
 
@@ -42,12 +46,14 @@ class AuthAccountTest extends TestCase
             'email' => '  ANNA@EXAMPLE.TEST ',
             'password' => 'correct-horse-5',
             'password_confirmation' => 'correct-horse-5',
+            'terms' => '1',
         ]);
 
         $user = User::query()->where('email', 'anna@example.test')->firstOrFail();
 
         $response->assertRedirect(route('app.dashboard'));
         $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->terms_accepted_at);
         $this->assertSame('Fönsterverkstan', $user->workshop->name);
         $this->assertTrue($user->workshop->trial_ends_at->between(now()->addMonths(3)->subMinute(), now()->addMonths(3)->addMinute()));
         $this->assertTrue(Hash::check('correct-horse-5', $user->password));
@@ -178,13 +184,35 @@ class AuthAccountTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_registration_requires_the_terms_to_be_accepted(): void
+    {
+        $this->from(route('register'))->post(route('auth.register.store'), [
+            'name' => 'Anna Andersson',
+            'company' => 'Fönsterverkstan',
+            'email' => 'anna@example.test',
+            'password' => 'correct-horse-5',
+            'password_confirmation' => 'correct-horse-5',
+        ])->assertSessionHasErrors(['terms' => 'Godkänn villkoren för att skapa kontot.']);
+
+        $this->assertDatabaseCount('users', 0);
+        $this->assertGuest();
+    }
+
+    public function test_legacy_login_path_redirects_permanently_to_the_swedish_login_page(): void
+    {
+        $this->get('/login')
+            ->assertStatus(301)
+            ->assertRedirect('/logga-in');
+    }
+
     public function test_logout_clears_the_authenticated_session(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
             ->post(route('auth.logout'))
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'Du har loggat ut.');
 
         $this->assertGuest();
     }
@@ -298,7 +326,7 @@ class AuthAccountTest extends TestCase
 
         $this->actingAs($user)->get($verificationUrl)
             ->assertRedirect(route('app.dashboard'))
-            ->assertSessionHas('status', 'E-postadressen har verifierats.');
+            ->assertSessionHas('status', 'E-postadressen är verifierad.');
 
         $this->assertNotNull($user->fresh()->email_verified_at);
 
@@ -321,7 +349,7 @@ class AuthAccountTest extends TestCase
 
         $this->get($verificationUrl)
             ->assertRedirect(route('login'))
-            ->assertSessionHas('email_verified_notice', 'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.')
+            ->assertSessionHas('email_verified_notice', 'E-postadressen är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.')
             ->assertSessionHas('url.intended', $verificationUrl);
 
         $this->assertGuest();
@@ -329,10 +357,10 @@ class AuthAccountTest extends TestCase
 
         $this->get($verificationUrl)
             ->assertRedirect(route('login'))
-            ->assertSessionHas('email_verified_notice', 'Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.');
+            ->assertSessionHas('email_verified_notice', 'E-postadressen är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.');
 
         $this->get(route('login'))
-            ->assertSee('Din e-post är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.', false)
+            ->assertSee('E-postadressen är verifierad. Logga in med samma e-postadress och lösenord som när kontot skapades.', false)
             ->assertSee('auth-notice', false);
 
         $this->post(route('auth.login.store'), [
@@ -430,7 +458,10 @@ class AuthAccountTest extends TestCase
         $this->get(route('verification.notice'))
             ->assertOk()
             ->assertSee($user->email)
-            ->assertSee('Skicka bekräftelselänk igen');
+            ->assertSee('Skicka bekräftelselänk igen')
+            ->assertSee('class="workshop-heading auth-page__title"', false)
+            ->assertSee('auth-page__nowrap', false)
+            ->assertSee('Hittar du inte mejlet? Kolla skräpposten.', false);
     }
 
     public function test_signed_verification_with_the_wrong_hash_returns_a_forbidden_page_without_verifying(): void

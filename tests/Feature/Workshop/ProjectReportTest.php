@@ -71,6 +71,8 @@ class ProjectReportTest extends TestCase
             ->assertDontSee('stage-track', false)
             ->assertDontSee('Skrapning', false)
             ->assertDontSee('Glasning', false)
-            ->assertDontSee('report-header__brand', false);
+            ->assertDontSee('report-header__brand', false)
+            ->assertDontSee('Pågår', false)
+            ->assertDontSee('Avslutat', false);
     }
 }
