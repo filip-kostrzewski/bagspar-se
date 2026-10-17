@@ -75,6 +75,16 @@
         </div>
     </footer>
 
+    <dialog class="workshop-dialog" data-confirm-dialog aria-labelledby="workshop-confirm-title">
+        <form method="dialog" class="workshop-dialog__panel">
+            <p id="workshop-confirm-title" class="workshop-dialog__title" data-confirm-message></p>
+            <div class="workshop-dialog__actions">
+                <button class="workshop-button workshop-button--secondary" type="submit" value="cancel" data-confirm-cancel>Avbryt</button>
+                <button class="workshop-button workshop-button--primary" type="submit" value="confirm" data-confirm-accept>Fortsätt</button>
+            </div>
+        </form>
+    </dialog>
+
     @stack('scripts')
 </body>
 </html>

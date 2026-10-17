@@ -249,8 +249,11 @@
                     @csrf
                     <input type="hidden" name="form_context" value="photo">
                     @php
-                        $hasAfterPhoto = $photos->contains(fn ($existingPhoto): bool => $existingPhoto->moment === 'after');
-                        $selectedMoment = old('form_context') === 'photo' ? old('moment') : ($hasAfterPhoto ? null : 'before');
+                        $hasBeforePhoto = $photos->contains(fn ($existingPhoto): bool => $existingPhoto->moment !== 'after');
+                        $oldMoment = old('form_context') === 'photo' ? old('moment') : null;
+                        $selectedMoment = in_array($oldMoment, ['before', 'after'], true)
+                            ? $oldMoment
+                            : ($hasBeforePhoto ? 'after' : 'before');
                     @endphp
                     <fieldset class="moment-choice">
                         <legend>Tillfälle</legend>

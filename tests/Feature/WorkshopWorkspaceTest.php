@@ -347,7 +347,7 @@ class WorkshopWorkspaceTest extends TestCase
         $this->assertDatabaseCount('sash_photos', 0);
     }
 
-    public function test_photo_upload_defaults_to_before_until_an_after_exists_and_the_moment_can_change(): void
+    public function test_photo_upload_defaults_to_before_until_a_before_photo_exists_and_the_moment_can_change(): void
     {
         Storage::fake('local');
         $owner = User::factory()->create();
@@ -381,6 +381,37 @@ class WorkshopWorkspaceTest extends TestCase
         $this->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
             ->assertSee('>Efter</strong>', false)
+            ->assertSee('name="moment" type="radio" value="before" required checked', false)
+            ->assertDontSee('name="moment" type="radio" value="after" checked', false);
+
+        $this->from(route('app.sashes.show', [$project, $sash]))
+            ->post(route('app.sashes.photos.store', [$project, $sash]), [
+                'form_context' => 'photo',
+                'moment' => 'during',
+                'photo' => UploadedFile::fake()->image('bad.jpg', 80, 60),
+            ])->assertSessionHasErrors('moment');
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertSee('name="moment" type="radio" value="before" required checked', false)
+            ->assertDontSee('name="moment" type="radio" value="after" checked', false);
+
+        SashPhoto::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'moment' => 'before',
+        ]);
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertSee('name="moment" type="radio" value="after" checked', false)
+            ->assertDontSee('name="moment" type="radio" value="before" required checked', false);
+
+        $nullSash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        SashPhoto::factory()->create([
+            'sash_id' => $nullSash->getKey(),
+            'moment' => null,
+        ]);
+
+        $this->get(route('app.sashes.show', [$project, $nullSash]))
+            ->assertSee('name="moment" type="radio" value="after" checked', false)
             ->assertDontSee('name="moment" type="radio" value="before" required checked', false);
 
         $this->actingAs($other)
@@ -438,6 +469,60 @@ class WorkshopWorkspaceTest extends TestCase
         $this->get(route('app.settings.edit'))->assertRedirect(route('login'));
         $this->get(route('app.sashes.qr', [$project, $sash]))->assertRedirect(route('login'));
         $this->get(route('app.sashes.photos.show', [$project, $sash, $photo]))->assertRedirect(route('login'));
+    }
+
+    public function test_project_sash_cards_show_the_latest_after_photo_or_else_a_before_photo(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $withAfter = WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'A1',
+        ]);
+        $withBefore = WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'B1',
+        ]);
+        $empty = WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'C1',
+        ]);
+        $olderBefore = SashPhoto::factory()->create([
+            'sash_id' => $withAfter->getKey(),
+            'moment' => 'before',
+        ]);
+        $olderAfter = SashPhoto::factory()->create([
+            'sash_id' => $withAfter->getKey(),
+            'moment' => 'after',
+        ]);
+        $latestAfter = SashPhoto::factory()->create([
+            'sash_id' => $withAfter->getKey(),
+            'moment' => 'after',
+        ]);
+        $olderNull = SashPhoto::factory()->create([
+            'sash_id' => $withBefore->getKey(),
+            'moment' => null,
+        ]);
+        $latestBefore = SashPhoto::factory()->create([
+            'sash_id' => $withBefore->getKey(),
+            'moment' => 'before',
+        ]);
+        $olderBefore->forceFill(['created_at' => '2026-10-01 08:00:00', 'updated_at' => '2026-10-01 08:00:00'])->save();
+        $olderAfter->forceFill(['created_at' => '2026-10-02 08:00:00', 'updated_at' => '2026-10-02 08:00:00'])->save();
+        $latestAfter->forceFill(['created_at' => '2026-10-16 08:00:00', 'updated_at' => '2026-10-16 08:00:00'])->save();
+        $olderNull->forceFill(['created_at' => '2026-10-01 08:00:00', 'updated_at' => '2026-10-01 08:00:00'])->save();
+        $latestBefore->forceFill(['created_at' => '2026-10-10 08:00:00', 'updated_at' => '2026-10-10 08:00:00'])->save();
+
+        $this->actingAs($owner)
+            ->get(route('app.projects.show', $project))
+            ->assertOk()
+            ->assertSee('class="sash-card__thumb" src="'.route('app.sashes.photos.show', [$project, $withAfter, $latestAfter]).'" alt="" width="64" height="64" loading="lazy" decoding="async"', false)
+            ->assertSee('class="sash-card__thumb" src="'.route('app.sashes.photos.show', [$project, $withBefore, $latestBefore]).'" alt="" width="64" height="64" loading="lazy" decoding="async"', false)
+            ->assertDontSee(route('app.sashes.photos.show', [$project, $withAfter, $olderAfter]), false)
+            ->assertDontSee(route('app.sashes.photos.show', [$project, $withAfter, $olderBefore]), false)
+            ->assertDontSee(route('app.sashes.photos.show', [$project, $withBefore, $olderNull]), false)
+            ->assertSee('sash-card__thumb--empty', false)
+            ->assertSeeInOrder([$withAfter->code, $withBefore->code, $empty->code], false);
     }
 
     private function createStoredPhoto(WindowSash $sash): SashPhoto

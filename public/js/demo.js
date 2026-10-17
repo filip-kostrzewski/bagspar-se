@@ -88,16 +88,7 @@ if (root) {
             });
     });
 
-    root.querySelector('[data-reset]')?.addEventListener('click', (event) => {
-        const button = event.currentTarget;
-        const message = button instanceof HTMLElement
-            ? button.dataset.resetConfirm || 'Återställ exemplet? Ändringar du gjort på kortet tas bort.'
-            : 'Återställ exemplet? Ändringar du gjort på kortet tas bort.';
-
-        if (!window.confirm(message)) {
-            return;
-        }
-
+    const resetExample = () => {
         const demoId = readDemoId();
         current = clone(defaults);
         current.phase = demoId ? 'pending' : 'idle';
@@ -107,6 +98,36 @@ if (root) {
         if (demoId) {
             syncNow();
         }
+    };
+
+    root.querySelector('[data-reset]')?.addEventListener('click', (event) => {
+        const button = event.currentTarget;
+        const message = button instanceof HTMLElement
+            ? button.dataset.resetConfirm || 'Återställ exemplet? Ändringar du gjort på kortet tas bort.'
+            : 'Återställ exemplet? Ändringar du gjort på kortet tas bort.';
+        const dialog = document.querySelector('[data-confirm-dialog]');
+
+        if (! (dialog instanceof HTMLDialogElement)) {
+            return;
+        }
+
+        const messageNode = dialog.querySelector('[data-confirm-message]');
+
+        if (messageNode) {
+            messageNode.textContent = message;
+        }
+
+        const onClose = () => {
+            dialog.removeEventListener('close', onClose);
+
+            if (dialog.returnValue === 'confirm') {
+                resetExample();
+            }
+        };
+
+        dialog.addEventListener('close', onClose);
+        dialog.showModal();
+        dialog.querySelector('[data-confirm-cancel]')?.focus();
     });
 
     root.querySelectorAll('[data-photo]').forEach((photo) => {

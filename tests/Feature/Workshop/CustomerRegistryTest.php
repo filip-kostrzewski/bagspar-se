@@ -88,13 +88,20 @@ class CustomerRegistryTest extends TestCase
             'contact_name' => '  Ada Ek  ',
             'address' => '  Ekgatan 2, Uppsala  ',
             'email' => '  Kontakt@Exempel.TEST  ',
-        ])->assertRedirect();
+        ])->assertRedirect()->assertSessionHas('status', 'Sparat');
 
         $customer = Customer::query()->where('workshop_id', $owner->workshop_id)->firstOrFail();
         $this->assertSame('BRF Eken', $customer->name);
         $this->assertSame('Ada Ek', $customer->contact_name);
         $this->assertSame('Ekgatan 2, Uppsala', $customer->address);
         $this->assertSame('kontakt@exempel.test', $customer->email);
+
+        $this->patch(route('app.customers.update', $customer), [
+            'name' => 'BRF Eken',
+            'contact_name' => 'Ada Ek',
+            'address' => 'Ekgatan 2, Uppsala',
+            'email' => 'kontakt@exempel.test',
+        ])->assertSessionHas('status', 'Sparat');
 
         $this->get(route('app.customers.index'))
             ->assertSee('BRF Eken', false)
@@ -218,17 +225,27 @@ class CustomerRegistryTest extends TestCase
         $this->actingAs($owner)->get(route('app.projects.create'))
             ->assertOk()
             ->assertSee('data-customer-combobox', false)
+            ->assertSee('role="combobox"', false)
+            ->assertSee('role="listbox"', false)
+            ->assertSee('aria-controls="customer-list"', false)
+            ->assertSee('<select id="customer-id" name="customer_id" data-customer-select>', false)
             ->assertSee('+ Ny kund', false)
             ->assertDontSee('Kund i registret', false)
             ->assertDontSee('Ny eller befintlig kund', false)
             ->assertDontSee('name="customer_name"', false);
+
+        $script = file_get_contents(public_path('js/workshop.js'));
+        $this->assertIsString($script);
+        $this->assertStringContainsString("setAttribute('aria-hidden', 'true')", $script);
+        $this->assertStringContainsString('aria-activedescendant', $script);
+        $this->assertStringNotContainsString('window.confirm', $script);
 
         $this->patch(route('app.projects.update', $project), [
             'form_context' => 'project',
             'name' => 'Villa Ek',
             'customer_id' => (string) $chosen->getKey(),
             'customer_name' => 'BRF Björken',
-        ])->assertRedirect();
+        ])->assertRedirect()->assertSessionHas('status', 'Sparat');
 
         $project->refresh();
         $this->assertSame($chosen->getKey(), $project->customer_id);

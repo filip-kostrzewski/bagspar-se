@@ -43,6 +43,11 @@ class DemoPageTest extends TestCase
         $response->assertDontSee('>EXEMPEL<', false);
         $response->assertSee('>Stäng<', false);
         $response->assertSee('data-reset-confirm="Återställ exemplet? Ändringar du gjort på kortet tas bort."', false);
+        $response->assertSee('data-confirm-dialog', false);
+        $response->assertSee('data-confirm-cancel', false);
+        $demoScript = file_get_contents(public_path('js/demo.js'));
+        $this->assertIsString($demoScript);
+        $this->assertStringNotContainsString('window.confirm', $demoScript);
         $response->assertSee('Börja med ett eget konto', false);
         $response->assertSee('Starta gratis pilot', false);
         $response->assertSee('Ditt verkstadskonto kräver internetanslutning', false);

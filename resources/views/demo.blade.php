@@ -153,6 +153,16 @@
         <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
         <p><a href="{{ route('home') }}#intresse">Vill du stämma av piloten? Kontakta oss</a></p>
     </aside>
+
+    <dialog class="site-dialog" data-confirm-dialog aria-labelledby="demo-confirm-title">
+        <form method="dialog">
+            <p id="demo-confirm-title" data-confirm-message></p>
+            <div class="site-dialog__actions">
+                <button class="button button--small site-dialog__cancel" type="submit" value="cancel" data-confirm-cancel>Avbryt</button>
+                <button class="button button--small" type="submit" value="confirm">Återställ</button>
+            </div>
+        </form>
+    </dialog>
 </main>
 @endsection
 

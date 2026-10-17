@@ -139,12 +139,59 @@ document.querySelectorAll('[data-print-labels]').forEach((button) => {
     });
 });
 
+const confirmDialog = document.querySelector('[data-confirm-dialog]');
+let pendingConfirmForm = null;
+
+if (confirmDialog instanceof HTMLDialogElement) {
+    confirmDialog.addEventListener('close', () => {
+        const form = pendingConfirmForm;
+        pendingConfirmForm = null;
+
+        if (confirmDialog.returnValue !== 'confirm' || ! (form instanceof HTMLFormElement)) {
+            return;
+        }
+
+        form.dataset.confirmed = 'true';
+        form.requestSubmit();
+    });
+}
+
 document.querySelectorAll('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (event) => {
+        if (form.dataset.confirmed === 'true') {
+            delete form.dataset.confirmed;
+
+            return;
+        }
+
         const message = form.getAttribute('data-confirm');
 
-        if (message && ! window.confirm(message)) {
+        if (! message || ! (confirmDialog instanceof HTMLDialogElement)) {
             event.preventDefault();
+
+            return;
+        }
+
+        event.preventDefault();
+        pendingConfirmForm = form;
+
+        const messageNode = confirmDialog.querySelector('[data-confirm-message]');
+        const acceptButton = confirmDialog.querySelector('[data-confirm-accept]');
+        const cancelButton = confirmDialog.querySelector('[data-confirm-cancel]');
+
+        if (messageNode) {
+            messageNode.textContent = message;
+        }
+
+        if (acceptButton instanceof HTMLButtonElement) {
+            const label = event.submitter instanceof HTMLElement ? event.submitter.textContent.trim() : '';
+            acceptButton.textContent = label !== '' ? label : 'Fortsätt';
+        }
+
+        confirmDialog.showModal();
+
+        if (cancelButton instanceof HTMLElement) {
+            cancelButton.focus();
         }
     });
 });
@@ -162,22 +209,63 @@ document.querySelectorAll('[data-customer-combobox]').forEach((root) => {
         value: option.value,
         label: option.textContent.trim(),
     }));
+    let visibleOptions = [];
+    let activeIndex = -1;
 
     const hideList = () => {
         list.hidden = true;
         search.setAttribute('aria-expanded', 'false');
+        search.removeAttribute('aria-activedescendant');
+        activeIndex = -1;
+    };
+
+    const setActive = (index, shouldScroll) => {
+        const items = [...list.querySelectorAll('[role="option"]')];
+
+        if (items.length === 0 || index < 0) {
+            activeIndex = -1;
+            search.removeAttribute('aria-activedescendant');
+
+            return;
+        }
+
+        activeIndex = index;
+        items.forEach((item, itemIndex) => {
+            const selected = itemIndex === activeIndex;
+            item.setAttribute('aria-selected', selected ? 'true' : 'false');
+            item.classList.toggle('is-active', selected);
+
+            if (selected) {
+                search.setAttribute('aria-activedescendant', item.id);
+
+                if (shouldScroll) {
+                    item.scrollIntoView({ block: 'nearest' });
+                }
+            }
+        });
     };
 
     const choose = (option) => {
         select.value = option.value;
-        search.value = option.value === 'new' ? '' : option.label;
+
+        if (option.value === 'new') {
+            const typed = search.value.trim();
+            const nameInput = root.querySelector('input[name="new_customer_name"]');
+
+            if (nameInput instanceof HTMLInputElement && typed !== '' && typed !== option.label) {
+                nameInput.value = typed.slice(0, 160);
+            }
+        } else {
+            search.value = option.label;
+        }
+
         hideList();
         select.dispatchEvent(new Event('change', { bubbles: true }));
     };
 
     const render = () => {
         const query = search.value.trim().toLocaleLowerCase('sv');
-        const matches = options.filter((option) => {
+        visibleOptions = options.filter((option) => {
             if (option.value === '') {
                 return false;
             }
@@ -190,22 +278,28 @@ document.querySelectorAll('[data-customer-combobox]').forEach((root) => {
         });
 
         list.replaceChildren();
-        matches.forEach((option) => {
-            const item = document.createElement('button');
-            item.type = 'button';
+        visibleOptions.forEach((option, index) => {
+            const item = document.createElement('div');
+            item.id = `${list.id}-option-${index}`;
             item.className = 'customer-combobox__option';
             item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', 'false');
             item.textContent = option.label;
+            item.addEventListener('mousedown', (event) => {
+                event.preventDefault();
+            });
             item.addEventListener('click', () => choose(option));
             list.append(item);
         });
-        list.hidden = matches.length === 0;
+        list.hidden = visibleOptions.length === 0;
         search.setAttribute('aria-expanded', list.hidden ? 'false' : 'true');
+        setActive(visibleOptions.length === 0 ? -1 : 0, false);
     };
 
     root.dataset.enhanced = 'true';
     select.classList.add('visually-hidden');
     select.tabIndex = -1;
+    select.setAttribute('aria-hidden', 'true');
 
     const selected = options.find((option) => option.value === select.value && option.value !== '' && option.value !== 'new');
     if (selected) {
@@ -223,6 +317,47 @@ document.querySelectorAll('[data-customer-combobox]').forEach((root) => {
         }
 
         render();
+    });
+    search.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            const wasHidden = list.hidden;
+
+            if (wasHidden) {
+                render();
+            }
+
+            if (visibleOptions.length === 0) {
+                return;
+            }
+
+            if (wasHidden) {
+                setActive(event.key === 'ArrowDown' ? 0 : visibleOptions.length - 1, true);
+
+                return;
+            }
+
+            const direction = event.key === 'ArrowDown' ? 1 : -1;
+            const next = activeIndex < 0
+                ? (direction > 0 ? 0 : visibleOptions.length - 1)
+                : (activeIndex + direction + visibleOptions.length) % visibleOptions.length;
+            setActive(next, true);
+
+            return;
+        }
+
+        if (event.key === 'Escape' && ! list.hidden) {
+            event.preventDefault();
+            event.stopPropagation();
+            hideList();
+
+            return;
+        }
+
+        if (event.key === 'Enter' && ! list.hidden && visibleOptions[activeIndex]) {
+            event.preventDefault();
+            choose(visibleOptions[activeIndex]);
+        }
     });
 
     root.closest('form')?.addEventListener('submit', (event) => {

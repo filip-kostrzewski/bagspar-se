@@ -122,7 +122,7 @@ class ProjectReadyMailTest extends TestCase
             'name' => $project->name,
             'customer_id' => $customer->getKey(),
             'notify_customer_when_ready' => '1',
-        ])->assertSessionHas('status', 'Projektet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.');
+        ])->assertSessionHas('status', 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.');
 
         Mail::assertSent(ProjectReadyMail::class, 1);
         $this->assertTrue((bool) $project->fresh()?->notify_customer_when_ready);

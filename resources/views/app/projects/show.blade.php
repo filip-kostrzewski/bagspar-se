@@ -184,6 +184,16 @@
                     @foreach ($sashes as $sash)
                         <article class="sash-card">
                             <a class="sash-card__main" href="{{ route('app.sashes.show', [$project, $sash]) }}">
+                                @php
+                                    $coverPhoto = $sash->coverPhoto();
+                                @endphp
+                                @if ($coverPhoto instanceof \App\Models\SashPhoto)
+                                    <img class="sash-card__thumb" src="{{ route('app.sashes.photos.show', [$project, $sash, $coverPhoto]) }}" alt="" width="64" height="64" loading="lazy" decoding="async">
+                                @else
+                                    <span class="sash-card__thumb sash-card__thumb--empty" aria-hidden="true">
+                                        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="5" width="24" height="30" rx="1.5"/><path d="M20 5v30M8 20h24"/></svg>
+                                    </span>
+                                @endif
                                 <span class="sash-card__code">{{ $sash->code }}</span>
                                 <span class="sash-card__details">
                                     @if ($sash->room || $sash->location)

@@ -1990,6 +1990,44 @@ textarea {
     font-size: 16px;
 }
 
+.site-dialog {
+    width: min(420px, calc(100vw - 32px));
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--ink);
+}
+
+.site-dialog::backdrop {
+    background: rgb(23 49 59 / 45%);
+}
+
+.site-dialog form {
+    display: grid;
+    gap: 18px;
+    margin: 0;
+    padding: 22px;
+}
+
+.site-dialog p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.site-dialog__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.site-dialog__cancel {
+    border-color: var(--rule);
+    background: var(--white);
+}
+
 .job-card__reset {
     margin-top: 18px;
     padding: 0;

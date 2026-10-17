@@ -37,7 +37,7 @@ class CustomerController extends Controller
         $validated = $this->validated($request);
         $customer = $workshop->customers()->create($validated);
 
-        return redirect()->route('app.customers.edit', $customer)->with('status', 'Kunden har sparats.');
+        return redirect()->route('app.customers.edit', $customer)->with('status', 'Sparat');
     }
 
     public function edit(Request $request, Customer $customer): View
@@ -57,7 +57,7 @@ class CustomerController extends Controller
         $customer = $workshop->customers()->whereKey($customer->getKey())->firstOrFail();
         $customer->update($this->validated($request));
 
-        return back()->with('status', 'Kunden har sparats.');
+        return back()->with('status', 'Sparat');
     }
 
     /**

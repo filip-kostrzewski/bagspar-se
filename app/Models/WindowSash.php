@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class WindowSash extends Model
 {
@@ -41,6 +42,22 @@ class WindowSash extends Model
     public function photos(): HasMany
     {
         return $this->hasMany(SashPhoto::class, 'sash_id');
+    }
+
+    public function coverPhoto(): ?SashPhoto
+    {
+        $photos = $this->photos;
+        $latestAfter = $this->latestPhoto($photos->filter(
+            fn (SashPhoto $photo): bool => $photo->moment === 'after',
+        ));
+
+        if ($latestAfter instanceof SashPhoto) {
+            return $latestAfter;
+        }
+
+        return $this->latestPhoto($photos->filter(
+            fn (SashPhoto $photo): bool => $photo->moment !== 'after',
+        ));
     }
 
     /** @return HasMany<SashEvent, $this> */
@@ -119,5 +136,26 @@ class WindowSash extends Model
         ]);
 
         return $event;
+    }
+
+    /**
+     * @param  Collection<int, SashPhoto>  $photos
+     */
+    private function latestPhoto(Collection $photos): ?SashPhoto
+    {
+        $photo = $photos
+            ->sort(function (SashPhoto $left, SashPhoto $right): int {
+                $leftTime = $left->created_at?->getTimestamp() ?? 0;
+                $rightTime = $right->created_at?->getTimestamp() ?? 0;
+
+                if ($leftTime !== $rightTime) {
+                    return $rightTime <=> $leftTime;
+                }
+
+                return $right->getKey() <=> $left->getKey();
+            })
+            ->first();
+
+        return $photo instanceof SashPhoto ? $photo : null;
     }
 }

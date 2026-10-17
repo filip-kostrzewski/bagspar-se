@@ -54,9 +54,15 @@ class ProjectArchiveTest extends TestCase
         $this->actingAs($other)->post(route('app.projects.archive', $project), ['action' => 'archive'])->assertNotFound();
         $this->get(route('app.projects.confirm-destroy', $project))->assertNotFound();
 
+        $script = file_get_contents(public_path('js/workshop.js'));
+        $this->assertIsString($script);
+        $this->assertStringNotContainsString('window.confirm', $script);
+
         $this->actingAs($owner)->get(route('app.projects.show', $project))
             ->assertOk()
             ->assertSee('data-confirm="Arkivera projektet? Det döljs i den vanliga listan."', false)
+            ->assertSee('data-confirm-dialog', false)
+            ->assertSee('data-confirm-cancel', false)
             ->assertSee('project-danger-zone', false)
             ->assertSee('Pågående projekt', false);
 

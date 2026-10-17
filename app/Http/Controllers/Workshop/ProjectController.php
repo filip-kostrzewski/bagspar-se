@@ -63,7 +63,10 @@ class ProjectController extends Controller
     {
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
-        $sashes = $project->windowSashes()->orderBy('code')->get();
+        $sashes = $project->windowSashes()
+            ->with(['photos' => fn (HasMany $query) => $query->select(['id', 'sash_id', 'moment', 'created_at'])])
+            ->orderBy('code')
+            ->get();
         $customers = $workshop->customers()->orderBy('name')->orderBy('id')->get();
         $project->load('customer');
 
@@ -103,8 +106,10 @@ class ProjectController extends Controller
         $validated = $this->withCustomer($workshop, $request, $validated);
         $project->update($validated);
         $sent = app(ReadyCustomerNotifier::class)->sync($project);
-        $message = $sent
-            ? 'Projektet har uppdaterats. Kunden har fått ett mejl om att alla bågar är klara.'
+        $message = $request->input('form_context') === 'project'
+            ? ($sent
+                ? 'Sparat. Kunden har fått ett mejl om att alla bågar är klara.'
+                : 'Sparat')
             : 'Projektet har uppdaterats.';
 
         return back()->with('status', $message);

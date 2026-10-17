@@ -13,7 +13,7 @@
         @endforeach
         <option value="new" @selected($selectedCustomerId === 'new')>+ Ny kund</option>
     </select>
-    <div id="{{ $prefix }}customer-list" class="customer-combobox__list" data-customer-list role="listbox" hidden></div>
+    <div id="{{ $prefix }}customer-list" class="customer-combobox__list" data-customer-list role="listbox" aria-label="Kunder" hidden></div>
     <div class="customer-combobox__new">
         <div class="form-field">
             <label for="{{ $prefix }}new-customer-name">Namn</label>
