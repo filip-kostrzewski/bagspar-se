@@ -163,15 +163,18 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->get(route('app.projects.show', $otherProject))->assertNotFound();
         $this->get(route('app.projects.report', $otherProject))->assertNotFound();
+        $this->get(route('app.projects.labels', $otherProject))->assertNotFound();
         $this->patch(route('app.projects.update', $otherProject), ['status' => 'completed'])->assertNotFound();
         $this->post(route('app.sashes.store', $otherProject), ['code' => 'FORBIDDEN'])->assertNotFound();
         $this->get(route('app.sashes.show', [$otherProject, $otherSash]))->assertNotFound();
+        $this->get(route('app.sashes.label', [$otherProject, $otherSash]))->assertNotFound();
         $this->patch(route('app.sashes.update', [$otherProject, $otherSash]), ['stage' => 'ready'])->assertNotFound();
         $this->post(route('app.sashes.photos.store', [$otherProject, $otherSash]), [
             'photo' => UploadedFile::fake()->image('private.jpg', 80, 60),
         ])->assertNotFound();
         $this->get(route('app.sashes.photos.show', [$otherProject, $otherSash, $otherPhoto]))->assertNotFound();
         $this->get(route('app.sashes.show', [$ownProject, $otherSash]))->assertNotFound();
+        $this->get(route('app.sashes.label', [$ownProject, $otherSash]))->assertNotFound();
         $this->get(route('app.sashes.photos.show', [$ownProject, $ownSash, $otherPhoto]))->assertNotFound();
 
         $this->assertDatabaseCount('sash_photos', 1);
@@ -187,10 +190,12 @@ class WorkshopWorkspaceTest extends TestCase
         $this->actingAs($owner)
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'photo' => UploadedFile::fake()->image('before.jpg', 120, 90),
+                'moment' => 'before',
             ])
             ->assertRedirect();
 
         $photo = $sash->photos()->firstOrFail();
+        $this->assertSame('before', $photo->moment);
         $this->assertSame('before.jpg', $photo->original_filename);
         $this->assertSame('image/webp', $photo->mime_type);
         $this->assertStringEndsWith('.webp', $photo->path);
@@ -229,7 +234,10 @@ class WorkshopWorkspaceTest extends TestCase
         $this->get(route('app.projects.report', $project))
             ->assertOk()
             ->assertSee('<dd>2026-10-16</dd>', false)
-            ->assertSee('Rapport från Bågspår · 2026-10-16', false);
+            ->assertSee('class="report-footer__product">Bågspår</span>', false)
+            ->assertSee('2026-10-16', false)
+            ->assertDontSee('window.webp', false)
+            ->assertDontSee('Rapport från Bågspår', false);
     }
 
     public function test_jpeg_exif_orientations_are_applied_and_metadata_is_stripped(): void
@@ -256,6 +264,7 @@ class WorkshopWorkspaceTest extends TestCase
 
             $this->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'photo' => UploadedFile::fake()->createWithContent('oriented-'.$orientation.'.jpg', $source),
+                'moment' => 'after',
             ])->assertRedirect();
 
             $photo = $sash->photos()->latest('id')->firstOrFail();
@@ -287,11 +296,13 @@ class WorkshopWorkspaceTest extends TestCase
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'photo' => UploadedFile::fake()->create('unsafe.svg', 1, 'image/svg+xml'),
+                'moment' => 'before',
             ])->assertSessionHasErrors('photo');
 
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'photo' => UploadedFile::fake()->image('too-wide.jpg', 6001, 1),
+                'moment' => 'before',
             ])->assertSessionHasErrors('photo');
 
         for ($index = 0; $index < 20; $index++) {
@@ -308,9 +319,32 @@ class WorkshopWorkspaceTest extends TestCase
         $this->from(route('app.sashes.show', [$project, $sash]))
             ->post(route('app.sashes.photos.store', [$project, $sash]), [
                 'photo' => UploadedFile::fake()->image('too-many.jpg', 80, 60),
+                'moment' => 'before',
             ])->assertSessionHasErrors('photo');
 
         $this->assertDatabaseCount('sash_photos', 20);
+    }
+
+    public function test_photo_upload_requires_a_before_or_after_moment(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $this->actingAs($owner);
+
+        $this->from(route('app.sashes.show', [$project, $sash]))
+            ->post(route('app.sashes.photos.store', [$project, $sash]), [
+                'photo' => UploadedFile::fake()->image('missing-moment.jpg', 80, 60),
+            ])->assertSessionHasErrors(['moment' => 'Välj om bilden är tagen före eller efter.']);
+
+        $this->from(route('app.sashes.show', [$project, $sash]))
+            ->post(route('app.sashes.photos.store', [$project, $sash]), [
+                'photo' => UploadedFile::fake()->image('unknown-moment.jpg', 80, 60),
+                'moment' => 'during',
+            ])->assertSessionHasErrors(['moment' => 'Välj före eller efter.']);
+
+        $this->assertDatabaseCount('sash_photos', 0);
     }
 
     public function test_guest_cannot_open_private_workshop_routes_or_photo_urls(): void
@@ -322,6 +356,9 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->get(route('app.dashboard'))->assertRedirect(route('login'));
         $this->get(route('app.projects.report', $project))->assertRedirect(route('login'));
+        $this->get(route('app.projects.labels', $project))->assertRedirect(route('login'));
+        $this->get(route('app.sashes.label', [$project, $sash]))->assertRedirect(route('login'));
+        $this->get(route('app.settings.edit'))->assertRedirect(route('login'));
         $this->get(route('app.sashes.qr', [$project, $sash]))->assertRedirect(route('login'));
         $this->get(route('app.sashes.photos.show', [$project, $sash, $photo]))->assertRedirect(route('login'));
     }

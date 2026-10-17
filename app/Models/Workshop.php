@@ -14,6 +14,10 @@ class Workshop extends Model
 
     protected $fillable = [
         'name',
+        'organization_number',
+        'contact_email',
+        'address',
+        'logo_path',
         'trial_ends_at',
     ];
 
@@ -22,6 +26,11 @@ class Workshop extends Model
         return [
             'trial_ends_at' => 'datetime',
         ];
+    }
+
+    public function hasLogo(): bool
+    {
+        return is_string($this->logo_path) && $this->logo_path !== '';
     }
 
     /** @return HasMany<User, $this> */

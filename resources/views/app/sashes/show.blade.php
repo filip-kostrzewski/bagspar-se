@@ -49,8 +49,7 @@
                 </div>
             </div>
             <div class="sash-hero__actions no-print">
-                <button class="workshop-button workshop-button--secondary" type="button" data-print-label>Skriv ut etikett</button>
-                <p class="visually-hidden" role="status" aria-live="polite" data-label-print-status></p>
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.sashes.label', [$project, $sash]) }}">Skriv ut etikett</a>
             </div>
         </section>
 
@@ -214,6 +213,19 @@
                     @csrf
                     <input type="hidden" name="form_context" value="photo">
                     <div class="form-field">
+                        <label for="moment">Tillfälle</label>
+                        <select id="moment" name="moment" required @if ($errors->has('moment') && old('form_context') === 'photo') aria-invalid="true" aria-describedby="moment-error" @endif>
+                            <option value="" @selected(! in_array(old('moment'), ['before', 'after'], true))>Välj före eller efter</option>
+                            <option value="before" @selected(old('moment') === 'before')>Före</option>
+                            <option value="after" @selected(old('moment') === 'after')>Efter</option>
+                        </select>
+                        @error('moment')
+                            @if (old('form_context') === 'photo')
+                                <p class="form-field__error" id="moment-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
+                    <div class="form-field">
                         <label for="photo">Välj bild</label>
                         <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required @if ($errors->has('photo')) aria-invalid="true" aria-describedby="photo-error" @endif>
                         @error('photo')
@@ -230,28 +242,5 @@
             @endif
             </section>
         </div>
-
-        <aside class="workshop-label-print" aria-label="Utskrivbar arbetskortsetikett">
-            <img
-                class="workshop-label-print__qr"
-                src="{{ route('app.sashes.qr', [$project, $sash]) }}"
-                alt=""
-                width="160"
-                height="160"
-            >
-            <div class="workshop-label-print__details">
-                <div class="workshop-label-print__brand">
-                    <img src="{{ asset('images/bagspar-mark.svg') }}" alt="" width="28" height="28">
-                    <span>Bågspår</span>
-                </div>
-                <p class="workshop-label-print__eyebrow">ARBETSKORT</p>
-                <h2>{{ $sash->code }}</h2>
-                <p class="workshop-label-print__project">{{ $project->name }}</p>
-                @if ($sash->room || $sash->location)
-                    <p class="workshop-label-print__location">{{ collect([$sash->room, $sash->location])->filter()->join(' · ') }}</p>
-                @endif
-                <p class="workshop-label-print__login">Skanning kräver inloggning till verkstaden.</p>
-            </div>
-        </aside>
     </div>
 @endsection

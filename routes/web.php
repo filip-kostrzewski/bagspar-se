@@ -11,10 +11,12 @@ use App\Http\Controllers\PilotLeadController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Workshop\DashboardController;
+use App\Http\Controllers\Workshop\LabelPrintController;
 use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
 use App\Http\Controllers\Workshop\WindowSashController;
+use App\Http\Controllers\Workshop\WorkshopSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -68,14 +70,19 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app')->name('app.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/installningar', [WorkshopSettingsController::class, 'edit'])->name('settings.edit');
+    Route::patch('/installningar', [WorkshopSettingsController::class, 'update'])->name('settings.update');
+    Route::get('/installningar/logotyp', [WorkshopSettingsController::class, 'logo'])->name('settings.logo');
     Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');
+    Route::get('/projekt/{project}/etiketter', [LabelPrintController::class, 'sheet'])->whereNumber('project')->name('projects.labels');
     Route::get('/projekt/{project}', [ProjectController::class, 'show'])->whereNumber('project')->name('projects.show');
     Route::patch('/projekt/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('projects.update');
     Route::get('/projekt/{project}/bagar/nytt', [WindowSashController::class, 'create'])->whereNumber('project')->name('sashes.create');
     Route::post('/projekt/{project}/bagar', [WindowSashController::class, 'store'])->whereNumber('project')->name('sashes.store');
     Route::get('/projekt/{project}/bagar/{sash}/qr', SashQrCodeController::class)->whereNumber(['project', 'sash'])->name('sashes.qr');
+    Route::get('/projekt/{project}/bagar/{sash}/etikett', [LabelPrintController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.label');
     Route::get('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.show');
     Route::patch('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'update'])->whereNumber(['project', 'sash'])->name('sashes.update');
     Route::post('/projekt/{project}/bagar/{sash}/bilder', [SashPhotoController::class, 'store'])->middleware('throttle:10,1')->whereNumber(['project', 'sash'])->name('sashes.photos.store');

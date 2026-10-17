@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -85,7 +86,10 @@ class ProjectController extends Controller
     {
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
-        $sashes = $project->windowSashes()->with('photos')->orderBy('code')->get();
+        $sashes = $project->windowSashes()
+            ->with(['photos' => fn (HasMany $query) => $query->orderBy('created_at')->orderBy('id')])
+            ->orderBy('code')
+            ->get();
 
         return view('app.projects.report', compact('workshop', 'project', 'sashes'));
     }

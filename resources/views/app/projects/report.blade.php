@@ -16,9 +16,22 @@
         </nav>
 
         <header class="report-header">
-            <div class="report-header__brand">
-                <img src="{{ asset('images/bagspar-mark.svg') }}" alt="" width="42" height="42">
-                <span>Bågspår</span>
+            <div class="report-workshop">
+                @if ($workshop->hasLogo())
+                    <img class="report-workshop__logo" src="{{ route('app.settings.logo') }}" alt="" width="72" height="72">
+                @endif
+                <div>
+                    <p class="report-workshop__name">{{ $workshop->name }}</p>
+                    @if ($workshop->organization_number)
+                        <p class="report-workshop__contact">Org.nr {{ $workshop->organization_number }}</p>
+                    @endif
+                    @if ($workshop->contact_email)
+                        <p class="report-workshop__contact">{{ $workshop->contact_email }}</p>
+                    @endif
+                    @if ($workshop->address)
+                        <p class="report-workshop__contact">{{ $workshop->address }}</p>
+                    @endif
+                </div>
             </div>
             <div class="report-header__actions no-print">
                 <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.show', $project) }}">Till projektet</a>
@@ -73,12 +86,8 @@
                                 <h3>{{ $sash->code }}</h3>
                                 <p class="report-sash__location">{{ collect([$sash->room, $sash->location])->filter()->join(' · ') ?: 'Plats inte angiven' }}</p>
                             </div>
-                            <span class="report-sash__stage">
-                                @include('partials.workshop.stage-icon', ['stage' => $sash->stage])
-                                @include('partials.workshop.stage-label', ['stage' => $sash->stage])
-                            </span>
+                            <p class="report-sash__state">@include('partials.workshop.stage-label', ['stage' => $sash->stage])</p>
                         </header>
-                        @include('partials.workshop.stage-tracker', ['currentStage' => $sash->stage])
                         @if ($sash->notes)
                             <div class="report-sash__notes">
                                 <h4>Arbetsanteckningar</h4>
@@ -89,8 +98,8 @@
                             <div class="report-photo-grid" aria-label="Bilder för båge {{ $sash->code }}">
                                 @foreach ($sash->photos as $photo)
                                     <figure>
-                                        <img src="{{ route('app.sashes.photos.show', [$project, $sash, $photo]) }}" alt="{{ $photo->original_filename ?? 'Foto' }} för båge {{ $sash->code }}" loading="eager">
-                                        <figcaption>{{ $photo->original_filename ?? 'Foto' }}</figcaption>
+                                        <img src="{{ route('app.sashes.photos.show', [$project, $sash, $photo]) }}" alt="{{ $photo->documentMomentLabel() ?? 'Foto' }} för båge {{ $sash->code }}" width="640" height="480" loading="eager" decoding="sync">
+                                        <figcaption>{{ $photo->documentCaption() }}</figcaption>
                                     </figure>
                                 @endforeach
                             </div>
@@ -101,8 +110,8 @@
         @endif
 
         <footer class="report-footer">
-            <span>{{ $workshop->name }}</span>
-            <span>Rapport från Bågspår · {{ now()->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
+            <span class="report-footer__product">Bågspår</span>
+            <span>{{ now()->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
         </footer>
     </div>
 @endsection

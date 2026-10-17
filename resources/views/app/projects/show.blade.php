@@ -50,6 +50,7 @@
             </div>
             <div class="project-hero__actions no-print">
                 <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.report', $project) }}">Visa projektrapport</a>
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.labels', $project) }}">Skriv ut etiketter</a>
                 <form method="POST" action="{{ route('app.projects.update', $project) }}">
                     @csrf
                     @method('PATCH')

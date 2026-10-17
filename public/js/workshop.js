@@ -76,21 +76,16 @@ document.querySelectorAll('[data-print-report]').forEach((button) => {
     });
 });
 
-document.querySelectorAll('[data-print-label]').forEach((button) => {
+document.querySelectorAll('[data-print-labels]').forEach((button) => {
     button.addEventListener('click', async () => {
-        const qrImage = document.querySelector('.workshop-label-print__qr');
+        const qrImages = [...document.querySelectorAll('.print-label__qr')];
         const status = document.querySelector('[data-label-print-status]');
         const originalButtonText = button.textContent;
 
         button.disabled = true;
         button.textContent = 'Förbereder etikett…';
 
-        const imageIsReady = await new Promise((resolve) => {
-            if (!qrImage) {
-                resolve(false);
-                return;
-            }
-
+        const imagesAreReady = await Promise.all(qrImages.map((qrImage) => new Promise((resolve) => {
             if (qrImage.complete) {
                 resolve(qrImage.naturalWidth > 0);
                 return;
@@ -98,9 +93,9 @@ document.querySelectorAll('[data-print-label]').forEach((button) => {
 
             qrImage.addEventListener('load', () => resolve(qrImage.naturalWidth > 0), { once: true });
             qrImage.addEventListener('error', () => resolve(false), { once: true });
-        });
+        })));
 
-        if (!imageIsReady) {
+        if (qrImages.length === 0 || imagesAreReady.some((ready) => !ready)) {
             if (status) {
                 status.textContent = 'QR-koden kunde inte laddas. Kontrollera anslutningen och försök igen.';
             }
@@ -109,26 +104,13 @@ document.querySelectorAll('[data-print-label]').forEach((button) => {
             return;
         }
 
-        try {
-            await qrImage.decode();
-        } catch {
-            if (status) {
-                status.textContent = 'QR-koden kunde inte laddas. Kontrollera anslutningen och försök igen.';
-            }
-            button.disabled = false;
-            button.textContent = originalButtonText;
-            return;
-        }
+        await Promise.all(qrImages.map((qrImage) => qrImage.decode().catch(() => undefined)));
 
         if (status) {
             status.textContent = '';
         }
         button.disabled = false;
         button.textContent = originalButtonText;
-        document.body.classList.add('is-label-printing');
-        window.addEventListener('afterprint', () => {
-            document.body.classList.remove('is-label-printing');
-        }, { once: true });
         window.print();
     });
 });

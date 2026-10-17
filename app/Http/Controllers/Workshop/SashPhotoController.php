@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -29,7 +30,10 @@ class SashPhotoController extends Controller
         $sash = $this->sashForProject($project, $sash);
         $validated = $request->validate([
             'photo' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:max_width=6000,max_height=6000'],
+            'moment' => ['required', Rule::in(SashPhoto::MOMENTS)],
         ], [
+            'moment.required' => 'Välj om bilden är tagen före eller efter.',
+            'moment.in' => 'Välj före eller efter.',
             'photo.required' => 'Välj en bild att ladda upp.',
             'photo.file' => 'Filen kunde inte läsas som en uppladdad bild.',
             'photo.image' => 'Filen måste vara en bild.',
@@ -58,7 +62,7 @@ class SashPhotoController extends Controller
         $path = null;
 
         try {
-            DB::transaction(function () use ($file, $project, $sash, $webp, &$path): void {
+            DB::transaction(function () use ($file, $project, $sash, $validated, $webp, &$path): void {
                 $lockedSash = WindowSash::query()->lockForUpdate()->findOrFail($sash->getKey());
 
                 if ($lockedSash->photos()->count() >= self::MAX_PHOTOS_PER_SASH) {
@@ -72,6 +76,7 @@ class SashPhotoController extends Controller
 
                 $lockedSash->photos()->create([
                     'path' => $path,
+                    'moment' => $validated['moment'],
                     'original_filename' => $this->safeOriginalFilename($file->getClientOriginalName()),
                     'mime_type' => 'image/webp',
                     'size' => strlen($webp),
