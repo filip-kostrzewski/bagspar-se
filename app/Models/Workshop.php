@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\WorkshopLogo;
 use Database\Factories\WorkshopFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ class Workshop extends Model
 
     public function hasLogo(): bool
     {
-        return is_string($this->logo_path) && $this->logo_path !== '';
+        return WorkshopLogo::visible($this) !== null;
     }
 
     /** @return HasMany<User, $this> */

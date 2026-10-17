@@ -85,6 +85,8 @@
                 <span id="logo-label">Logotyp</span>
                 @if ($workshop->hasLogo())
                     <img class="settings-logo-preview" src="{{ route('app.settings.logo') }}" alt="Nuvarande logotyp för {{ $workshop->name }}" width="72" height="72">
+                @else
+                    <p class="settings-logo-empty">Ingen logotyp</p>
                 @endif
                 <div class="file-picker">
                     <label class="visually-hidden" for="logo">Logotypfil</label>

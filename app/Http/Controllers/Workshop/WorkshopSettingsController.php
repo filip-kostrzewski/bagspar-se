@@ -7,6 +7,7 @@ use App\Models\Workshop;
 use App\Support\Kronor;
 use App\Support\PrivateImageResponse;
 use App\Support\SwedishPhone;
+use App\Support\WorkshopLogo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -131,13 +132,10 @@ class WorkshopSettingsController extends Controller
 
     public function logo(Request $request): Response
     {
-        $workshop = $this->currentWorkshop($request);
-        $path = $workshop->logo_path;
-        $prefix = 'workshop-logos/'.$workshop->getKey().'/';
+        $image = WorkshopLogo::visible($this->currentWorkshop($request));
+        abort_if($image === null, 404);
 
-        abort_unless(is_string($path) && str_starts_with($path, $prefix), 404);
-
-        return PrivateImageResponse::make($path, 'image/webp');
+        return PrivateImageResponse::fromBytes($image['bytes'], $image['mime']);
     }
 
     private function storeLogo(Workshop $workshop, string $sourcePath): string

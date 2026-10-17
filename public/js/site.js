@@ -104,14 +104,8 @@ if (workflow instanceof HTMLElement) {
                     }
                 });
 
-                image.alt = imageAlt;
                 image.classList.add('is-changing');
-                const finishImageTransition = () => {
-                    window.requestAnimationFrame(() => image.classList.remove('is-changing'));
-                };
-
-                image.addEventListener('load', finishImageTransition, { once: true });
-                image.addEventListener('error', finishImageTransition, { once: true });
+                image.alt = imageAlt;
                 image.loading = 'eager';
                 if (imageWidth > 0) {
                     image.width = imageWidth;
@@ -119,15 +113,19 @@ if (workflow instanceof HTMLElement) {
                 if (imageHeight > 0) {
                     image.height = imageHeight;
                 }
-                image.srcset = '';
-                image.src = fullImage;
+
+                const revealNextImage = () => {
+                    image.classList.remove('is-changing');
+                };
+
+                image.addEventListener('load', revealNextImage, { once: true });
+                image.addEventListener('error', revealNextImage, { once: true });
                 image.srcset = `${smallImage} ${smallImageWidth || 600}w, ${fullImage} ${imageWidth}w`;
+                image.src = fullImage;
 
                 if (image.complete && image.naturalWidth > 0) {
-                    finishImageTransition();
+                    revealNextImage();
                 }
-
-                window.setTimeout(finishImageTransition, 500);
             });
         });
 

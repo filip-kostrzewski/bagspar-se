@@ -3392,6 +3392,20 @@ body.label-print-sheet {
     object-fit: contain;
 }
 
+.settings-logo-empty {
+    margin: 0 0 10px;
+    color: var(--ink-soft);
+    font-size: 14px;
+}
+
+.client-status .report-sashes {
+    padding-top: 0;
+}
+
+.client-status .report-sash:first-child {
+    border-top: 0;
+}
+
 .password-field {
     display: flex;
     align-items: center;

@@ -15,6 +15,7 @@
         .sash { margin-top: 14px; page-break-inside: avoid; }
         .photo { margin: 6px 8px 0 0; }
         img { max-width: 220px; }
+        .keep-together, .keep-together tr, .keep-together td { page-break-inside: avoid; }
     </style>
 </head>
 <body>
@@ -126,14 +127,21 @@
     @endforelse
 
     @if (is_string($clientStatusUrl))
-        <h2>Status för kunden</h2>
-        @if (is_string($clientStatusQrImage) && $clientStatusQrImage !== '')
-            <p>Skanna koden för att se etapperna och bilderna före och efter. Anteckningar ingår inte.</p>
-            <p><img src="{{ $clientStatusQrImage }}" alt="QR-kod till kundens status" width="160" height="160"></p>
-        @endif
-        <p>{{ $clientStatusUrl }}</p>
+        <table class="keep-together" width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td style="page-break-inside: avoid; height: 360px;">
+                    <h2>Status för kunden</h2>
+                    @if (is_string($clientStatusQrImage) && $clientStatusQrImage !== '')
+                        <p>Skanna koden för att se etapperna och bilderna före och efter. Anteckningar ingår inte.</p>
+                        <p><img src="{{ $clientStatusQrImage }}" alt="QR-kod till kundens status" width="160" height="160"></p>
+                    @endif
+                    <p><a href="{{ $clientStatusUrl }}">{{ $clientStatusUrl }}</a></p>
+                    <p class="muted">Bågspår · {{ \App\Support\SwedishDate::format(now()->timezone('Europe/Stockholm')) }}</p>
+                </td>
+            </tr>
+        </table>
+    @else
+        <p class="muted">Bågspår · {{ \App\Support\SwedishDate::format(now()->timezone('Europe/Stockholm')) }}</p>
     @endif
-
-    <p class="muted">Bågspår · {{ \App\Support\SwedishDate::format(now()->timezone('Europe/Stockholm')) }}</p>
 </body>
 </html>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\SashPhoto;
 use App\Support\PrivateImageResponse;
+use App\Support\WorkshopLogo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,13 +37,10 @@ class ClientStatusController extends Controller
 
     public function logo(string $token): Response
     {
-        $project = $this->projectForToken($token);
-        $workshop = $project->workshop()->firstOrFail();
-        $path = $workshop->logo_path;
-        $prefix = 'workshop-logos/'.$workshop->getKey().'/';
-        abort_unless(is_string($path) && str_starts_with($path, $prefix), 404);
+        $image = WorkshopLogo::visible($this->projectForToken($token)->workshop()->firstOrFail());
+        abort_if($image === null, 404);
 
-        return PrivateImageResponse::make($path, 'image/webp');
+        return PrivateImageResponse::fromBytes($image['bytes'], $image['mime']);
     }
 
     private function projectForToken(string $token): Project

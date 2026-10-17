@@ -15,6 +15,13 @@ final class PrivateImageResponse
         $bytes = $disk->get($path);
         abort_if(! is_string($bytes) || $bytes === '', 404);
 
+        return self::fromBytes($bytes, $contentType);
+    }
+
+    public static function fromBytes(string $bytes, string $contentType): Response
+    {
+        abort_if($bytes === '', 404);
+
         return response($bytes, 200, [
             'Content-Type' => $contentType,
             'Content-Disposition' => 'inline',

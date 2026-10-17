@@ -218,6 +218,7 @@ class ClientStatusTest extends TestCase
         $this->assertIsString($css);
         $this->assertMatchesRegularExpression('/\.report-workshop\s*\{[^}]*display:\s*block/', $css);
         $this->assertStringContainsString('.report-workshop:has(.report-workshop__logo)', $css);
+        $this->assertMatchesRegularExpression('/\.client-status \.report-sash:first-child\s*\{[^}]*border-top:\s*0/', $css);
 
         $owner->workshop->update(['phone' => '+46701234567']);
 
@@ -229,5 +230,34 @@ class ClientStatusTest extends TestCase
             ->get(route('app.projects.report', $project))
             ->assertOk()
             ->assertSee('<a href="tel:+46701234567">070-123 45 67</a>', false);
+    }
+
+    public function test_a_broken_logo_file_leaves_no_gap_on_the_status_page(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $path = 'workshop-logos/'.$owner->workshop->getKey().'/tom.webp';
+        Storage::disk('local')->put($path, 'inte-en-bild');
+        $owner->workshop->update(['name' => 'Ekens Fönster', 'logo_path' => $path]);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Villa Ek',
+        ]);
+        $project->forceFill([
+            'client_status_enabled' => true,
+            'client_status_token' => str_repeat('f', 48),
+        ])->save();
+        WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'B-1',
+        ]);
+
+        $this->get(route('client-status.show', ['token' => str_repeat('f', 48)]))
+            ->assertOk()
+            ->assertDontSee('report-workshop__logo', false)
+            ->assertSee('Ekens Fönster', false);
+
+        $this->get(route('client-status.logo', ['token' => str_repeat('f', 48)]))
+            ->assertNotFound();
     }
 }

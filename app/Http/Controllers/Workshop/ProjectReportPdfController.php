@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Support\EmbeddedImage;
 use App\Support\PdfDocument;
 use App\Support\ProjectReport;
+use App\Support\WorkshopLogo;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,7 +36,9 @@ class ProjectReportPdfController extends Controller
         }
 
         $data['photoEmbeds'] = $embeds;
-        $data['logoEmbed'] = EmbeddedImage::jpegDataUri($workshop->logo_path, 'workshop-logos/'.$workshop->getKey().'/');
+        $data['logoEmbed'] = WorkshopLogo::visible($workshop) === null
+            ? null
+            : EmbeddedImage::jpegDataUri($workshop->logo_path, 'workshop-logos/'.$workshop->getKey().'/');
         $html = view('app.projects.report-pdf', $data)->render();
         $name = PdfDocument::filename($project->name.'-rapport.pdf');
 

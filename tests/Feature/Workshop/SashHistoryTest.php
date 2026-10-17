@@ -81,7 +81,8 @@ class SashHistoryTest extends TestCase
             'location' => 'Innerbåge',
             'stage' => 'received',
             'notes' => '',
-        ])->assertRedirect();
+        ])->assertRedirect()
+            ->assertSessionHas('status', 'Inga ändringar');
 
         $sash->refresh();
         $this->assertSame('received', $sash->stage);

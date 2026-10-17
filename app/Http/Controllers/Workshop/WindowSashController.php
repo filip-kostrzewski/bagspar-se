@@ -116,6 +116,18 @@ class WindowSashController extends Controller
         $stageChanged = is_string($incomingStage) && $incomingStage !== $previousStage;
         $notesChanged = array_key_exists('notes', $validated)
             && $this->normalizedNote($validated['notes']) !== $previousNotes;
+        $detailsChanged = false;
+
+        foreach (['code', 'room', 'location'] as $field) {
+            if (array_key_exists($field, $validated) && $this->normalizedNote($validated[$field]) !== $this->normalizedNote($sash->{$field})) {
+                $detailsChanged = true;
+            }
+        }
+
+        if (! $stageChanged && ! $notesChanged && ! $detailsChanged) {
+            return back()->with('status', 'Inga ändringar');
+        }
+
         $sash->update($validated);
         $actor = $request->user();
 

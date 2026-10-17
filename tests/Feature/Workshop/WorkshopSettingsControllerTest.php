@@ -26,7 +26,8 @@ class WorkshopSettingsControllerTest extends TestCase
             ->assertSee('Telefon', false)
             ->assertSee('name="address"', false)
             ->assertSee('data-file-picker="logo"', false)
-            ->assertSee('Välj bild', false);
+            ->assertSee('Välj bild', false)
+            ->assertSee('Ingen logotyp', false);
 
         $css = file_get_contents(public_path('css/workshop.css'));
         $this->assertIsString($css);
@@ -184,6 +185,70 @@ class WorkshopSettingsControllerTest extends TestCase
 
         $this->assertNull($owner->workshop->fresh()->logo_path);
         Storage::disk('local')->assertMissing($workshop->logo_path);
+    }
+
+    public function test_a_broken_or_invisible_logo_is_not_shown(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $workshop = $owner->workshop;
+        $brokenPath = 'workshop-logos/'.$workshop->getKey().'/broken.webp';
+        Storage::disk('local')->put($brokenPath, 'inte-en-bild');
+        $workshop->update(['logo_path' => $brokenPath]);
+
+        $this->actingAs($owner)
+            ->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('Ingen logotyp', false)
+            ->assertDontSee('settings-logo-preview', false);
+
+        $this->get(route('app.settings.logo'))->assertNotFound();
+
+        $transparent = imagecreatetruecolor(24, 24);
+        imagealphablending($transparent, false);
+        imagesavealpha($transparent, true);
+        $clear = imagecolorallocatealpha($transparent, 0, 0, 0, 127);
+        imagefilledrectangle($transparent, 0, 0, 24, 24, $clear === false ? 0 : $clear);
+        ob_start();
+        imagewebp($transparent);
+        $webp = ob_get_clean();
+        imagedestroy($transparent);
+        $this->assertIsString($webp);
+        Storage::disk('local')->put($brokenPath, $webp);
+
+        $this->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('Ingen logotyp', false)
+            ->assertDontSee('settings-logo-preview', false);
+        $this->get(route('app.settings.logo'))->assertNotFound();
+    }
+
+    public function test_a_logo_is_served_with_its_real_image_type(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $image = imagecreatetruecolor(30, 20);
+        $red = imagecolorallocate($image, 180, 30, 30);
+        imagefilledrectangle($image, 0, 0, 30, 20, $red === false ? 0 : $red);
+        ob_start();
+        imagejpeg($image, null, 90);
+        $jpeg = ob_get_clean();
+        imagedestroy($image);
+        $this->assertIsString($jpeg);
+
+        $path = 'workshop-logos/'.$owner->workshop->getKey().'/logo.webp';
+        Storage::disk('local')->put($path, $jpeg);
+        $owner->workshop->update(['logo_path' => $path]);
+
+        $this->actingAs($owner)
+            ->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('settings-logo-preview', false)
+            ->assertDontSee('Ingen logotyp', false);
+
+        $response = $this->get(route('app.settings.logo'));
+        $response->assertOk()->assertHeader('Content-Type', 'image/jpeg');
+        $this->assertStringStartsWith("\xFF\xD8\xFF", (string) $response->getContent());
     }
 
     public function test_owner_can_save_and_clear_an_optional_hourly_rate(): void

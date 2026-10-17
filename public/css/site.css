@@ -2708,8 +2708,8 @@ html.cookie-choice-saved .cookie-banner {
 }
 
 .atelier-photo__image.is-changing {
-    opacity: 0.62;
-    transform: scale(0.99);
+    opacity: 0;
+    transition: none;
 }
 
 .atelier-photo__light {
