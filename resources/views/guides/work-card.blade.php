@@ -38,7 +38,7 @@
         <p>Rubriken är bågens nummer, till exempel 2-KÖK-F1-B2, och platsen i klartext: våning 2, kök, vänster innerbåge. Efter inloggning ser den som öppnar kortet båda. Numret räcker när lappen sitter kvar. Klartexten räcker när någon läser listan i verkstaden utan att ha bågen framför sig.</p>
 
         <h3>QR-kod</h3>
-        <p>Skriv ut en QR-etikett direkt från arbetskortet. När någon skannar den öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot. Etiketten visar också bågens nummer, så att den går att identifiera utan att skanna.</p>
+        <p>Skriv ut en QR-etikett direkt från arbetskortet. När någon skannar den öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot. Etiketten visar också bågens nummer, så att den går att identifiera utan att skanna. Kunden får en separat statuslänk utan anteckningar.</p>
 
         <h3>Anteckningar</h3>
         <p>Skriv korta rader: glaset tas ur, gångjärn saknas, kulör inte vald, kitt lagt så måla inte idag. Den som läser ska kunna handla på meningen utan era interna förkortningar.</p>

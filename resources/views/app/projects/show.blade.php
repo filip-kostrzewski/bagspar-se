@@ -61,6 +61,38 @@
             </div>
         </section>
 
+        <section class="client-status-share" aria-labelledby="client-status-title">
+            <p class="workshop-eyebrow">TILL KUNDEN</p>
+            <h2 class="workshop-section-heading" id="client-status-title">Statuslänk</h2>
+            <p>Länken visar verkstadens namn och kontakt, bågarnas etapp och bilder före och efter. Anteckningar följer inte med. QR-koden på etiketten är fortfarande bara för personalen.</p>
+            @if ($project->clientStatusIsPublic())
+                <div class="copy-link-control">
+                    <label class="visually-hidden" for="client-status-url">Kundens statuslänk</label>
+                    <input id="client-status-url" type="url" value="{{ route('client-status.show', ['token' => $project->client_status_token]) }}" readonly>
+                    <button class="workshop-button workshop-button--quiet" type="button" data-copy-link="client-status-url">Kopiera</button>
+                </div>
+                <p class="copy-link-control__status" aria-live="polite" data-copy-status></p>
+                <div class="client-status-share__actions">
+                    <form method="POST" action="{{ route('app.projects.client-status.update', $project) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="rotate">
+                        <button class="workshop-button workshop-button--quiet" type="submit">Skapa ny länk</button>
+                    </form>
+                    <form method="POST" action="{{ route('app.projects.client-status.update', $project) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="disable">
+                        <button class="workshop-button workshop-button--secondary" type="submit">Stäng av statuslänk</button>
+                    </form>
+                </div>
+            @else
+                <form method="POST" action="{{ route('app.projects.client-status.update', $project) }}">
+                    @csrf
+                    <input type="hidden" name="action" value="enable">
+                    <button class="workshop-button workshop-button--secondary" type="submit">Slå på statuslänk</button>
+                </form>
+            @endif
+        </section>
+
         <details class="edit-details-panel" @if (old('form_context') === 'project') open @endif>
             <summary>Redigera projektuppgifter</summary>
             <div class="edit-details-panel__body">

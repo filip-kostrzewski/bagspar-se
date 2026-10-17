@@ -179,7 +179,7 @@
                         @if ($sash->room || $sash->location)
                             <span>{{ collect([$sash->room, $sash->location])->filter()->join(' · ') }}</span>
                         @endif
-                        <p>Skanningen är till för verkstadens personal och kräver inloggning. Det finns ingen publik vy.</p>
+                        <p>Skanningen är till för verkstadens personal och kräver inloggning. Kundens status är en separat länk som slås på för projektet.</p>
                     </div>
                 </div>
                 <p class="work-card-link-panel__fallback">Om QR-koden inte kan läsas kan du kopiera länken:</p>

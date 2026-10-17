@@ -57,7 +57,7 @@
         <p>Någon skriver om numret på kortet men inte på brickan, eller tvärtom. Läs dem mot varandra när bågen lämnar verkstaden. Ett av dem ska inte vara en äldre version.</p>
 
         <h2>Lappen och QR-koden</h2>
-        <p>Lappen visar bågens nummer även med färg på händerna och utan täckning. I Bågspår skriver du ut en QR-etikett direkt från arbetskortet. När koden skannas öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot.</p>
+        <p>Lappen visar bågens nummer även med färg på händerna och utan täckning. I Bågspår skriver du ut en QR-etikett direkt från arbetskortet. När koden skannas öppnas det privata arbetskortet för bågen. Skanning kräver inloggning till verkstadskontot. Kundens statuslänk är en annan adress och visar inte arbetskortets anteckningar.</p>
         <p>Koden ersätter inte lappen. Etiketten visar också numret, så att bågen går att identifiera utan mobil eller täckning. Fäst märkningen där den överlever arbetet; kortet håller det som inte får plats på brickan.</p>
 
         @include('partials.guide-faq', ['faqs' => [

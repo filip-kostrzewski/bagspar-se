@@ -2859,6 +2859,53 @@ body.label-print-sheet {
     display: block;
 }
 
+.client-status-share,
+.report-client-status {
+    margin-top: 28px;
+}
+
+.client-status-share > p,
+.report-client-status > p {
+    max-width: 68ch;
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    line-height: 1.45;
+}
+
+.client-status-share .copy-link-control {
+    margin-top: 16px;
+}
+
+.client-status-share__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.report-client-status__qr svg {
+    display: block;
+    width: 140px;
+    height: 140px;
+    margin-top: 12px;
+}
+
+.report-client-status__url {
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+.client-status-main {
+    width: min(920px, 100%);
+    margin: 0 auto;
+    padding: 32px 0 64px;
+}
+
+.client-status__location {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+}
+
 .settings-logo-preview {
     display: block;
     width: 72px;

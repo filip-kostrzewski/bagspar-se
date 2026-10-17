@@ -28,7 +28,7 @@
     <div class="label-toolbar no-print">
         <p class="workshop-eyebrow">A4 · 62 × 29 MM</p>
         <h1 class="label-toolbar__title">Etiketter för {{ $project->name }}</h1>
-        <p>Varje ruta är 62 × 29 mm och visar QR-kod, bågens nummer, rum och projekt. Skanningen är till för verkstadens personal och kräver inloggning.</p>
+        <p>Varje ruta är 62 × 29 mm och visar QR-kod, bågens nummer, rum och projekt. Skanningen är till för verkstadens personal och kräver inloggning. Kundens status är en separat länk.</p>
         <div class="label-toolbar__actions">
             <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.show', $project) }}">Till projektet</a>
             @if ($sashes->isNotEmpty())

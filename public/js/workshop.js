@@ -41,7 +41,7 @@ document.querySelectorAll('[data-file-picker]').forEach((button) => {
 document.querySelectorAll('[data-copy-link]').forEach((button) => {
     button.addEventListener('click', async () => {
         const input = document.getElementById(button.dataset.copyLink);
-        const status = button.closest('.work-card-link-panel')?.querySelector('[data-copy-status]');
+        const status = button.closest('.work-card-link-panel, .client-status-share')?.querySelector('[data-copy-status]');
 
         if (!input) {
             return;

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ClientStatusController;
 use App\Http\Controllers\DemoSyncController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Workshop\DashboardController;
 use App\Http\Controllers\Workshop\LabelPrintController;
+use App\Http\Controllers\Workshop\ProjectClientStatusController;
 use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
@@ -58,6 +60,20 @@ Route::post('/inbjudan/{token}', [AcceptWorkshopInvitationController::class, 'st
     ->middleware('throttle:10,1')
     ->name('invitations.accept.store');
 
+Route::get('/status/{token}', [ClientStatusController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{40,80}')
+    ->middleware('throttle:60,1')
+    ->name('client-status.show');
+Route::get('/status/{token}/logotyp', [ClientStatusController::class, 'logo'])
+    ->where('token', '[A-Za-z0-9]{40,80}')
+    ->middleware('throttle:60,1')
+    ->name('client-status.logo');
+Route::get('/status/{token}/bilder/{photo}', [ClientStatusController::class, 'photo'])
+    ->where('token', '[A-Za-z0-9]{40,80}')
+    ->whereNumber('photo')
+    ->middleware('throttle:60,1')
+    ->name('client-status.photos');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/registrera', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1')->name('auth.register.store');
@@ -95,6 +111,7 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');
+    Route::post('/projekt/{project}/statuslank', [ProjectClientStatusController::class, 'update'])->whereNumber('project')->name('projects.client-status.update');
     Route::get('/projekt/{project}/etiketter', [LabelPrintController::class, 'sheet'])->whereNumber('project')->name('projects.labels');
     Route::get('/projekt/{project}', [ProjectController::class, 'show'])->whereNumber('project')->name('projects.show');
     Route::patch('/projekt/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('projects.update');

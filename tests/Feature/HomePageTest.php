@@ -35,6 +35,7 @@ class HomePageTest extends TestCase
         $response->assertDontSee('medarbetarinbjudningar', false);
         $response->assertSee('Utskrivbar QR-etikett', false);
         $response->assertSee('Öppnar det privata arbetskortet efter inloggning.', false);
+        $response->assertSee('Kunden får en separat statuslänk.', false);
         $response->assertSee('Upp till 20 per båge · högst 5 MB per foto.', false);
         $response->assertSee('Skriv ut eller spara som PDF i webbläsaren.', false);
         $response->assertDontSee('Fortsättning avtalas separat', false);

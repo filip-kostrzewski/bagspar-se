@@ -104,6 +104,15 @@
             </section>
         @endif
 
+        @if (is_string($clientStatusUrl) && is_string($clientStatusQr) && $clientStatusQr !== '')
+            <section class="report-client-status" aria-labelledby="client-status-title">
+                <h2 id="client-status-title">Status för kunden</h2>
+                <p>Skanna koden för att se etapperna och bilderna före och efter. Anteckningar ingår inte.</p>
+                <div class="report-client-status__qr">{!! $clientStatusQr !!}</div>
+                <p class="report-client-status__url">{{ $clientStatusUrl }}</p>
+            </section>
+        @endif
+
         <footer class="report-footer">
             <span class="report-footer__product">Bågspår</span>
             <span>{{ now()->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>

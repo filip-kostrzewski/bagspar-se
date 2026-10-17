@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Support\SashQrCodeRenderer;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -90,7 +91,19 @@ class ProjectController extends Controller
             ->with(['photos' => fn (HasMany $query) => $query->orderBy('created_at')->orderBy('id')])
             ->orderBy('code')
             ->get();
+        $clientStatusUrl = $project->clientStatusIsPublic()
+            ? route('client-status.show', ['token' => $project->client_status_token])
+            : null;
+        $clientStatusQr = null;
 
-        return view('app.projects.report', compact('workshop', 'project', 'sashes'));
+        if (is_string($clientStatusUrl)) {
+            $clientStatusQr = preg_replace(
+                '/^<\?xml[^>]*>\s*/',
+                '',
+                app(SashQrCodeRenderer::class)->render($clientStatusUrl),
+            );
+        }
+
+        return view('app.projects.report', compact('workshop', 'project', 'sashes', 'clientStatusUrl', 'clientStatusQr'));
     }
 }

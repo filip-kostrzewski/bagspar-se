@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -32,5 +33,24 @@ class Project extends Model
     public function windowSashes(): HasMany
     {
         return $this->hasMany(WindowSash::class);
+    }
+
+    public function clientStatusIsPublic(): bool
+    {
+        return $this->client_status_enabled
+            && is_string($this->client_status_token)
+            && $this->client_status_token !== '';
+    }
+
+    public function issueClientStatusToken(): void
+    {
+        $this->client_status_token = Str::random(48);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'client_status_enabled' => 'boolean',
+        ];
     }
 }

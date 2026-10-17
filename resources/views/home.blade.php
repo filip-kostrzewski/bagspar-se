@@ -250,7 +250,7 @@
             </figure>
             <figure data-reveal>
                 <img src="{{ asset('images/product/qr-etikett.webp') }}?v={{ $labelShotVersion }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
-                <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning.</figcaption>
+                <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning. Kunden får en separat statuslänk.</figcaption>
             </figure>
             <figure data-reveal>
                 <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2" width="1960" height="3102" loading="lazy" decoding="async">
@@ -274,7 +274,7 @@
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'tag'])</span>
-                    <span><strong>Utskrivbar QR-etikett</strong><small>Öppnar det privata arbetskortet efter inloggning.</small></span>
+                    <span><strong>Utskrivbar QR-etikett</strong><small>Öppnar det privata arbetskortet efter inloggning. Kunden får en separat statuslänk.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'lock'])</span>
