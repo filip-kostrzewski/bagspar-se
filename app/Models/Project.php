@@ -159,6 +159,7 @@ class Project extends Model
             'notify_customer_when_ready' => 'boolean',
             'customer_ready_notified_at' => 'datetime',
             'delivery_date' => 'date',
+            'delivery_approved_at' => 'datetime',
         ];
     }
 }

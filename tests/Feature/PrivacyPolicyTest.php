@@ -30,6 +30,8 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('14 dagar', false);
         $response->assertSee('Uppgifter i verkstadens konto', false);
         $response->assertSee('Bildfilerna är privata och visas via en skyddad appfunktion', false);
+        $response->assertSee('Om den som har länken godkänner leveransen sparas namnet och tidpunkten på projektet.', false);
+        $response->assertDontSee('ROT-underlag', false);
         $response->assertSee('artikel 6.1 b', false);
         $response->assertSee('Integritetsskyddsmyndigheten', false);
         $response->assertSee('mailto:kontakt@bagspar.se', false);

@@ -178,6 +178,9 @@ class GuidePageTest extends TestCase
         $response->assertSee('href="'.route('guides.marking').'"', false);
         $response->assertSee('href="'.route('guides.work-card').'"', false);
         $response->assertSee('href="'.route('guides.documentation').'"', false);
+        $response->assertSee('I Bågspår kan rapporten laddas ner som PDF eller skrivas ut.', false);
+        $response->assertDontSee('i webbläsaren', false);
+        $response->assertDontSee('ROT-underlag', false);
         $response->assertSee('Den lovar inte ett resultat', false);
         $response->assertDontSee('tänkt', false);
         $response->assertDontSee('planerat', false);

@@ -48,6 +48,16 @@
                     @if ($project->delivery_date)
                         <p><span>Beräknad leverans</span>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
                     @endif
+                    @if ($project->delivery_approved_at)
+                        <p class="project-approval"><span>Leverans godkänd</span>{{ \App\Support\SwedishDate::formatDateTime($project->delivery_approved_at) }}@if (is_string($project->delivery_approved_name) && $project->delivery_approved_name !== '') av {{ $project->delivery_approved_name }}@endif</p>
+                        @if (auth()->user()?->isOwner())
+                            <form method="POST" action="{{ route('app.projects.delivery-approval.destroy', $project) }}" data-confirm="Kundens godkännande tas bort från projektet och rapporten." data-confirm-title="Ta bort godkännandet?">
+                                @csrf
+                                @method('DELETE')
+                                <button class="workshop-button workshop-button--quiet" type="submit">Ta bort godkännande</button>
+                            </form>
+                        @endif
+                    @endif
                     <p><span>Arbetskort</span>{{ $sashCount }} {{ $sashCount === 1 ? 'båge' : 'bågar' }}</p>
                 </div>
                 @if ($project->notes)
@@ -59,6 +69,7 @@
             </div>
             <div class="project-hero__actions no-print">
                 <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.report', $project) }}">Visa projektrapport</a>
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.rot', $project) }}">ROT-underlag</a>
                 <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.labels', $project) }}">Skriv ut etiketter</a>
                 <form method="POST" action="{{ route('app.projects.update', $project) }}">
                     @csrf

@@ -41,7 +41,11 @@ class HomePageTest extends TestCase
         $response->assertSee('Öppnar det privata arbetskortet efter inloggning.', false);
         $response->assertSee('Kunden får en separat statuslänk.', false);
         $response->assertSee('Upp till 20 per båge · högst 5 MB per foto.', false);
-        $response->assertSee('Skriv ut eller spara som PDF i webbläsaren.', false);
+        $response->assertSee('Ladda ner som PDF eller skriv ut.', false);
+        $response->assertSee('Samma uppgifter, nedladdade som PDF eller utskrivna.', false);
+        $response->assertDontSee('i webbläsaren', false);
+        $response->assertDontSee('ROT-underlag', false);
+        $response->assertDontSee('Godkänn leverans', false);
         $response->assertDontSee('Fortsättning avtalas separat', false);
         $response->assertSee('2-KÖK-F1-B2', false);
         $response->assertSee('Ett exempel med testuppgifter är öppet utan konto.', false);

@@ -229,7 +229,7 @@ class WorkshopWorkspaceTest extends TestCase
         $this->actingAs($owner)
             ->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
-            ->assertSee('<span>16 okt 2026</span>', false);
+            ->assertSee('<p class="photo-card__caption">Före · 16 okt 2026</p>', false);
 
         $this->get(route('app.projects.report', $project))
             ->assertOk()
@@ -380,7 +380,7 @@ class WorkshopWorkspaceTest extends TestCase
 
         $this->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
-            ->assertSee('>Efter</strong>', false)
+            ->assertSee('class="photo-card__caption">Efter · ', false)
             ->assertSee('name="moment" type="radio" value="before" required checked', false)
             ->assertDontSee('name="moment" type="radio" value="after" checked', false);
 

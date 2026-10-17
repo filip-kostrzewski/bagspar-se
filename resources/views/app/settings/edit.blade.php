@@ -13,7 +13,7 @@
         <section class="settings-intro" aria-labelledby="page-title">
             <p class="workshop-eyebrow">PÅ PROJEKTRAPPORTEN</p>
             <h1 class="workshop-heading" id="page-title">Verkstadens uppgifter</h1>
-            <p class="workspace-lede">Namn, logotyp, kontakt och organisationsnummer visas i sidhuvudet när du skriver ut en projektrapport.</p>
+            <p class="workspace-lede">Namn, logotyp, kontakt och organisationsnummer visas i sidhuvudet när du laddar ner eller skriver ut en projektrapport.</p>
         </section>
 
         @if ($errors->any())
@@ -60,6 +60,15 @@
                 <input id="address" name="address" type="text" value="{{ is_string(old('address')) ? old('address') : $workshop->address }}" maxlength="255" autocomplete="street-address" @if ($errors->has('address')) aria-invalid="true" aria-describedby="address-error" @endif>
                 @error('address')
                     <p class="form-field__error" id="address-error">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="form-field">
+                <label for="hourly-rate">Timpris <span class="form-optional">Valfritt</span></label>
+                <input id="hourly-rate" name="hourly_rate" type="text" inputmode="decimal" value="{{ is_string(old('hourly_rate')) ? old('hourly_rate') : ($workshop->hourly_rate_ore !== null ? \App\Support\Kronor::input($workshop->hourly_rate_ore) : '') }}" @if ($errors->has('hourly_rate')) aria-invalid="true" aria-describedby="hourly-rate-error" @endif>
+                <p class="form-field__hint" id="hourly-rate-hint">Kronor per timme. Används bara i ROT-underlaget, till exempel 650 eller 650,50.</p>
+                @error('hourly_rate')
+                    <p class="form-field__error" id="hourly-rate-error">{{ $message }}</p>
                 @enderror
             </div>
 

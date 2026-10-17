@@ -19,12 +19,14 @@ class Workshop extends Model
         'address',
         'logo_path',
         'trial_ends_at',
+        'hourly_rate_ore',
     ];
 
     protected function casts(): array
     {
         return [
             'trial_ends_at' => 'datetime',
+            'hourly_rate_ore' => 'integer',
         ];
     }
 

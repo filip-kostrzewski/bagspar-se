@@ -107,4 +107,64 @@ class WorkshopSettingsControllerTest extends TestCase
         $this->assertNull($owner->workshop->fresh()->logo_path);
         Storage::disk('local')->assertMissing($workshop->logo_path);
     }
+
+    public function test_owner_can_save_and_clear_an_optional_hourly_rate(): void
+    {
+        $owner = User::factory()->create();
+
+        $this->actingAs($owner)
+            ->patch(route('app.settings.update'), [
+                'name' => 'Ekens Fönster',
+                'hourly_rate' => '650,50',
+                'hourly_rate_ore' => 1,
+            ])->assertRedirect()
+            ->assertSessionHas('status', 'Verkstadens uppgifter har sparats.');
+
+        $this->assertSame(65050, $owner->workshop->fresh()->hourly_rate_ore);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => 'Ekens Fönster',
+        ])->assertRedirect();
+
+        $this->assertSame(65050, $owner->workshop->fresh()->hourly_rate_ore);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => 'Ekens Fönster',
+            'hourly_rate' => '',
+        ])->assertRedirect();
+
+        $this->assertNull($owner->workshop->fresh()->hourly_rate_ore);
+    }
+
+    public function test_an_invalid_hourly_rate_is_rejected_in_swedish(): void
+    {
+        $owner = User::factory()->create();
+
+        $this->actingAs($owner)
+            ->from(route('app.settings.edit'))
+            ->patch(route('app.settings.update'), [
+                'name' => 'Ekens Fönster',
+                'hourly_rate' => '650,50.1',
+            ])->assertSessionHasErrors([
+                'hourly_rate' => 'Ange timpriset i kronor, till exempel 650 eller 650,50.',
+            ]);
+
+        $this->assertNull($owner->workshop->fresh()->hourly_rate_ore);
+    }
+
+    public function test_a_member_cannot_change_workshop_settings(): void
+    {
+        $owner = User::factory()->create();
+        $member = User::factory()->member()->create(['workshop_id' => $owner->workshop_id]);
+
+        $this->actingAs($member)
+            ->patch(route('app.settings.update'), [
+                'name' => 'Annat namn',
+                'hourly_rate' => '100',
+            ])->assertForbidden();
+
+        $workshop = $owner->workshop->fresh();
+        $this->assertNotSame('Annat namn', $workshop->name);
+        $this->assertNull($workshop->hourly_rate_ore);
+    }
 }

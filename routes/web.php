@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ClientStatusApprovalController;
 use App\Http\Controllers\ClientStatusController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DemoSyncController;
@@ -15,10 +16,13 @@ use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Workshop\CustomerController;
 use App\Http\Controllers\Workshop\DashboardController;
+use App\Http\Controllers\Workshop\DeliveryApprovalController;
 use App\Http\Controllers\Workshop\LabelPrintController;
 use App\Http\Controllers\Workshop\ProjectClientStatusController;
 use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\ProjectMaterialController;
+use App\Http\Controllers\Workshop\ProjectReportPdfController;
+use App\Http\Controllers\Workshop\ProjectRotController;
 use App\Http\Controllers\Workshop\SashMaterialController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
@@ -83,6 +87,10 @@ Route::get('/status/{token}/bilder/{photo}', [ClientStatusController::class, 'ph
     ->whereNumber('photo')
     ->middleware('throttle:60,1')
     ->name('client-status.photos');
+Route::post('/status/{token}/godkann', [ClientStatusApprovalController::class, 'store'])
+    ->where('token', '[A-Za-z0-9]{40,80}')
+    ->middleware('throttle:10,1')
+    ->name('client-status.approve');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
@@ -130,6 +138,11 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');
+    Route::get('/projekt/{project}/rapport.pdf', ProjectReportPdfController::class)->whereNumber('project')->name('projects.report.pdf');
+    Route::get('/projekt/{project}/rot-underlag', [ProjectRotController::class, 'show'])->whereNumber('project')->name('projects.rot');
+    Route::get('/projekt/{project}/rot-underlag.csv', [ProjectRotController::class, 'csv'])->whereNumber('project')->name('projects.rot.csv');
+    Route::get('/projekt/{project}/rot-underlag.pdf', [ProjectRotController::class, 'pdf'])->whereNumber('project')->name('projects.rot.pdf');
+    Route::delete('/projekt/{project}/leveransgodkannande', [DeliveryApprovalController::class, 'destroy'])->whereNumber('project')->name('projects.delivery-approval.destroy');
     Route::get('/projekt/{project}/material', [ProjectMaterialController::class, 'show'])->whereNumber('project')->name('projects.materials');
     Route::post('/projekt/{project}/arkiv', [ProjectController::class, 'archive'])->whereNumber('project')->name('projects.archive');
     Route::get('/projekt/{project}/ta-bort', [ProjectController::class, 'confirmDestroy'])->whereNumber('project')->name('projects.confirm-destroy');

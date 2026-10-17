@@ -255,7 +255,7 @@
             </figure>
             <figure data-reveal>
                 <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H" width="2200" height="3066" loading="lazy" decoding="async">
-                <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
+                <figcaption><strong>Projektrapport</strong> Samma uppgifter, nedladdade som PDF eller utskrivna.</figcaption>
             </figure>
         </div>
     </section>
@@ -284,7 +284,7 @@
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'print'])</span>
-                    <span><strong>Projektrapport</strong><small>Skriv ut eller spara som PDF i webbläsaren.</small></span>
+                    <span><strong>Projektrapport</strong><small>Ladda ner som PDF eller skriv ut.</small></span>
                 </li>
             </ul>
             <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>

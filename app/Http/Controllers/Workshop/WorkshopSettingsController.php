@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Workshop;
+use App\Support\Kronor;
 use App\Support\PrivateImageResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 
 class WorkshopSettingsController extends Controller
@@ -45,6 +47,13 @@ class WorkshopSettingsController extends Controller
             'address' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=2000,max_height=2000'],
             'remove_logo' => ['sometimes', 'boolean'],
+            'hourly_rate' => ['nullable', 'string', 'max:20', function (string $attribute, mixed $value, \Closure $fail): void {
+                try {
+                    Kronor::parseOptional($value);
+                } catch (InvalidArgumentException) {
+                    $fail('Ange timpriset i kronor, till exempel 650 eller 650,50.');
+                }
+            }],
         ], [
             'name.required' => 'Ange verkstadens namn.',
             'name.string' => 'Ange verkstadens namn som text.',
@@ -57,6 +66,7 @@ class WorkshopSettingsController extends Controller
             'logo.mimes' => 'Logotypen måste vara i formatet JPG, PNG eller WebP.',
             'logo.max' => 'Logotypen får vara högst 2 MB.',
             'logo.dimensions' => 'Logotypen får vara högst 2 000 pixlar bred eller hög.',
+            'hourly_rate.max' => 'Timpriset får vara högst 1 000 000 kr.',
         ]);
 
         $address = $validated['address'] ?? null;
@@ -86,6 +96,10 @@ class WorkshopSettingsController extends Controller
             'contact_email' => $validated['contact_email'] ?? null,
             'address' => $address,
         ]);
+
+        if ($request->exists('hourly_rate')) {
+            $workshop->hourly_rate_ore = Kronor::parseOptional($validated['hourly_rate'] ?? null);
+        }
 
         if (is_string($storedLogoPath)) {
             $workshop->logo_path = $storedLogoPath;

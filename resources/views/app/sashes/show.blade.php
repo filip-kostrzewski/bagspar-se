@@ -181,7 +181,7 @@
                                 <span>{{ \App\Support\WorkDuration::label($entry->minutes) }}</span>
                                 <span>{{ $entry->user_name }}</span>
                                 @if (is_string($entry->note) && $entry->note !== '')
-                                    <span>{{ $entry->note }}</span>
+                                    <p class="sash-log__note">{{ $entry->note }}</p>
                                 @endif
                                 @if (auth()->user()?->isOwner() || $entry->user_id === auth()->id())
                                     <details class="sash-log__edit" @if ($editingTime) open @endif>
@@ -288,7 +288,7 @@
                             <li>
                                 <span>{{ \App\Models\SashMaterial::labelForType($material->type) }}</span>
                                 <span>{{ $material->description }}</span>
-                                <span>{{ \App\Models\SashMaterial::quantityLabel($material->quantity) }} {{ $material->unit }}</span>
+                                <span>{{ \App\Models\SashMaterial::quantityLabel($material->quantity) }} {{ $material->unit }}@if (is_int($material->unit_price_ore)) · à {{ \App\Support\Kronor::format($material->unit_price_ore) }}@endif</span>
                                 <details class="sash-log__edit" @if ($editingMaterial) open @endif>
                                     <summary>Ändra</summary>
                                     <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.materials.update', [$project, $sash, $material]) }}" novalidate>
@@ -330,6 +330,15 @@
                                             <label for="material-unit-{{ $material->getKey() }}">Enhet</label>
                                             <input id="material-unit-{{ $material->getKey() }}" name="unit" type="text" maxlength="20" value="{{ $editingMaterial && is_string(old('unit')) ? old('unit') : $material->unit }}" @if ($errors->has('unit') && $editingMaterial) aria-invalid="true" @endif>
                                             @error('unit')
+                                                @if ($editingMaterial)
+                                                    <p class="form-field__error">{{ $message }}</p>
+                                                @endif
+                                            @enderror
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="material-price-{{ $material->getKey() }}">À-pris (kr) <span class="form-optional">Valfritt</span></label>
+                                            <input id="material-price-{{ $material->getKey() }}" name="unit_price" type="text" inputmode="decimal" value="{{ $editingMaterial && is_string(old('unit_price')) ? old('unit_price') : ($material->unit_price_ore !== null ? \App\Support\Kronor::input($material->unit_price_ore) : '') }}" @if ($errors->has('unit_price') && $editingMaterial) aria-invalid="true" @endif>
+                                            @error('unit_price')
                                                 @if ($editingMaterial)
                                                     <p class="form-field__error">{{ $message }}</p>
                                                 @endif
@@ -390,6 +399,16 @@
                             @endif
                         @enderror
                     </div>
+                    <div class="form-field">
+                        <label for="material-price">À-pris (kr) <span class="form-optional">Valfritt</span></label>
+                        <input id="material-price" name="unit_price" type="text" inputmode="decimal" value="{{ old('form_context') === 'material' && is_string(old('unit_price')) ? old('unit_price') : '' }}" @if ($errors->has('unit_price') && old('form_context') === 'material') aria-invalid="true" aria-describedby="material-price-error" @endif>
+                        <p class="form-field__hint">Används i ROT-underlaget. Lämna tomt om priset inte är satt.</p>
+                        @error('unit_price')
+                            @if (old('form_context') === 'material')
+                                <p class="form-field__error" id="material-price-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
                     <button class="workshop-button workshop-button--primary" type="submit">Spara material</button>
                 </form>
             </section>
@@ -445,8 +464,7 @@
                                 <img src="{{ route('app.sashes.photos.show', [$project, $sash, $photo]) }}" alt="{{ $photo->original_filename ?? 'Foto' }} för båge {{ $sash->code }}" loading="lazy">
                             </a>
                             <figcaption>
-                                <strong>{{ $photo->documentMomentLabel() ?? 'Foto' }}</strong>
-                                <span>{{ \App\Support\SwedishDate::format($photo->created_at?->copy()->timezone('Europe/Stockholm')) }}</span>
+                                <p class="photo-card__caption">{{ $photo->documentCaption() }}</p>
                                 <form method="POST" action="{{ route('app.sashes.photos.update', [$project, $sash, $photo]) }}">
                                     @csrf
                                     @method('PATCH')

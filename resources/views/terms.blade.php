@@ -14,7 +14,7 @@
         <p>Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta.@if (filled(config('bagspar.contact_email'))) Kontakt: <a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a>.@endif</p>
 
         <h2>1. Tjänsten och avtalet</h2>
-        <p>Bågspår är en webbtjänst där en fönsterverkstad samlar märkning, bilder, anteckningar och arbetssteg för varje båge, och kan skriva ut en QR-etikett och en projektrapport.</p>
+        <p>Bågspår är en webbtjänst där en fönsterverkstad samlar märkning, bilder, anteckningar och arbetssteg för varje båge, och kan skriva ut en QR-etikett och ladda ner eller skriva ut en projektrapport.</p>
         <p>Tjänsten tillhandahålls av Prodi Digital AB. Kontaktuppgifter finns ovan.</p>
         <p>Villkoren gäller mellan Prodi Digital AB och den verkstad som skapar och använder kontot. Personen som skapar kontot ska ha rätt att företräda verkstaden.</p>
 

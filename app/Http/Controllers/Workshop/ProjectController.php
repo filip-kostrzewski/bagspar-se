@@ -7,8 +7,8 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\SashTimeEntry;
 use App\Models\Workshop;
+use App\Support\ProjectReport;
 use App\Support\ReadyCustomerNotifier;
-use App\Support\SashQrCodeRenderer;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -140,48 +140,12 @@ class ProjectController extends Controller
     {
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
-        $project->load('customer');
-        $sashes = $project->windowSashes()
-            ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])
-            ->orderBy('code')
-            ->get();
-        $clientStatusUrl = $project->clientStatusIsPublic()
-            ? route('client-status.show', ['token' => $project->client_status_token])
-            : null;
-        $clientStatusQr = null;
 
-        if (is_string($clientStatusUrl)) {
-            $clientStatusQr = preg_replace(
-                '/^<\?xml[^>]*>\s*/',
-                '',
-                app(SashQrCodeRenderer::class)->render($clientStatusUrl),
-            );
-        }
-
-        $includeWorkNotes = $request->boolean('anteckningar');
-        $includeWorkTime = $request->boolean('arbetstid');
-        $timeEntries = SashTimeEntry::query()
-            ->whereIn('sash_id', $sashes->modelKeys())
-            ->orderBy('user_name')
-            ->orderBy('id')
-            ->get();
-        $timeByPerson = $timeEntries
-            ->groupBy('user_name')
-            ->map(fn ($rows): int => (int) $rows->sum('minutes'))
-            ->sortKeys();
-        $timeTotalMinutes = (int) $timeEntries->sum('minutes');
-
-        return view('app.projects.report', compact(
-            'workshop',
-            'project',
-            'sashes',
-            'clientStatusUrl',
-            'clientStatusQr',
-            'includeWorkNotes',
-            'includeWorkTime',
-            'timeTotalMinutes',
-            'timeEntries',
-            'timeByPerson',
+        return view('app.projects.report', ProjectReport::data(
+            $workshop,
+            $project,
+            $request->boolean('anteckningar'),
+            $request->boolean('arbetstid'),
         ));
     }
 

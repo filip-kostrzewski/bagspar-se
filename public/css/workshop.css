@@ -1572,10 +1572,9 @@ svg {
     font-size: 12px;
 }
 
-.photo-card figcaption strong {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.photo-card__caption {
+    margin: 0;
+    font-weight: 700;
 }
 
 .photo-card figcaption span {
@@ -3437,6 +3436,44 @@ body.label-print-sheet {
     align-items: center;
     padding: 10px 0;
     border-top: 1px solid var(--rule);
+}
+
+.sash-log__note {
+    flex: 1 0 100%;
+    margin: 0;
+    color: var(--ink-soft);
+}
+
+.basis-notice {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--ink);
+    background: var(--white);
+}
+
+.basis-notice strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.basis-notice p,
+.project-approval,
+.delivery-approval p {
+    margin: 0;
+}
+
+.project-approval {
+    margin-top: 12px;
+    font-weight: 650;
+}
+
+.delivery-approval {
+    margin-top: 28px;
+}
+
+.delivery-approval .workshop-form {
+    margin-top: 12px;
 }
 
 .sash-log__list form {

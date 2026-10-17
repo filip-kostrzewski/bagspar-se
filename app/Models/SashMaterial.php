@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Kronor;
 use Database\Factories\SashMaterialFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,7 @@ class SashMaterial extends Model
         'description',
         'quantity',
         'unit',
+        'unit_price_ore',
     ];
 
     /** @return BelongsTo<WindowSash, $this> */
@@ -48,7 +50,13 @@ class SashMaterial extends Model
 
     public function historyLabel(): string
     {
-        return self::labelForType($this->type).', '.$this->description.', '.self::quantityLabel($this->quantity).' '.$this->unit;
+        $label = self::labelForType($this->type).', '.$this->description.', '.self::quantityLabel($this->quantity).' '.$this->unit;
+
+        if (is_int($this->unit_price_ore)) {
+            $label .= ', à '.Kronor::format($this->unit_price_ore);
+        }
+
+        return $label;
     }
 
     public static function quantityLabel(mixed $quantity): string
@@ -67,6 +75,7 @@ class SashMaterial extends Model
     {
         return [
             'quantity' => 'decimal:2',
+            'unit_price_ore' => 'integer',
         ];
     }
 }

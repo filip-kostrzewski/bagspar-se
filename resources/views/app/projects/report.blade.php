@@ -45,7 +45,8 @@
                     <button class="workshop-button workshop-button--quiet" type="submit">Uppdatera rapporten</button>
                 </form>
                 <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.show', $project) }}">Till projektet</a>
-                <button class="workshop-button workshop-button--primary" type="button" data-print-report>Skriv ut / spara som PDF</button>
+                <a class="workshop-button workshop-button--secondary" href="{{ route('app.projects.report.pdf', $project) }}@if ($includeWorkNotes || $includeWorkTime)?{{ http_build_query(array_filter(['anteckningar' => $includeWorkNotes ? '1' : null, 'arbetstid' => $includeWorkTime ? '1' : null])) }}@endif">Ladda ner PDF</a>
+                <button class="workshop-button workshop-button--primary" type="button" data-print-report>Skriv ut</button>
             </div>
         </header>
 
@@ -77,6 +78,17 @@
                 @endif
                 @if ($project->delivery_date)
                     <div><dt>Beräknad leverans</dt><dd>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</dd></div>
+                @endif
+                @if ($project->delivery_approved_at)
+                    <div>
+                        <dt>Leverans godkänd</dt>
+                        <dd>
+                            {{ \App\Support\SwedishDate::formatDateTime($project->delivery_approved_at) }}
+                            @if (is_string($project->delivery_approved_name) && $project->delivery_approved_name !== '')
+                                av {{ $project->delivery_approved_name }}
+                            @endif
+                        </dd>
+                    </div>
                 @endif
                 @if ($includeWorkTime)
                     <div><dt>Arbetstid totalt</dt><dd>{{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</dd></div>
@@ -146,6 +158,11 @@
                                         @endforeach
                                     </ul>
                                 @endif
+                                @foreach ($sashTime as $entry)
+                                    @if (is_string($entry->note) && $entry->note !== '')
+                                        <p>{{ $entry->user_name }}: {{ $entry->note }}</p>
+                                    @endif
+                                @endforeach
                             </div>
                         @endif
                         @if ($includeWorkNotes && $sash->notes)

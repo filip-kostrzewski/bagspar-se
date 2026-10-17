@@ -8,10 +8,12 @@ use App\Models\SashEvent;
 use App\Models\SashMaterial;
 use App\Models\User;
 use App\Models\WindowSash;
+use App\Support\Kronor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 
 class SashMaterialController extends Controller
 {
@@ -75,7 +77,7 @@ class SashMaterialController extends Controller
     }
 
     /**
-     * @return array{type: string, description: string, quantity: mixed, unit: string}
+     * @return array{type: string, description: string, quantity: mixed, unit: string, unit_price_ore?: int|null}
      */
     private function validatedMaterial(Request $request): array
     {
@@ -89,6 +91,13 @@ class SashMaterialController extends Controller
             'description' => ['required', 'string', 'max:160'],
             'quantity' => ['required', 'numeric', 'min:0.01', 'max:9999.99', 'decimal:0,2'],
             'unit' => ['required', 'string', 'max:20'],
+            'unit_price' => ['nullable', 'string', 'max:20', function (string $attribute, mixed $value, \Closure $fail): void {
+                try {
+                    Kronor::parseOptional($value);
+                } catch (InvalidArgumentException) {
+                    $fail('Ange à-priset i kronor, till exempel 800 eller 800,50.');
+                }
+            }],
         ], [
             'type.required' => 'Välj typ av material.',
             'type.in' => 'Välj glas, kitt, färg, beslag eller övrigt.',
@@ -101,13 +110,20 @@ class SashMaterialController extends Controller
             'quantity.decimal' => 'Mängden får ha högst två decimaler.',
             'unit.required' => 'Ange en enhet.',
             'unit.max' => 'Enheten får vara högst 20 tecken.',
+            'unit_price.max' => 'À-priset får vara högst 1 000 000 kr.',
         ]);
 
-        return [
+        $material = [
             'type' => $validated['type'],
             'description' => trim($validated['description']),
             'quantity' => $validated['quantity'],
             'unit' => trim($validated['unit']),
         ];
+
+        if ($request->exists('unit_price')) {
+            $material['unit_price_ore'] = Kronor::parseOptional($validated['unit_price'] ?? null);
+        }
+
+        return $material;
     }
 }

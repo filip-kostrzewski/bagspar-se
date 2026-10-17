@@ -79,7 +79,10 @@ class ProjectReportTest extends TestCase
             ->assertDontSee('kittet löst i nederkant', false)
             ->assertDontSee('HEMLIG PROJEKTANTECKNING', false)
             ->assertDontSee('Arbetsanteckningar', false)
-            ->assertSee('Visa arbetsanteckningar i rapporten', false);
+            ->assertSee('Visa arbetsanteckningar i rapporten', false)
+            ->assertSee('Ladda ner PDF', false)
+            ->assertSee('>Skriv ut</button>', false)
+            ->assertDontSee('Skriv ut / spara som PDF', false);
 
         $this->get(route('app.settings.logo'))
             ->assertOk()

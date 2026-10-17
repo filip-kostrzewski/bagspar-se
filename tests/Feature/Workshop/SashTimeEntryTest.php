@@ -60,7 +60,7 @@ class SashTimeEntryTest extends TestCase
             ->assertSee('data-confirm-title="Ta bort tidsposten?"', false)
             ->assertSee('Tid lades till: 16 okt 2026, 1 tim 30 min. Kittade bågen.', false)
             ->assertSee('Bo Berg', false)
-            ->assertSee('Kittade bågen', false);
+            ->assertSee('<p class="sash-log__note">Kittade bågen</p>', false);
 
         $this->actingAs($owner)
             ->post(route('app.sashes.time.store', [$project, $sash]), [
