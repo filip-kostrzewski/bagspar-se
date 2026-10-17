@@ -24,6 +24,9 @@ class PrivacyPolicyTest extends TestCase
         $response->assertSee('e-postadress', false);
         $response->assertSee('tidpunkten då anmälan skickades', false);
         $response->assertSee('så länge de behövs för att följa upp anmälan och piloten', false);
+        $response->assertSee('Meddelanden via kontaktformuläret', false);
+        $response->assertSee('Företag och telefonnummer sparas bara om du fyller i dem.', false);
+        $response->assertDontSee('Vi ber inte om telefonnummer', false);
         $response->assertSee('14 dagar', false);
         $response->assertSee('Uppgifter i verkstadens konto', false);
         $response->assertSee('Bildfilerna är privata och visas via en skyddad appfunktion', false);

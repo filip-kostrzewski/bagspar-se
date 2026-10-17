@@ -118,6 +118,7 @@
                 @if (request()->routeIs('home'))
                     <a class="site-nav__link site-nav__example" href="{{ route('demo') }}">Prova exempel</a>
                 @endif
+                <a class="site-nav__link site-nav__contact" href="{{ route('contact') }}">Kontakt</a>
                 <a class="site-nav__link site-nav__login" href="{{ route('login') }}">Logga in</a>
                 <a class="button button--small site-nav__cta" href="{{ route('register') }}">Starta gratis pilot</a>
             </nav>
@@ -146,11 +147,9 @@
                 <a href="{{ route('guides.marking') }}">Märkning</a>
                 <a href="{{ route('privacy') }}">Integritetspolicy</a>
                 <a href="{{ route('terms') }}">Villkor</a>
+                <a href="{{ route('contact') }}">Kontakt</a>
                 @if ($showGoogleAnalytics)
                     <button type="button" data-cookie-settings>Cookie-inställningar</button>
-                @endif
-                @if (filled(config('bagspar.contact_email')))
-                    <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakt</a>
                 @endif
             </nav>
             <p class="site-footer__copyright">© {{ now()->year }} Bågspår</p>

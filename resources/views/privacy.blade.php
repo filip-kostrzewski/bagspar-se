@@ -14,7 +14,7 @@
     <p class="eyebrow">INTEGRITET</p>
     <h1 class="display-heading">Integritetspolicy</h1>
     <div class="privacy-page__body body-copy">
-        <p>Den här sidan beskriver hur vi behandlar personuppgifter när du anmäler en verkstad till Bågspår, enligt dataskyddsförordningen (GDPR).</p>
+        <p>Den här sidan beskriver hur vi behandlar personuppgifter när du anmäler en verkstad till Bågspår eller skickar ett meddelande via kontaktformuläret, enligt dataskyddsförordningen (GDPR).</p>
 
         <h2>Personuppgiftsansvarig</h2>
         <p>Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta, är personuppgiftsansvarig för uppgifterna i anmälan.</p>
@@ -26,13 +26,16 @@
             <li>e-postadress</li>
             <li>tidpunkten då anmälan skickades</li>
         </ul>
-        <p>Formuläret har inga andra fält. Vi ber inte om telefonnummer, personnummer eller en beskrivning av ert arbetssätt.</p>
+        <p>Anmälan har inga andra fält. Den ber inte om telefonnummer, personnummer eller en beskrivning av ert arbetssätt.</p>
 
         <h2>Varför vi behandlar uppgifterna</h2>
         <p>Uppgifterna används för att ta emot anmälan och kontakta dig om pilotplatsen. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran innan avtal om piloten. Vi säljer inte uppgifterna.</p>
 
         <h2>Hur länge uppgifterna sparas</h2>
         <p>Vi sparar uppgifterna så länge de behövs för att följa upp anmälan och piloten. Du kan när som helst kontakta oss och be att uppgifterna raderas.</p>
+
+        <h2>Meddelanden via kontaktformuläret</h2>
+        <p>När du skriver till oss via kontaktformuläret sparar vi namn, e-postadress, meddelande och tidpunkt. Företag och telefonnummer sparas bara om du fyller i dem. Uppgifterna används för att läsa och besvara meddelandet. Den rättsliga grunden är artikel 6.1 b i dataskyddsförordningen: åtgärder på din begäran. Vi sparar dem så länge de behövs för att hantera meddelandet. Du kan be oss radera dem.</p>
 
         <h2>Vilka som tar del av uppgifterna</h2>
         <p>Uppgifterna sparas i Bågspårs databas och i ett internt e-postmeddelande till oss när en anmälan kommer in. Webbserverns vanliga tekniska loggar kan innehålla IP-adress och tidpunkt. De används för drift och säkerhet.</p>
@@ -79,7 +82,7 @@
             <p>Skriv till <a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a> om du vill att vi raderar uppgifterna, om du vill använda någon annan av dina rättigheter, eller om du har en fråga om uppgifterna.</p>
         @endif
 
-        <p class="privacy-page__updated">Senast uppdaterad 15 oktober 2026.</p>
+        <p class="privacy-page__updated">Senast uppdaterad 17 oktober 2026.</p>
     </div>
 </main>
 @endsection

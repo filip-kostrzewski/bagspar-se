@@ -24,6 +24,7 @@ class SitemapController extends Controller
         'guides.document-renovation',
         'privacy',
         'terms',
+        'contact',
     ];
 
     public function __invoke(): Response

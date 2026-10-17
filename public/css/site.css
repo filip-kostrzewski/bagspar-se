@@ -720,6 +720,7 @@ textarea {
 
 .form-field input[type="text"],
 .form-field input[type="email"],
+.form-field input[type="tel"],
 .form-field textarea {
     width: 100%;
     min-height: 54px;
@@ -994,6 +995,10 @@ textarea {
 .guide-page__body {
     max-width: 760px;
     margin-top: 36px;
+}
+
+.contact-page__form {
+    margin-top: 28px;
 }
 
 .privacy-page__body h2,
@@ -3141,8 +3146,14 @@ html.cookie-choice-saved .cookie-banner {
 }
 
 .contact-note .form-field input[type="text"],
-.contact-note .form-field input[type="email"] {
+.contact-note .form-field input[type="email"],
+.contact-note .form-field input[type="tel"],
+.contact-note .form-field textarea {
     min-height: 50px;
+}
+
+.contact-note .form-field textarea {
+    min-height: 96px;
 }
 
 .contact-note .interest-form__submit {
@@ -3336,7 +3347,8 @@ html.cookie-choice-saved .cookie-banner {
         display: none;
     }
 
-    .site-nav__login {
+    .site-nav__login,
+    .site-nav__contact {
         display: inline-flex;
         min-height: 44px;
         align-items: center;

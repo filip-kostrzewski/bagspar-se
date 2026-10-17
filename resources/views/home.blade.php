@@ -360,6 +360,19 @@
         </div>
     </section>
 
+    <section id="kontakt" class="contact-note" aria-labelledby="contact-title">
+        <div class="contact-note__inner page-shell">
+            <div class="contact-note__intro" data-reveal>
+                <p class="eyebrow">KONTAKT</p>
+                <h2 id="contact-title" class="section-heading">Skriv till oss</h2>
+                <p>Namn, e-post och ett meddelande räcker. Företag och telefon är valfria.</p>
+            </div>
+            <div class="contact-note__form-wrap" data-reveal>
+                @include('partials.contact-form', ['idPrefix' => 'home-contact', 'source' => 'home'])
+            </div>
+        </div>
+    </section>
+
 </main>
 @endsection
 

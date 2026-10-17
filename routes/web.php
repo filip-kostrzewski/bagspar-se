@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClientStatusController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DemoSyncController;
 use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
@@ -44,6 +45,10 @@ Route::view('/guider/dokumentera-fonsterrenovering', 'guides.document-renovation
 Route::redirect('/integritet', '/integritetspolicy', 301);
 Route::view('/integritetspolicy', 'privacy')->name('privacy');
 Route::view('/villkor', 'terms')->name('terms');
+Route::get('/kontakt', [ContactMessageController::class, 'create'])->name('contact');
+Route::post('/kontakt', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
 Route::middleware(['admin', 'throttle:30,1'])->group(function (): void {
