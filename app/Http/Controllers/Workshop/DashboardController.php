@@ -27,7 +27,13 @@ class DashboardController extends Controller
         $currentProjects = $workshop->projects()->notArchived();
         $projects = $workshop->projects()
             ->when($showingArchived, fn (Builder $query) => $query->archived(), fn (Builder $query) => $query->notArchived())
-            ->when($filters['kund'] !== '', fn (Builder $query) => $query->where('customer_name', 'like', $this->like($filters['kund'])))
+            ->when($filters['kund'] !== '', function (Builder $query) use ($filters): void {
+                $like = $this->like($filters['kund']);
+                $query->where(function (Builder $customers) use ($like): void {
+                    $customers->where('customer_name', 'like', $like)
+                        ->orWhereHas('customer', fn (Builder $customer) => $customer->where('name', 'like', $like));
+                });
+            })
             ->when($filters['rum'] !== '' || $filters['etapp'] !== '', function (Builder $query) use ($filters): void {
                 $query->whereHas('windowSashes', function (Builder $sashes) use ($filters): void {
                     if ($filters['rum'] !== '') {
@@ -39,6 +45,7 @@ class DashboardController extends Controller
                     }
                 });
             })
+            ->with('customer')
             ->withCount('windowSashes')
             ->latest()
             ->get();

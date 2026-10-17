@@ -33,8 +33,11 @@
                 </span>
                 <h1 class="workshop-heading" id="page-title">{{ $project->name }}</h1>
                 <div class="project-hero__facts">
-                    @if ($project->customer_name)
-                        <p><span>Kund</span>{{ $project->customer_name }}</p>
+                    @if ($project->customerLabel())
+                        <p><span>Kund</span>{{ $project->customerLabel() }}</p>
+                    @endif
+                    @if ($project->customer?->contact_name)
+                        <p><span>Kontakt</span>{{ $project->customer->contact_name }}</p>
                     @endif
                     @if ($project->location)
                         <p><span>Plats</span>{{ $project->location }}</p>
@@ -122,15 +125,12 @@
                             @endif
                         @enderror
                     </div>
-                    <div class="form-field">
-                        <label for="edit-project-customer">Kund eller beställare</label>
-                        <input id="edit-project-customer" name="customer_name" type="text" value="{{ old('form_context') === 'project' && is_string(old('customer_name')) ? old('customer_name') : $project->customer_name }}" maxlength="160" @if ($errors->has('customer_name') && old('form_context') === 'project') aria-invalid="true" aria-describedby="edit-project-customer-error" @endif>
-                        @error('customer_name')
-                            @if (old('form_context') === 'project')
-                                <p class="form-field__error" id="edit-project-customer-error">{{ $message }}</p>
-                            @endif
-                        @enderror
-                    </div>
+                    @include('partials.workshop.customer-fields', [
+                        'prefix' => 'edit-',
+                        'customers' => $customers,
+                        'selectedCustomerId' => old('form_context') === 'project' ? old('customer_id') : $project->customer_id,
+                        'customerName' => old('form_context') === 'project' && is_string(old('customer_name')) ? old('customer_name') : ($project->customer_name ?? ''),
+                    ])
                     <div class="form-field">
                         <label for="edit-project-location">Adress eller plats</label>
                         <input id="edit-project-location" name="location" type="text" value="{{ old('form_context') === 'project' && is_string(old('location')) ? old('location') : $project->location }}" maxlength="255" @if ($errors->has('location') && old('form_context') === 'project') aria-invalid="true" aria-describedby="edit-project-location-error" @endif>

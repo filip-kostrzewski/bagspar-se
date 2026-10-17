@@ -53,8 +53,17 @@
                 </div>
             </div>
             <dl class="report-facts">
-                @if ($project->customer_name)
-                    <div><dt>Kund</dt><dd>{{ $project->customer_name }}</dd></div>
+                @if ($project->customerLabel())
+                    <div><dt>Kund</dt><dd>{{ $project->customerLabel() }}</dd></div>
+                @endif
+                @if ($project->customer?->contact_name)
+                    <div><dt>Kontakt</dt><dd>{{ $project->customer->contact_name }}</dd></div>
+                @endif
+                @if ($project->customer?->email)
+                    <div><dt>E-post</dt><dd>{{ $project->customer->email }}</dd></div>
+                @endif
+                @if ($project->customer?->address)
+                    <div><dt>Kundadress</dt><dd>{{ $project->customer->address }}</dd></div>
                 @endif
                 @if ($project->location)
                     <div><dt>Plats</dt><dd>{{ $project->location }}</dd></div>

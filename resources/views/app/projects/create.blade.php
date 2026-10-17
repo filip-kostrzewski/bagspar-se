@@ -36,13 +36,12 @@
                     @enderror
                 </div>
 
-                <div class="form-field">
-                    <label for="customer_name">Kund eller beställare <span class="form-optional">Valfritt</span></label>
-                    <input id="customer_name" name="customer_name" type="text" value="{{ is_string(old('customer_name')) ? old('customer_name') : '' }}" autocomplete="off" maxlength="160" @if ($errors->has('customer_name')) aria-invalid="true" aria-describedby="customer-name-error" @endif>
-                    @error('customer_name')
-                        <p class="form-field__error" id="customer-name-error">{{ $message }}</p>
-                    @enderror
-                </div>
+                @include('partials.workshop.customer-fields', [
+                    'prefix' => '',
+                    'customers' => $customers,
+                    'selectedCustomerId' => old('customer_id'),
+                    'customerName' => is_string(old('customer_name')) ? old('customer_name') : '',
+                ])
 
                 <div class="form-field">
                     <label for="location">Adress eller plats <span class="form-optional">Valfritt</span></label>

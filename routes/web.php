@@ -12,6 +12,7 @@ use App\Http\Controllers\ManifestController;
 use App\Http\Controllers\PilotLeadController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Workshop\CustomerController;
 use App\Http\Controllers\Workshop\DashboardController;
 use App\Http\Controllers\Workshop\LabelPrintController;
 use App\Http\Controllers\Workshop\ProjectClientStatusController;
@@ -104,6 +105,11 @@ Route::middleware('auth')->group(function (): void {
 Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app')->name('app.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/export.csv', WorkshopExportController::class)->name('export');
+    Route::get('/kunder', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('/kunder/ny', [CustomerController::class, 'create'])->name('customers.create');
+    Route::post('/kunder', [CustomerController::class, 'store'])->name('customers.store');
+    Route::get('/kunder/{customer}', [CustomerController::class, 'edit'])->whereNumber('customer')->name('customers.edit');
+    Route::patch('/kunder/{customer}', [CustomerController::class, 'update'])->whereNumber('customer')->name('customers.update');
     Route::get('/installningar', [WorkshopSettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/installningar', [WorkshopSettingsController::class, 'update'])->name('settings.update');
     Route::get('/installningar/logotyp', [WorkshopSettingsController::class, 'logo'])->name('settings.logo');

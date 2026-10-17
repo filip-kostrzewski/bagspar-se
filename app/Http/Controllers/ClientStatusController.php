@@ -15,6 +15,7 @@ class ClientStatusController extends Controller
     public function show(string $token): Response
     {
         $project = $this->projectForToken($token);
+        $project->load('customer');
         $workshop = $project->workshop()->firstOrFail();
         $sashes = $project->windowSashes()
             ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])

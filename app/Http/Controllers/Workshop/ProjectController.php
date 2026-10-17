@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\Project;
 use App\Models\SashPhoto;
+use App\Models\Workshop;
 use App\Support\SashQrCodeRenderer;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +20,11 @@ class ProjectController extends Controller
 {
     public function create(Request $request): View
     {
+        $workshop = $this->currentWorkshop($request);
+
         return view('app.projects.create', [
-            'workshop' => $this->currentWorkshop($request),
+            'workshop' => $workshop,
+            'customers' => $workshop->customers()->orderBy('name')->orderBy('id')->get(),
         ]);
     }
 
@@ -28,6 +33,7 @@ class ProjectController extends Controller
         $workshop = $this->currentWorkshop($request);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'customer_id' => ['nullable', 'integer'],
             'customer_name' => ['nullable', 'string', 'max:160'],
             'location' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:5000'],
@@ -43,6 +49,7 @@ class ProjectController extends Controller
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
         ]);
 
+        $validated = $this->withCustomer($workshop, $validated);
         $project = $workshop->projects()->create($validated);
 
         return redirect()->route('app.projects.show', $project)->with('status', 'Projektet har sparats.');
@@ -53,8 +60,10 @@ class ProjectController extends Controller
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
         $sashes = $project->windowSashes()->orderBy('code')->get();
+        $customers = $workshop->customers()->orderBy('name')->orderBy('id')->get();
+        $project->load('customer');
 
-        return view('app.projects.show', compact('workshop', 'project', 'sashes'));
+        return view('app.projects.show', compact('workshop', 'project', 'sashes', 'customers'));
     }
 
     public function update(Request $request, Project $project): RedirectResponse
@@ -63,6 +72,7 @@ class ProjectController extends Controller
         $project = $this->projectForWorkshop($workshop, $project);
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:160'],
+            'customer_id' => ['sometimes', 'nullable', 'integer'],
             'customer_name' => ['sometimes', 'nullable', 'string', 'max:160'],
             'location' => ['sometimes', 'nullable', 'string', 'max:255'],
             'notes' => ['sometimes', 'nullable', 'string', 'max:5000'],
@@ -81,6 +91,7 @@ class ProjectController extends Controller
         ]);
 
         abort_if($validated === [], 422);
+        $validated = $this->withCustomer($workshop, $validated);
         $project->update($validated);
 
         return back()->with('status', 'Projektet har uppdaterats.');
@@ -90,6 +101,7 @@ class ProjectController extends Controller
     {
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
+        $project->load('customer');
         $sashes = $project->windowSashes()
             ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])
             ->orderBy('code')
@@ -160,6 +172,47 @@ class ProjectController extends Controller
         $project->delete();
 
         return redirect()->route('app.dashboard')->with('status', 'Projektet och bildfilerna har tagits bort.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function withCustomer(Workshop $workshop, array $validated): array
+    {
+        $name = isset($validated['customer_name']) && is_string($validated['customer_name'])
+            ? trim($validated['customer_name'])
+            : '';
+        $customerId = $validated['customer_id'] ?? null;
+        unset($validated['customer_id']);
+
+        if ($name !== '') {
+            $customer = Customer::findOrCreateForWorkshop($workshop, $name);
+            $validated['customer_id'] = $customer->getKey();
+            $validated['customer_name'] = $customer->name;
+
+            return $validated;
+        }
+
+        if (array_key_exists('customer_name', $validated) && ! is_numeric($customerId)) {
+            $validated['customer_id'] = null;
+            $validated['customer_name'] = null;
+
+            return $validated;
+        }
+
+        if (is_numeric($customerId)) {
+            $customer = $workshop->customers()->whereKey((int) $customerId)->first();
+
+            if (! $customer instanceof Customer) {
+                abort(404);
+            }
+
+            $validated['customer_id'] = $customer->getKey();
+            $validated['customer_name'] = $customer->name;
+        }
+
+        return $validated;
     }
 
     private function ownedProject(Request $request, Project $project): Project

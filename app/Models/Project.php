@@ -17,6 +17,7 @@ class Project extends Model
 
     protected $fillable = [
         'workshop_id',
+        'customer_id',
         'name',
         'customer_name',
         'location',
@@ -28,6 +29,19 @@ class Project extends Model
     public function workshop(): BelongsTo
     {
         return $this->belongsTo(Workshop::class);
+    }
+
+    /** @return BelongsTo<Customer, $this> */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function customerLabel(): ?string
+    {
+        $name = $this->customer?->name ?? $this->customer_name;
+
+        return is_string($name) && trim($name) !== '' ? $name : null;
     }
 
     /** @return HasMany<WindowSash, $this> */

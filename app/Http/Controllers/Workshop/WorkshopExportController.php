@@ -72,7 +72,7 @@ class WorkshopExportController extends Controller
 
         return [
             $this->cell($project->name),
-            $this->cell($project->customer_name ?? ''),
+            $this->cell($project->customerLabel() ?? ''),
             $this->cell($project->location ?? ''),
             $this->cell($project->status === 'completed' ? 'Avslutad' : 'Pågår'),
             $this->cell($project->isArchived() ? 'Ja' : 'Nej'),

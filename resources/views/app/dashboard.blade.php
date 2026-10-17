@@ -134,8 +134,8 @@
                                     <span class="project-card__arrow" aria-hidden="true">↗</span>
                                 </div>
                                 <h3>{{ $project->name }}</h3>
-                                @if ($project->customer_name)
-                                    <p class="project-card__customer">{{ $project->customer_name }}</p>
+                                @if ($project->customerLabel())
+                                    <p class="project-card__customer">{{ $project->customerLabel() }}</p>
                                 @endif
                                 @if ($project->location)
                                     <p class="project-card__location">

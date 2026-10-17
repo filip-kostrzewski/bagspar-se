@@ -27,6 +27,12 @@
         <section class="report-project" aria-labelledby="page-title">
             <p class="workshop-eyebrow">STATUS</p>
             <h1 class="workshop-heading" id="page-title">{{ $project->name }}</h1>
+            @if ($project->customerLabel())
+                <p class="client-status__location">{{ $project->customerLabel() }}</p>
+            @endif
+            @if ($project->customer?->contact_name || $project->customer?->email || $project->customer?->address)
+                <p class="client-status__location">{{ collect([$project->customer?->contact_name, $project->customer?->email, $project->customer?->address])->filter()->join(' · ') }}</p>
+            @endif
             @if ($project->location)
                 <p class="client-status__location">{{ $project->location }}</p>
             @endif

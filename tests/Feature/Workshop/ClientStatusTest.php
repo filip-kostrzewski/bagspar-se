@@ -102,9 +102,9 @@ class ClientStatusTest extends TestCase
                 route('client-status.photos', ['token' => $token, 'photo' => $before]),
                 route('client-status.photos', ['token' => $token, 'photo' => $after]),
             ], false)
+            ->assertSee('BRF Hemlig', false)
             ->assertDontSee('HEMLIG PROJEKTANTECKNING', false)
             ->assertDontSee('HEMLIG BÅGANTECKNING', false)
-            ->assertDontSee('BRF Hemlig', false)
             ->assertDontSee('intern-fil.jpg', false)
             ->assertDontSee('Pågår', false);
 
