@@ -26,7 +26,8 @@ class TermsPageTest extends TestCase
         $response->assertSee('dröjsmålsränta', false);
         $response->assertDontSee('3 månader', false);
         $response->assertSee('ladda ner eller skriva ut en projektrapport', false);
-        $response->assertDontSee('ROT-underlag', false);
+        $response->assertSee('ROT-underlag', false);
+        $response->assertSee('inte skatterådgivning', false);
         $response->assertDontSee('Godkänn leverans', false);
         $response->assertSee('Verkstadens ägare skapar kontot och kan bjuda in medarbetare.', false);
         $response->assertSee('Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt.', false);

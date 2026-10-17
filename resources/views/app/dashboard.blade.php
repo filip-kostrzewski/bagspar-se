@@ -9,6 +9,9 @@
                 <p class="workshop-eyebrow">{{ $workshop->name }}</p>
                 <h1 class="workshop-heading" id="page-title">Projekt</h1>
                 <p class="workspace-lede">Håll ihop varje projekt, båge och arbetssteg.</p>
+                @if (auth()->user()?->isOwner() && $workshop->isTrialing())
+                    <p class="workspace-trial-note">Provperiod: {{ $workshop->accessDaysLeft() }} {{ $workshop->accessDaysLeft() === 1 ? 'dag' : 'dagar' }} kvar · <a class="workshop-text-link" href="{{ route('app.billing.edit') }}">Beställ abonnemang</a> för {{ \App\Support\Pricing::monthlyLabel() }} exkl. moms</p>
+                @endif
             </div>
             <div class="workspace-heading-row__actions">
                 @if (auth()->user()?->isOwner())

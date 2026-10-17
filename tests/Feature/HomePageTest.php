@@ -46,7 +46,11 @@ class HomePageTest extends TestCase
         $response->assertSee('Ladda ner som PDF eller skriv ut.', false);
         $response->assertSee('Samma uppgifter, nedladdade som PDF eller utskrivna.', false);
         $response->assertDontSee('i webbläsaren', false);
-        $response->assertDontSee('ROT-underlag', false);
+        $response->assertSee('ROT-underlag', false);
+        $response->assertSee('Hjälper Bågspår med ROT?', false);
+        $response->assertSee('Statuslänk till kunden', false);
+        $response->assertSee('kan godkänna leveransen med namn och tid', false);
+        $response->assertSee('inte skatterådgivning', false);
         $response->assertDontSee('Godkänn leverans', false);
         $response->assertDontSee('Fortsättning avtalas separat', false);
         $response->assertSee('2-KÖK-F1-B2', false);

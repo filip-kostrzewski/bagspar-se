@@ -3748,3 +3748,9 @@ body.label-print-sheet {
     font-size: 14px;
     line-height: 1.5;
 }
+
+.workspace-trial-note {
+    margin: 10px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+}

@@ -16,6 +16,10 @@
             'answer' => \App\Support\Pricing::monthlyLabel().' exkl. moms per verkstad. '.\App\Support\Pricing::seatsSentence().' '.\App\Support\Pricing::yearlySentence().' '.\App\Support\Pricing::invoiceSentence(),
         ],
         [
+            'question' => 'Hjälper Bågspår med ROT?',
+            'answer' => 'Ja. Tid och material som skrivs på arbetskorten summeras per projekt till ett ROT-underlag som du laddar ner som PDF eller CSV. Själva avdraget räknar du som vanligt på fakturan; underlaget är en sammanställning av verkstadens egna uppgifter, inte skatterådgivning.',
+        ],
+        [
             'question' => 'Vad händer när provperioden tar slut?',
             'answer' => 'Kontot låses tills ägaren beställer abonnemanget i appen. Projekt, bågar och bilder finns kvar, och verkstadens data kan alltid laddas ner. Ingen faktura skickas utan en beställning.',
         ],
@@ -273,24 +277,28 @@
             <p class="body-copy">{{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::invoiceSentence() }}</p>
             <ul class="pilot-features" aria-label="Det här ingår">
                 <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
-                    <span><strong>Verkstadens konto</strong><small>Bågar, bilder och anteckningar samlas här. Ägaren kan bjuda in medarbetare till samma verkstad.</small></span>
-                </li>
-                <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
-                    <span><strong>Obegränsat med projekt</strong><small>Samla steg och anteckningar för varje båge, projekt efter projekt.</small></span>
+                    <span><strong>Obegränsat med projekt och bågar</strong><small>Arbetskort med plats, anteckningar, tid och material för varje båge. Privata foton. Upp till 20 per båge · högst 5 MB per foto.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'tag'])</span>
                     <span><strong>Utskrivbar QR-etikett</strong><small>Öppnar det privata arbetskortet efter inloggning. Kunden får en separat statuslänk.</small></span>
                 </li>
                 <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'lock'])</span>
-                    <span><strong>Privata foton</strong><small>Upp till 20 per båge · högst 5 MB per foto.</small></span>
+                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
+                    <span><strong>Statuslänk till kunden</strong><small>Kunden ser etapp och bilder utan inloggning och kan godkänna leveransen med namn och tid.</small></span>
+                </li>
+                <li class="pilot-feature">
+                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
+                    <span><strong>ROT-underlag</strong><small>Tid och material från arbetskorten summerade per projekt, som PDF eller CSV, redo för fakturan.</small></span>
                 </li>
                 <li class="pilot-feature">
                     <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'print'])</span>
                     <span><strong>Projektrapport</strong><small>Ladda ner som PDF eller skriv ut.</small></span>
+                </li>
+                <li class="pilot-feature">
+                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
+                    <span><strong>Medarbetare</strong><small>Ägaren bjuder in medarbetare till samma verkstad. {{ \App\Support\Pricing::seatsSentence() }}</small></span>
                 </li>
             </ul>
             <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>

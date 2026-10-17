@@ -50,6 +50,19 @@ class WorkshopSettingsControllerTest extends TestCase
         $this->assertNull($workshop->logo_path);
     }
 
+    public function test_settings_page_states_the_seat_price_and_the_current_user_count(): void
+    {
+        $owner = User::factory()->create();
+        User::factory()->member()->create(['workshop_id' => $owner->workshop_id]);
+
+        $this->actingAs($owner)
+            ->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('Tre användare ingår, varje ytterligare användare kostar 149 kr/mån.', false)
+            ->assertSee('Verkstaden har just nu 2 användare.', false)
+            ->assertSee('href="'.route('app.billing.edit').'"', false);
+    }
+
     public function test_owner_can_save_a_swedish_phone_without_clearing_the_hourly_rate(): void
     {
         $owner = User::factory()->create();

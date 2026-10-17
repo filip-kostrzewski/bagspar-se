@@ -147,6 +147,36 @@ class WorkshopAccessTest extends TestCase
             ->assertDontSee('workshop-access-notice', false);
     }
 
+    public function test_the_dashboard_shows_the_owner_how_many_trial_days_remain(): void
+    {
+        $owner = $this->ownerOfWorkshop(['trial_ends_at' => now()->addDays(10)->endOfDay()]);
+
+        $this->actingAs($owner)
+            ->get(route('app.dashboard'))
+            ->assertOk()
+            ->assertSee('Provperiod: 10 dagar kvar', false)
+            ->assertSee('Beställ abonnemang', false)
+            ->assertSee('590 kr/mån exkl. moms', false);
+    }
+
+    public function test_the_dashboard_trial_note_is_not_shown_to_members_or_paid_workshops(): void
+    {
+        $owner = $this->ownerOfWorkshop(['trial_ends_at' => now()->addDays(10)->endOfDay()]);
+        $member = User::factory()->member()->create(['workshop_id' => $owner->workshop_id]);
+
+        $this->actingAs($member)
+            ->get(route('app.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Provperiod:', false);
+
+        $owner->workshop->update(['paid_until' => now()->addMonth()]);
+
+        $this->actingAs($owner)
+            ->get(route('app.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Provperiod:', false);
+    }
+
     public function test_a_member_of_a_locked_workshop_is_told_that_only_the_owner_can_order(): void
     {
         $owner = $this->ownerWithEndedTrial();

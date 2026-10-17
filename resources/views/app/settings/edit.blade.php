@@ -114,6 +114,13 @@
             <p class="workshop-eyebrow">ÅTKOMST</p>
             <h2 class="workshop-section-heading" id="staff-title">Medarbetare</h2>
             <p class="staff-panel__intro">Ägaren bjuder in medarbetare via e-post. En medarbetare kan arbeta med projekt och bågar, men inte ändra de här uppgifterna eller ta bort projekt.</p>
+            @php
+                $seatSummary = 'Verkstaden har just nu '.$members->count().' användare';
+                if ($invitations->isNotEmpty()) {
+                    $seatSummary .= ' och '.$invitations->count().' väntande '.($invitations->count() === 1 ? 'inbjudan' : 'inbjudningar');
+                }
+            @endphp
+            <p class="staff-panel__intro">{{ \App\Support\Pricing::seatsSentence() }} {{ $seatSummary }}. <a class="workshop-text-link" href="{{ route('app.billing.edit') }}">Se abonnemanget</a>.</p>
 
             <ul class="staff-list">
                 @foreach ($members as $member)
