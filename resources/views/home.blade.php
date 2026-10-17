@@ -9,7 +9,7 @@
     $homeFaqs = [
         [
             'question' => 'Hur startar jag den gratis piloten?',
-            'answer' => 'Skapa ett verkstadskonto för att börja. Ett konto per verkstad.',
+            'answer' => 'Skapa ett verkstadskonto för att börja. Ägaren kan bjuda in medarbetare till samma verkstad.',
         ],
         [
             'question' => 'Vad kostar Bågspår efter tre månader?',

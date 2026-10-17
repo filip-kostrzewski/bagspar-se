@@ -12,10 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'workshop_id', 'terms_accepted_at'])]
+#[Fillable(['name', 'email', 'password', 'workshop_id', 'role', 'terms_accepted_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
+    public const ROLE_OWNER = 'owner';
+
+    public const ROLE_MEMBER = 'member';
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -25,6 +29,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function workshop(): BelongsTo
     {
         return $this->belongsTo(Workshop::class);
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role === self::ROLE_OWNER;
+    }
+
+    public function isMember(): bool
+    {
+        return $this->role === self::ROLE_MEMBER;
+    }
+
+    public function roleLabel(): string
+    {
+        return $this->isOwner() ? 'Ägare' : 'Medarbetare';
     }
 
     /**

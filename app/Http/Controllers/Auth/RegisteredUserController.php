@@ -76,6 +76,7 @@ class RegisteredUserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
+                'role' => User::ROLE_OWNER,
                 'terms_accepted_at' => now(),
             ]);
         });

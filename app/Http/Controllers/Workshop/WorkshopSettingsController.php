@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Workshop;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -16,14 +17,20 @@ class WorkshopSettingsController extends Controller
 {
     public function edit(Request $request): View
     {
+        $workshop = $this->currentWorkshop($request);
+        Gate::authorize('update', $workshop);
+
         return view('app.settings.edit', [
-            'workshop' => $this->currentWorkshop($request),
+            'workshop' => $workshop,
+            'members' => $workshop->users()->orderBy('name')->orderBy('id')->get(),
+            'invitations' => $workshop->invitations()->pending()->orderBy('id')->get(),
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
         $workshop = $this->currentWorkshop($request);
+        Gate::authorize('update', $workshop);
         $contactEmail = $request->input('contact_email');
 
         if (is_string($contactEmail)) {

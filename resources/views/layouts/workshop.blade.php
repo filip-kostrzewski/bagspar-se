@@ -41,7 +41,9 @@
                     <span class="workshop-header__workspace">@isset($workshop){{ $workshop->name }}@else{{ auth()->user()->name }}@endisset</span>
                     <nav class="workshop-nav" aria-label="Verkstadsmeny">
                         <a href="{{ route('app.dashboard') }}" @if (request()->routeIs('app.dashboard', 'app.projects.*', 'app.sashes.*')) aria-current="page" @endif>Projekt</a>
-                        <a href="{{ route('app.settings.edit') }}" @if (request()->routeIs('app.settings.*')) aria-current="page" @endif>Inställningar</a>
+                        @if (auth()->user()?->isOwner())
+                            <a href="{{ route('app.settings.edit') }}" @if (request()->routeIs('app.settings.*')) aria-current="page" @endif>Inställningar</a>
+                        @endif
                     </nav>
                     <form method="POST" action="{{ route('auth.logout') }}">
                         @csrf

@@ -35,7 +35,7 @@
         <p>Uppsägning görs genom att skriva till kontaktadressen ovan. Den gäller från den dag vi tar emot den, utan uppsägningstid. En period som redan är betald avslutas vid det slut som står i bekräftelsen. Vi drar ingen ny betalning efter uppsägningen.</p>
 
         <h2>6. Konto, innehåll och personuppgifter</h2>
-        <p>Ett konto per verkstad. Verkstaden ansvarar för inloggningen och för att de uppgifter, namn och bilder som läggs in i tjänsten får användas där. Arbetskort, bilder och rapporter visas efter inloggning.</p>
+        <p>Verkstadens ägare skapar kontot och kan bjuda in medarbetare. Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt. Verkstaden ansvarar för inloggningarna och för att de uppgifter, namn och bilder som läggs in i tjänsten får användas där. Arbetskort, bilder och rapporter visas efter inloggning.</p>
         <p>Integritetspolicyn beskriver hur Prodi Digital AB hanterar kontouppgifter och uppgifter i verkstadens konto. För personuppgifter om verkstadens kunder ansvarar verkstaden för sin användning och för information till de registrerade. Om Prodi Digital AB behandlar sådana uppgifter för verkstadens räkning krävs ett separat personuppgiftsbiträdesavtal. Dessa villkor och integritetspolicyn är inte ett sådant avtal. Kontakta oss innan kontot används för sådan behandling.</p>
 
         <h2>7. Avslut och kontakt</h2>

@@ -89,5 +89,60 @@
 
             <button class="workshop-button workshop-button--primary" type="submit">Spara uppgifter</button>
         </form>
+
+        <section class="staff-panel" aria-labelledby="staff-title">
+            <p class="workshop-eyebrow">ÅTKOMST</p>
+            <h2 class="workshop-section-heading" id="staff-title">Medarbetare</h2>
+            <p class="staff-panel__intro">Ägaren bjuder in medarbetare via e-post. En medarbetare kan arbeta med projekt och bågar, men inte ändra de här uppgifterna eller ta bort projekt.</p>
+
+            <ul class="staff-list">
+                @foreach ($members as $member)
+                    <li class="staff-list__item">
+                        <div>
+                            <strong>{{ $member->name }}</strong>
+                            <p class="staff-list__meta">{{ $member->email }} · {{ $member->roleLabel() }}</p>
+                        </div>
+                        @if ($member->isMember())
+                            <form method="POST" action="{{ route('app.members.destroy', $member) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="workshop-button workshop-button--quiet" type="submit">Ta bort åtkomst</button>
+                            </form>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+
+            @if ($invitations->isNotEmpty())
+                <h3 class="staff-panel__subheading">Väntande inbjudningar</h3>
+                <ul class="staff-list">
+                    @foreach ($invitations as $invitation)
+                        <li class="staff-list__item">
+                            <div>
+                                <strong>{{ $invitation->email }}</strong>
+                                <p class="staff-list__meta">Gäller till {{ $invitation->expires_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</p>
+                            </div>
+                            <form method="POST" action="{{ route('app.invitations.destroy', $invitation) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="workshop-button workshop-button--quiet" type="submit">Ta bort inbjudan</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <form class="workshop-form settings-form" method="POST" action="{{ route('app.invitations.store') }}">
+                @csrf
+                <div class="form-field">
+                    <label for="invite-email">Bjud in med e-post</label>
+                    <input id="invite-email" name="email" type="email" value="{{ is_string(old('email')) ? old('email') : '' }}" maxlength="254" required autocomplete="off" @if ($errors->has('email')) aria-invalid="true" aria-describedby="invite-email-error" @endif>
+                    @error('email')
+                        <p class="form-field__error" id="invite-email-error">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button class="workshop-button workshop-button--secondary" type="submit">Skicka inbjudan</button>
+            </form>
+        </section>
     </div>
 @endsection

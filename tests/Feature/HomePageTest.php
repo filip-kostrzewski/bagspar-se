@@ -28,7 +28,8 @@ class HomePageTest extends TestCase
         $response->assertSee('>Klar</span>', false);
         $response->assertDontSee('Renovera', false);
         $response->assertDontSee('Återmontera', false);
-        $response->assertSee('Ett konto per verkstad.', false);
+        $response->assertSee('Ägaren kan bjuda in medarbetare till samma verkstad.', false);
+        $response->assertDontSee('Ett konto per verkstad.', false);
         $response->assertDontSee('En inloggning, utan medarbetarinbjudningar.', false);
         $response->assertDontSee('medarbetare kan inte bjudas in', false);
         $response->assertDontSee('medarbetarinbjudningar', false);

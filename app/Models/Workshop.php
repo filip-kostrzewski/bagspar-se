@@ -39,6 +39,12 @@ class Workshop extends Model
         return $this->hasMany(User::class);
     }
 
+    /** @return HasMany<WorkshopInvitation, $this> */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(WorkshopInvitation::class);
+    }
+
     /** @return HasMany<Project, $this> */
     public function projects(): HasMany
     {

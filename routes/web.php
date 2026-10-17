@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AcceptWorkshopInvitationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Workshop\ProjectController;
 use App\Http\Controllers\Workshop\SashPhotoController;
 use App\Http\Controllers\Workshop\SashQrCodeController;
 use App\Http\Controllers\Workshop\WindowSashController;
+use App\Http\Controllers\Workshop\WorkshopInvitationController;
 use App\Http\Controllers\Workshop\WorkshopSettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,15 @@ Route::post('/intresse', PilotLeadController::class)
     ->name('pilot-leads.store');
 
 Route::permanentRedirect('/login', '/logga-in');
+
+Route::get('/inbjudan/{token}', [AcceptWorkshopInvitationController::class, 'create'])
+    ->where('token', '[A-Za-z0-9]{64}')
+    ->middleware('throttle:30,1')
+    ->name('invitations.accept');
+Route::post('/inbjudan/{token}', [AcceptWorkshopInvitationController::class, 'store'])
+    ->where('token', '[A-Za-z0-9]{64}')
+    ->middleware('throttle:10,1')
+    ->name('invitations.accept.store');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/registrera', [RegisteredUserController::class, 'create'])->name('register');
@@ -78,6 +89,9 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/installningar', [WorkshopSettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/installningar', [WorkshopSettingsController::class, 'update'])->name('settings.update');
     Route::get('/installningar/logotyp', [WorkshopSettingsController::class, 'logo'])->name('settings.logo');
+    Route::post('/installningar/inbjudningar', [WorkshopInvitationController::class, 'store'])->middleware('throttle:10,1')->name('invitations.store');
+    Route::delete('/installningar/inbjudningar/{invitation}', [WorkshopInvitationController::class, 'destroy'])->whereNumber('invitation')->name('invitations.destroy');
+    Route::delete('/installningar/medarbetare/{member}', [WorkshopInvitationController::class, 'removeMember'])->whereNumber('member')->name('members.destroy');
     Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');

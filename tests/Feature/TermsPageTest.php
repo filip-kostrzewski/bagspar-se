@@ -22,7 +22,9 @@ class TermsPageTest extends TestCase
         $response->assertSee('Ingen betalning dras automatiskt', false);
         $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
         $response->assertSee('Ingen bindningstid och ingen uppsägningstid.', false);
-        $response->assertSee('Ett konto per verkstad.', false);
+        $response->assertSee('Verkstadens ägare skapar kontot och kan bjuda in medarbetare.', false);
+        $response->assertSee('Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt.', false);
+        $response->assertDontSee('Ett konto per verkstad.', false);
         $response->assertSee('href="'.route('privacy').'"', false);
         $response->assertSee('integritetspolicyn', false);
         $response->assertSee('mailto:kontakt@bagspar.se', false);

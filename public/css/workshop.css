@@ -2822,6 +2822,43 @@ body.label-print-sheet {
     margin-top: 28px;
 }
 
+.staff-panel {
+    max-width: 560px;
+    margin-top: 48px;
+}
+
+.staff-panel__intro,
+.staff-list__meta {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.staff-panel__subheading {
+    margin: 28px 0 0;
+    font-size: 16px;
+}
+
+.staff-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.staff-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+}
+
+.staff-list__item strong {
+    display: block;
+}
+
 .settings-logo-preview {
     display: block;
     width: 72px;
