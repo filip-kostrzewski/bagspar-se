@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Middleware\ForceProductionHttps;
 use App\Models\User;
+use App\Support\Pricing;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -32,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             ->view(['mail.auth.notification', 'mail.auth.notification-text'], [
                 'heading' => 'Verifiera din e-postadress',
                 'greeting' => 'Hej '.$user->name.'!',
-                'body' => 'Bekräfta e-postadressen för att säkra åtkomsten till verkstadens uppgifter.',
+                'body' => 'Bekräfta e-postadressen för att säkra åtkomsten till verkstadens uppgifter. '.Pricing::trialHeadline().' utan kort. '.Pricing::offerSentence(),
                 'actionText' => 'Verifiera e-postadress',
                 'url' => $verificationUrl,
                 'fallbackText' => 'Om knappen inte fungerar kan du kopiera länken nedan och klistra in den i webbläsaren:',

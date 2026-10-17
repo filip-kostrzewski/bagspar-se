@@ -217,6 +217,8 @@
     @php
         $labelShotVersion = substr(hash_file('sha256', public_path('images/product/qr-etikett.webp')), 0, 12);
         $reportShotVersion = substr(hash_file('sha256', public_path('images/product/projektrapport.webp')), 0, 12);
+        $rotShotVersion = substr(hash_file('sha256', public_path('images/product/rot-underlag.webp')), 0, 12);
+        $statusShotVersion = substr(hash_file('sha256', public_path('images/product/statussida.webp')), 0, 12);
         $glazingVersion = substr(hash_file('sha256', public_path('images/workshop-glazing.webp')), 0, 12);
     @endphp
     <section class="guide-ribbon section-space page-shell" aria-labelledby="guide-ribbon-title">
@@ -265,6 +267,14 @@
             <figure data-reveal>
                 <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H" width="2200" height="3066" loading="lazy" decoding="async">
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, nedladdade som PDF eller utskrivna.</figcaption>
+            </figure>
+            <figure data-reveal>
+                <img src="{{ asset('images/product/rot-underlag.webp') }}?v={{ $rotShotVersion }}" alt="ROT-underlag för Exempelprojekt i exempelverkstaden, med summerad arbetskostnad och material samt knapparna Ladda ner CSV och Ladda ner PDF" width="2560" height="1800" loading="lazy" decoding="async">
+                <figcaption><strong>ROT-underlag</strong> Tid och material summerade per projekt, som PDF eller CSV.</figcaption>
+            </figure>
+            <figure data-reveal>
+                <img src="{{ asset('images/product/statussida.webp') }}?v={{ $statusShotVersion }}" alt="Statussida för Exempelprojekt som kunden ser utan inloggning, med fyra bågar och deras steg samt ett godkännande av leveransen. Exempeldata." width="2560" height="2640" loading="lazy" decoding="async">
+                <figcaption><strong>Statussida för kunden</strong> Etapp per båge utan inloggning, med godkännande av leveransen.</figcaption>
             </figure>
         </div>
     </section>

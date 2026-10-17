@@ -41,6 +41,7 @@ class Workshop extends Model
         'billing_email',
         'billing_reference',
         'access_reminder_sent_at',
+        'onboarding_nudge_sent_at',
         'hourly_rate_ore',
     ];
 
@@ -51,6 +52,7 @@ class Workshop extends Model
             'subscription_ordered_at' => 'datetime',
             'paid_until' => 'datetime',
             'access_reminder_sent_at' => 'datetime',
+            'onboarding_nudge_sent_at' => 'datetime',
             'hourly_rate_ore' => 'integer',
         ];
     }

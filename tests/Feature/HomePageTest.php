@@ -77,6 +77,13 @@ class HomePageTest extends TestCase
         $response->assertSee('alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning och stegen Mottagen till Klar"', false);
         $response->assertSee('width="2560"', false);
         $response->assertSee('height="1800"', false);
+        $response->assertSee('images/product/rot-underlag.webp', false);
+        $response->assertSee('alt="ROT-underlag för Exempelprojekt i exempelverkstaden, med summerad arbetskostnad och material samt knapparna Ladda ner CSV och Ladda ner PDF"', false);
+        $response->assertSee('<strong>ROT-underlag</strong> Tid och material summerade per projekt, som PDF eller CSV.', false);
+        $response->assertSee('images/product/statussida.webp', false);
+        $response->assertSee('alt="Statussida för Exempelprojekt som kunden ser utan inloggning, med fyra bågar och deras steg samt ett godkännande av leveransen. Exempeldata."', false);
+        $response->assertSee('<strong>Statussida för kunden</strong> Etapp per båge utan inloggning, med godkännande av leveransen.', false);
+        $response->assertSee('height="2640"', false);
         $response->assertSee('images/product/qr-etikett.webp', false);
         $response->assertSee('alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt"', false);
         $response->assertSee('width="468"', false);

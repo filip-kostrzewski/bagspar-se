@@ -67,7 +67,14 @@ class AuthAccountTest extends TestCase
         );
         $this->assertTrue(Hash::check('correct-horse-5', $user->password));
         $this->assertNull($user->email_verified_at);
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user): bool {
+            $html = (string) $notification->toMail($user)->render();
+
+            $this->assertStringContainsString('Prova gratis i 30 dagar utan kort', $html);
+            $this->assertStringContainsString('590 kr/mån', $html);
+
+            return true;
+        });
     }
 
     public function test_registration_starts_a_thirty_day_trial_that_ends_at_the_end_of_the_last_day(): void
