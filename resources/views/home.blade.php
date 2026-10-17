@@ -253,7 +253,7 @@
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för ett exempelprojekt med två märkta bågar" width="2560" height="1866" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för ett exempelprojekt med två märkta bågar" width="2560" height="1800" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
         </div>
@@ -271,11 +271,11 @@
                 <figcaption><strong>Arbetskort</strong> Plats, anteckning och arbetssteg för en båge.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="Utskriven QR-etikett för båge 2-KÖK-F1-B2 med texten att skanning kräver inloggning" width="832" height="460" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="472" height="220" loading="lazy" decoding="async">
                 <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanning kräver inloggning.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt med bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2, arbetssteg och anteckningar" width="2560" height="1866" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt med bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2, arbetssteg och anteckningar" width="2560" height="1800" loading="lazy" decoding="async">
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
             </figure>
         </div>

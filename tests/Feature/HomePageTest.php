@@ -49,10 +49,11 @@ class HomePageTest extends TestCase
         $response->assertSee('width="2560"', false);
         $response->assertSee('height="1800"', false);
         $response->assertSee('images/product/qr-etikett.webp', false);
-        $response->assertSee('width="832"', false);
-        $response->assertSee('height="460"', false);
+        $response->assertSee('alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt"', false);
+        $response->assertSee('width="472"', false);
+        $response->assertSee('height="220"', false);
         $response->assertSee('images/product/projektrapport.webp', false);
-        $response->assertSee('height="1866"', false);
+        $response->assertSee('height="1800"', false);
         $response->assertSee('Skärmbilder från ett exempel med testuppgifter.', false);
         $response->assertDontSee('wisegent', false);
         $response->assertDontSee('Wisegent', false);
