@@ -104,7 +104,7 @@ final class CustomerDataExport
                 'Plats' => $project['plats'] ?? null,
                 'Anteckningar' => $project['anteckningar'] ?? null,
                 'Status' => $project['status'] ?? null,
-                'Leveransdatum' => $project['leveransdatum'] ?? null,
+                'Beräknad leverans' => $this->swedishDay(is_string($project['leveransdatum'] ?? null) ? $project['leveransdatum'] : null),
                 'Kundnamn' => $project['kundnamn'] ?? null,
             ] as $label => $value) {
                 $this->put($handle, ['Projekt', $customerName, $projectName, '', '', $label, $this->text($value)]);
@@ -147,14 +147,18 @@ final class CustomerDataExport
                 }
 
                 foreach ($sash['arbetstid'] as $entry) {
+                    $minutes = is_numeric($entry['minuter'] ?? null) ? (int) $entry['minuter'] : 0;
+                    $note = $this->text($entry['anteckning'] ?? null);
+                    $duration = WorkDuration::label($minutes);
+
                     $this->put($handle, [
                         'Arbetstid',
                         $customerName,
                         $projectName,
                         $code,
-                        $this->text($entry['datum'] ?? null),
+                        $this->swedishDay(is_string($entry['datum'] ?? null) ? $entry['datum'] : null),
                         $this->text($entry['anvandare'] ?? null),
-                        trim($this->text($entry['minuter'] ?? null).' min '.$this->text($entry['anteckning'] ?? null)),
+                        $note === '' ? $duration : $duration.'. '.$note,
                     ]);
                 }
 
@@ -251,14 +255,15 @@ final class CustomerDataExport
     private function eventRow(mixed $createdAt, string $userName, string $kind, ?string $text): array
     {
         $timestamp = $createdAt instanceof Carbon
-            ? $createdAt->timezone('Europe/Stockholm')->format('Y-m-d H:i')
+            ? SwedishDate::formatDateTime($createdAt)
             : null;
+        $label = $this->eventLabel($kind);
 
         return [
             'tid' => $timestamp,
             'anvandare' => $userName,
-            'slag' => $kind,
-            'etikett' => $this->eventLabel($kind),
+            'slag' => $label,
+            'etikett' => $label,
             'text' => $text,
         ];
     }
@@ -269,6 +274,8 @@ final class CustomerDataExport
             SashEvent::KIND_STAGE => 'etapp',
             SashEvent::KIND_NOTE => 'anteckning',
             SashEvent::KIND_PHOTO => 'bild',
+            SashEvent::KIND_TIME => 'tid',
+            SashEvent::KIND_MATERIAL => 'material',
             ProjectEvent::KIND_SASH_REMOVED => 'båge borttagen',
             default => $kind,
         };
@@ -285,7 +292,24 @@ final class CustomerDataExport
 
     private function text(mixed $value): string
     {
-        return is_string($value) ? $value : '';
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        return '';
+    }
+
+    private function swedishDay(?string $iso): string
+    {
+        if (! is_string($iso) || preg_match('/^\d{4}-\d{2}-\d{2}/', $iso) !== 1) {
+            return '';
+        }
+
+        return SwedishDate::format(Carbon::parse(substr($iso, 0, 10)));
     }
 
     private function cell(string $value): string

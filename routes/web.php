@@ -141,8 +141,10 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::patch('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'update'])->whereNumber(['project', 'sash'])->name('sashes.update');
     Route::delete('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'destroy'])->whereNumber(['project', 'sash'])->name('sashes.destroy');
     Route::post('/projekt/{project}/bagar/{sash}/tid', [SashTimeEntryController::class, 'store'])->whereNumber(['project', 'sash'])->name('sashes.time.store');
+    Route::patch('/projekt/{project}/bagar/{sash}/tid/{entry}', [SashTimeEntryController::class, 'update'])->whereNumber(['project', 'sash', 'entry'])->name('sashes.time.update');
     Route::delete('/projekt/{project}/bagar/{sash}/tid/{entry}', [SashTimeEntryController::class, 'destroy'])->whereNumber(['project', 'sash', 'entry'])->name('sashes.time.destroy');
     Route::post('/projekt/{project}/bagar/{sash}/material', [SashMaterialController::class, 'store'])->whereNumber(['project', 'sash'])->name('sashes.materials.store');
+    Route::patch('/projekt/{project}/bagar/{sash}/material/{material}', [SashMaterialController::class, 'update'])->whereNumber(['project', 'sash', 'material'])->name('sashes.materials.update');
     Route::delete('/projekt/{project}/bagar/{sash}/material/{material}', [SashMaterialController::class, 'destroy'])->whereNumber(['project', 'sash', 'material'])->name('sashes.materials.destroy');
     Route::post('/projekt/{project}/bagar/{sash}/bilder', [SashPhotoController::class, 'store'])->middleware('throttle:10,1')->whereNumber(['project', 'sash'])->name('sashes.photos.store');
     Route::patch('/projekt/{project}/bagar/{sash}/bilder/{photo}', [SashPhotoController::class, 'update'])->whereNumber(['project', 'sash', 'photo'])->name('sashes.photos.update');

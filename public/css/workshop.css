@@ -1917,22 +1917,35 @@ svg {
     margin-bottom: 20px;
 }
 
+.report-sash__time,
 .report-sash__notes {
     max-width: 760px;
     margin-top: 18px;
 }
 
+.report-sash__time h4,
 .report-sash__notes h4 {
     margin: 0 0 4px;
     font-size: 12px;
     font-weight: 800;
 }
 
+.report-sash__time p,
+.report-sash__time li,
 .report-sash__notes p {
     margin: 0;
     color: var(--ink-soft);
     font-size: 13px;
+}
+
+.report-sash__notes p {
     white-space: pre-line;
+}
+
+.report-sash__time ul {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
 }
 
 .report-photo-grid {
@@ -2659,6 +2672,7 @@ svg {
 
     .report-sash__heading,
     .report-sash .stage-track,
+    .report-sash__time,
     .report-sash__notes {
         break-inside: avoid;
     }
@@ -3090,6 +3104,11 @@ body.label-print-sheet {
     color: var(--ink-soft);
 }
 
+.project-danger-zone .form-field__error {
+    margin: 6px 0 0;
+    color: var(--danger);
+}
+
 .project-danger-actions {
     display: flex;
     flex-wrap: wrap;
@@ -3335,15 +3354,30 @@ body.label-print-sheet {
 
 .sash-log__form {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    align-items: end;
+    align-items: start;
     margin-top: 16px;
+}
+
+.sash-log__form .form-field {
+    min-width: 0;
+}
+
+.sash-log__form .form-field__error {
+    margin-top: 6px;
+    overflow-wrap: anywhere;
 }
 
 .sash-log__form .workshop-button {
     grid-column: 1 / -1;
     justify-self: start;
+}
+
+@media (min-width: 761px) {
+    .sash-log__form {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .sash-log__list {
@@ -3363,6 +3397,18 @@ body.label-print-sheet {
 
 .sash-log__list form {
     margin: 0;
+}
+
+.sash-log__edit {
+    flex-basis: 100%;
+    min-width: 0;
+}
+
+.sash-log__edit summary {
+    width: fit-content;
+    color: var(--ink);
+    font-weight: 650;
+    cursor: pointer;
 }
 
 .project-time {

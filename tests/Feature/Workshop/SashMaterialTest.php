@@ -56,8 +56,12 @@ class SashMaterialTest extends TestCase
 
         $this->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
+            ->assertSee('Material på den här bågen', false)
+            ->assertSee('2 rader på den här bågen.', false)
+            ->assertSee('data-confirm-title="Ta bort materialet?"', false)
             ->assertSee('Energiglas', false)
-            ->assertSee('1,5 m²', false);
+            ->assertSee('1,5 m²', false)
+            ->assertSee('Material lades till: Glas, Energiglas, 1,5 m².', false);
 
         $sheet = $this->get(route('app.projects.materials', $project));
         $sheet->assertOk()
@@ -100,9 +104,22 @@ class SashMaterialTest extends TestCase
             ->assertInvalid([
                 'type' => 'Välj glas, kitt, färg, beslag eller övrigt.',
                 'description' => 'Ange en beskrivning.',
-                'quantity' => 'Mängden måste vara minst 0,01.',
+                'quantity' => 'Mängden måste vara ett positivt tal.',
                 'unit' => 'Ange en enhet.',
             ]);
+
+        $this->from(route('app.sashes.show', [$project, $sash]))
+            ->followingRedirects()
+            ->post(route('app.sashes.materials.store', [$project, $sash]), [
+                'form_context' => 'material',
+                'type' => 'glas',
+                'description' => 'Fel mängd',
+                'quantity' => '-1',
+                'unit' => 'm²',
+            ])
+            ->assertOk()
+            ->assertSee('Mängden måste vara ett positivt tal.', false)
+            ->assertDontSee('The quantity field must be at least 0.01.', false);
 
         $this->actingAs($other)
             ->post(route('app.sashes.materials.store', [$project, $sash]), [
@@ -120,6 +137,9 @@ class SashMaterialTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('status', 'Materialraden har tagits bort.');
         $this->assertModelMissing($material);
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('Material togs bort: Glas, Energiglas, 1,5 m².', false);
 
         $this->actingAs($other)
             ->delete(route('app.sashes.materials.destroy', [$project, $otherSash, SashMaterial::query()->firstOrFail()]))
@@ -132,6 +152,56 @@ class SashMaterialTest extends TestCase
                 'unit' => 'st',
             ])
             ->assertNotFound();
+    }
+
+    public function test_a_member_can_edit_a_material_row_and_the_change_is_logged(): void
+    {
+        $owner = User::factory()->create(['name' => 'Ada Ek']);
+        $member = User::factory()->member()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Bo Berg',
+        ]);
+        $other = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $material = SashMaterial::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'type' => 'glas',
+            'description' => 'Energiglas',
+            'quantity' => '1.50',
+            'unit' => 'm²',
+        ]);
+
+        $this->actingAs($other)
+            ->patch(route('app.sashes.materials.update', [$project, $sash, $material]), [
+                'type' => 'kitt',
+                'description' => 'Linoljekitt',
+                'quantity' => '2',
+                'unit' => 'kg',
+            ])
+            ->assertNotFound();
+        $this->assertSame('Energiglas', $material->refresh()->description);
+
+        $this->actingAs($member)
+            ->patch(route('app.sashes.materials.update', [$project, $sash, $material]), [
+                'type' => 'kitt',
+                'description' => 'Linoljekitt',
+                'quantity' => '2,5',
+                'unit' => 'kg',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Materialet har ändrats.');
+
+        $material->refresh();
+        $this->assertSame('kitt', $material->type);
+        $this->assertSame('Linoljekitt', $material->description);
+        $this->assertSame('2.50', $material->quantity);
+        $this->assertSame('kg', $material->unit);
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('Material ändrades: Glas, Energiglas, 1,5 m² blev Kitt, Linoljekitt, 2,5 kg.', false)
+            ->assertSee('1 rad på den här bågen.', false);
     }
 
     public function test_deleting_a_sash_removes_its_materials(): void

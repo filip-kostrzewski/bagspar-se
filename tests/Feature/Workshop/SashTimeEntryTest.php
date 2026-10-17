@@ -56,6 +56,9 @@ class SashTimeEntryTest extends TestCase
         $this->get(route('app.sashes.show', [$project, $sash]))
             ->assertOk()
             ->assertSee('1 tim 30 min', false)
+            ->assertSee('Totalt 1 tim 30 min på den här bågen.', false)
+            ->assertSee('data-confirm-title="Ta bort tidsposten?"', false)
+            ->assertSee('Tid lades till: 16 okt 2026, 1 tim 30 min. Kittade bågen.', false)
             ->assertSee('Bo Berg', false)
             ->assertSee('Kittade bågen', false);
 
@@ -81,7 +84,9 @@ class SashTimeEntryTest extends TestCase
         $this->get(route('app.projects.report', $project).'?arbetstid=1')
             ->assertOk()
             ->assertSee('Arbetstid totalt', false)
-            ->assertSee('2 tim 15 min', false);
+            ->assertSee('2 tim 15 min', false)
+            ->assertSee('Bo Berg: 1 tim 30 min', false)
+            ->assertSee('Ada Ek: 45 min', false);
 
         $project->forceFill([
             'client_status_enabled' => true,
@@ -107,6 +112,19 @@ class SashTimeEntryTest extends TestCase
             ])
             ->assertRedirect(route('app.sashes.show', [$project, $sash]))
             ->assertInvalid(['hours' => 'Ange tiden i timmar eller minuter.']);
+
+        $this->from(route('app.sashes.show', [$project, $sash]))
+            ->actingAs($member)
+            ->followingRedirects()
+            ->post(route('app.sashes.time.store', [$project, $sash]), [
+                'form_context' => 'time',
+                'worked_on' => '2026-10-16',
+                'hours' => '-2',
+                'minutes' => '10',
+            ])
+            ->assertOk()
+            ->assertSee('Timmarna kan inte vara negativa.', false)
+            ->assertDontSee('The hours field must be at least 0.', false);
 
         $this->actingAs($other)
             ->post(route('app.sashes.time.store', [$project, $sash]), [
@@ -135,12 +153,76 @@ class SashTimeEntryTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('status', 'Tiden har tagits bort.');
         $this->assertModelMissing($entry);
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('Tid togs bort: 16 okt 2026, 1 tim 30 min. Kittade bågen.', false);
 
         $ownerEntry = SashTimeEntry::query()->where('user_id', $owner->getKey())->firstOrFail();
         $this->actingAs($owner)
             ->delete(route('app.sashes.time.destroy', [$project, $sash, $ownerEntry]))
             ->assertRedirect();
         $this->assertModelMissing($ownerEntry);
+    }
+
+    public function test_the_author_can_edit_a_time_entry_and_the_change_is_logged(): void
+    {
+        $owner = User::factory()->create(['name' => 'Ada Ek']);
+        $member = User::factory()->member()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Bo Berg',
+        ]);
+        $otherMember = User::factory()->member()->create([
+            'workshop_id' => $owner->workshop_id,
+        ]);
+        $other = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $entry = SashTimeEntry::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'user_id' => $member->getKey(),
+            'user_name' => 'Bo Berg',
+            'worked_on' => '2026-10-16',
+            'minutes' => 90,
+            'note' => 'Kittade bågen',
+        ]);
+
+        $this->actingAs($otherMember)
+            ->patch(route('app.sashes.time.update', [$project, $sash, $entry]), [
+                'worked_on' => '2026-10-16',
+                'hours' => '2',
+                'minutes' => '0',
+            ])
+            ->assertForbidden();
+        $this->assertSame(90, $entry->refresh()->minutes);
+
+        $this->actingAs($other)
+            ->patch(route('app.sashes.time.update', [$project, $sash, $entry]), [
+                'worked_on' => '2026-10-16',
+                'hours' => '2',
+            ])
+            ->assertNotFound();
+
+        $this->actingAs($member)
+            ->patch(route('app.sashes.time.update', [$project, $sash, $entry]), [
+                'worked_on' => '2026-10-17',
+                'hours' => '2',
+                'minutes' => '0',
+                'note' => 'Ommätt',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Tiden har ändrats.');
+
+        $entry->refresh();
+        $this->assertSame($member->getKey(), $entry->user_id);
+        $this->assertSame('Bo Berg', $entry->user_name);
+        $this->assertSame(120, $entry->minutes);
+        $this->assertSame('2026-10-17', $entry->worked_on?->toDateString());
+        $this->assertSame('Ommätt', $entry->note);
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('Tid ändrades: 16 okt 2026, 1 tim 30 min. Kittade bågen blev 17 okt 2026, 2 tim. Ommätt.', false)
+            ->assertSee('2 tim', false);
     }
 
     public function test_deleting_a_sash_removes_its_time_entries(): void

@@ -76,14 +76,17 @@
                     <div><dt>Plats</dt><dd>{{ $project->location }}</dd></div>
                 @endif
                 @if ($project->delivery_date)
-                    <div><dt>Leveransdatum</dt><dd>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</dd></div>
+                    <div><dt>Beräknad leverans</dt><dd>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</dd></div>
                 @endif
                 @if ($includeWorkTime)
                     <div><dt>Arbetstid totalt</dt><dd>{{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</dd></div>
+                    @foreach ($timeByPerson as $name => $minutes)
+                        <div><dt>{{ $name }}</dt><dd>{{ \App\Support\WorkDuration::label($minutes) }}</dd></div>
+                    @endforeach
                 @endif
                 <div><dt>Antal bågar</dt><dd>{{ $sashCount }}</dd></div>
                 @if ($project->created_at)
-                    <div><dt>Skapat</dt><dd>{{ $project->created_at->timezone('Europe/Stockholm')->format('Y-m-d') }}</dd></div>
+                    <div><dt>Skapat</dt><dd>{{ \App\Support\SwedishDate::formatDateTime($project->created_at) }}</dd></div>
                 @endif
             </dl>
             @if ($includeWorkNotes && $project->notes)
@@ -112,6 +115,23 @@
                             </div>
                             <p class="report-sash__state">@include('partials.workshop.stage-label', ['stage' => $sash->stage])</p>
                         </header>
+                        @if ($includeWorkTime)
+                            @php
+                                $sashTime = $timeEntries->where('sash_id', $sash->getKey());
+                                $sashTimeByPerson = $sashTime->groupBy('user_name')->map(fn ($rows): int => (int) $rows->sum('minutes'))->sortKeys();
+                            @endphp
+                            <div class="report-sash__time">
+                                <h4>Arbetstid</h4>
+                                <p>Totalt {{ \App\Support\WorkDuration::label((int) $sashTime->sum('minutes')) }}</p>
+                                @if ($sashTimeByPerson->isNotEmpty())
+                                    <ul>
+                                        @foreach ($sashTimeByPerson as $name => $minutes)
+                                            <li>{{ $name }}: {{ \App\Support\WorkDuration::label($minutes) }}</li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+                        @endif
                         @if ($includeWorkNotes && $sash->notes)
                             <div class="report-sash__notes">
                                 <h4>Arbetsanteckningar</h4>
@@ -144,7 +164,7 @@
 
         <footer class="report-footer">
             <span class="report-footer__product">Bågspår</span>
-            <span>{{ now()->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
+            <span>{{ \App\Support\SwedishDate::format(now()->timezone('Europe/Stockholm')) }}</span>
         </footer>
     </div>
 @endsection

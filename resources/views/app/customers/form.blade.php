@@ -73,7 +73,7 @@
                         <section class="project-danger-zone" aria-labelledby="erase-title">
                             <h2 class="workshop-section-heading" id="erase-title">Radera kund</h2>
                             <p>Skriv kundens namn. Välj om projekten ska vara kvar utan kunduppgifter eller tas bort tillsammans med bildfilerna.</p>
-                            <form class="workshop-form" method="POST" action="{{ route('app.customers.destroy', $customer) }}" data-confirm="Det går inte att ångra." data-confirm-title="Radera kunden?" data-confirm-match="{{ $customer->name }}" data-confirm-match-message="Skriv kundens namn för att bekräfta.">
+                            <form class="workshop-form" method="POST" action="{{ route('app.customers.destroy', $customer) }}" data-confirm="Det går inte att ångra." data-confirm-title="Radera kunden {{ $customer->name }}?" data-confirm-match="{{ $customer->name }}" data-confirm-match-message="Skriv kundens namn för att bekräfta.">
                                 @csrf
                                 @method('DELETE')
                                 <fieldset class="customer-removal">

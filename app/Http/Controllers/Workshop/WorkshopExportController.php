@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Workshop;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\WindowSash;
+use App\Support\SwedishDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -69,8 +70,8 @@ class WorkshopExportController extends Controller
      */
     private function row(Project $project, ?WindowSash $sash): array
     {
-        $created = ($sash?->created_at ?? $project->created_at)?->timezone('Europe/Stockholm')->format('Y-m-d');
-        $updated = ($sash?->updated_at ?? $project->updated_at)?->timezone('Europe/Stockholm')->format('Y-m-d');
+        $created = ($sash?->created_at ?? $project->created_at)?->copy()->timezone('Europe/Stockholm');
+        $updated = ($sash?->updated_at ?? $project->updated_at)?->copy()->timezone('Europe/Stockholm');
 
         return [
             $this->cell($project->name),
@@ -82,8 +83,8 @@ class WorkshopExportController extends Controller
             $this->cell($sash?->room ?? ''),
             $this->cell($sash?->location ?? ''),
             $this->cell($sash?->stageLabel() ?? ''),
-            $this->cell($created ?? ''),
-            $this->cell($updated ?? ''),
+            $this->cell(SwedishDate::format($created)),
+            $this->cell(SwedishDate::format($updated)),
             $this->cell($sash instanceof WindowSash ? (string) $sash->timeMinutes() : ''),
             $this->cell($sash instanceof WindowSash ? $sash->materialSummary() : ''),
         ];

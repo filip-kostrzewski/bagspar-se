@@ -46,6 +46,11 @@ class SashMaterial extends Model
         };
     }
 
+    public function historyLabel(): string
+    {
+        return self::labelForType($this->type).', '.$this->description.', '.self::quantityLabel($this->quantity).' '.$this->unit;
+    }
+
     public static function quantityLabel(mixed $quantity): string
     {
         if (! is_numeric($quantity)) {

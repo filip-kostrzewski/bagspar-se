@@ -160,9 +160,16 @@ class ProjectController extends Controller
 
         $includeWorkNotes = $request->boolean('anteckningar');
         $includeWorkTime = $request->boolean('arbetstid');
-        $timeTotalMinutes = (int) SashTimeEntry::query()
-            ->whereHas('sash', fn ($query) => $query->where('project_id', $project->getKey()))
-            ->sum('minutes');
+        $timeEntries = SashTimeEntry::query()
+            ->whereIn('sash_id', $sashes->modelKeys())
+            ->orderBy('user_name')
+            ->orderBy('id')
+            ->get();
+        $timeByPerson = $timeEntries
+            ->groupBy('user_name')
+            ->map(fn ($rows): int => (int) $rows->sum('minutes'))
+            ->sortKeys();
+        $timeTotalMinutes = (int) $timeEntries->sum('minutes');
 
         return view('app.projects.report', compact(
             'workshop',
@@ -173,6 +180,8 @@ class ProjectController extends Controller
             'includeWorkNotes',
             'includeWorkTime',
             'timeTotalMinutes',
+            'timeEntries',
+            'timeByPerson',
         ));
     }
 

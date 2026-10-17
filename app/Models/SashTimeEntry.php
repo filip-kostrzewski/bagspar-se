@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\SwedishDate;
+use App\Support\WorkDuration;
 use Database\Factories\SashTimeEntryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +33,17 @@ class SashTimeEntry extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function historyLabel(): string
+    {
+        $label = SwedishDate::format($this->worked_on).', '.WorkDuration::label($this->minutes);
+
+        if (is_string($this->note) && $this->note !== '') {
+            return $label.'. '.$this->note;
+        }
+
+        return $label;
     }
 
     protected function casts(): array

@@ -43,7 +43,7 @@
                 ])
 
                 <div class="form-field">
-                    <label for="delivery_date">Leveransdatum <span class="form-optional">Valfritt</span></label>
+                    <label for="delivery_date">Beräknad leverans <span class="form-optional">Valfritt</span></label>
                     <input id="delivery_date" name="delivery_date" type="date" value="{{ is_string(old('delivery_date')) ? old('delivery_date') : '' }}" @if ($errors->has('delivery_date')) aria-invalid="true" aria-describedby="delivery-date-error" @endif>
                     @error('delivery_date')
                         <p class="form-field__error" id="delivery-date-error">{{ $message }}</p>

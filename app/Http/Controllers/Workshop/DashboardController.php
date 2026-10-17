@@ -60,7 +60,7 @@ class DashboardController extends Controller
             'showingArchived' => $showingArchived,
             'filters' => $filters,
             'hasActiveFilters' => $filters['kund'] !== '' || $filters['rum'] !== '' || $filters['etapp'] !== '' || $filters['leverans'] !== '',
-            'overdueProjects' => $showingArchived ? collect() : $this->deliveryProjects($workshop)->deliveryOverdue($today)->get(),
+            'overdueProjects' => $showingArchived || $filters['leverans'] === 'kommande' ? collect() : $this->deliveryProjects($workshop)->deliveryOverdue($today)->get(),
             'upcomingProjects' => $showingArchived ? collect() : $this->deliveryProjects($workshop)->deliveryDuring($today, $upcomingEnd)->get(),
             'archivedCount' => $workshop->projects()->archived()->count(),
             'hasAnyProjects' => $workshop->projects()->exists(),

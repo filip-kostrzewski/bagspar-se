@@ -6,7 +6,9 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectEvent;
 use App\Models\SashEvent;
+use App\Models\SashMaterial;
 use App\Models\SashPhoto;
+use App\Models\SashTimeEntry;
 use App\Models\User;
 use App\Models\WindowSash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -120,9 +122,9 @@ class CustomerGdprTest extends TestCase
         $json->assertJsonPath('projekt.0.bagar.0.etapp', 'Glasning');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.text', 'Nytt kitt.');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.anvandare', 'Bo Berg');
-        $json->assertJsonPath('projekt.0.bagar.0.historik.0.slag', 'note');
+        $json->assertJsonPath('projekt.0.bagar.0.historik.0.slag', 'anteckning');
         $json->assertJsonPath('projekt.0.bagar.0.historik.0.etikett', 'anteckning');
-        $json->assertJsonPath('projekt.0.historik.0.slag', 'sash-removed');
+        $json->assertJsonPath('projekt.0.historik.0.slag', 'båge borttagen');
         $json->assertJsonPath('projekt.0.historik.0.etikett', 'båge borttagen');
         $json->assertJsonPath('projekt.0.bagar.0.bilder.0.url', route('app.sashes.photos.show', [$project, $sash, $photo]));
         $json->assertJsonPath('projekt.0.historik.0.text', 'Bågen B-1 togs bort.');
@@ -138,7 +140,7 @@ class CustomerGdprTest extends TestCase
         $this->assertStringContainsString('Villa Ek', $csv);
         $this->assertStringContainsString('V2-H', $csv);
         $this->assertStringContainsString('Nytt kitt.', $csv);
-        $this->assertStringContainsString('2026-10-16 10:30', $csv);
+        $this->assertStringContainsString('16 okt 2026 10:30', $csv);
         $this->assertStringContainsString('Bågen B-1 togs bort.', $csv);
         $this->assertStringContainsString(route('app.sashes.photos.show', [$project, $sash, $photo]), $csv);
         $this->assertStringNotContainsString('Hemlig granne', $csv);
@@ -178,7 +180,8 @@ class CustomerGdprTest extends TestCase
             ->get(route('app.customers.edit', $customer))
             ->assertOk()
             ->assertSee('Radera kund', false)
-            ->assertSee('data-confirm-title="Radera kunden?"', false)
+            ->assertSee('data-confirm-title="Radera kunden BRF Eken?"', false)
+            ->assertSee('class="form-field__error" id="confirmation-error"', false)
             ->assertSee('data-confirm-match="BRF Eken"', false)
             ->assertSee('id="removal-anonymize" name="removal" type="radio" value="anonymize" required checked', false)
             ->assertSee('Skriv BRF Eken för att bekräfta.', false)
@@ -308,5 +311,74 @@ class CustomerGdprTest extends TestCase
             ->assertRedirect(route('app.customers.index'));
 
         $this->assertModelMissing($customer);
+    }
+
+    public function test_the_customer_csv_keeps_time_and_material_on_their_own_rows(): void
+    {
+        $owner = User::factory()->create();
+        $customer = Customer::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'BRF Eken',
+        ]);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'customer_id' => $customer->getKey(),
+            'name' => 'Villa Ek',
+            'customer_name' => 'BRF Eken',
+        ]);
+        $sash = WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'V2-H',
+        ]);
+        SashTimeEntry::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'user_id' => $owner->getKey(),
+            'user_name' => 'Bo Berg',
+            'worked_on' => '2026-10-16',
+            'minutes' => 45,
+            'note' => 'TEST kitt',
+        ]);
+        SashMaterial::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'type' => 'glas',
+            'description' => 'Energiglas',
+            'quantity' => '1.50',
+            'unit' => 'm²',
+        ]);
+
+        $csv = $this->actingAs($owner)
+            ->get(route('app.customers.export.csv', $customer))
+            ->streamedContent();
+        $rows = $this->csvRows($csv);
+
+        $this->assertContains(
+            ['Arbetstid', 'BRF Eken', 'Villa Ek', 'V2-H', '16 okt 2026', 'Bo Berg', '45 min. TEST kitt'],
+            $rows,
+        );
+        $this->assertContains(
+            ['Material', 'BRF Eken', 'Villa Ek', 'V2-H', '', 'Glas', '1,5 m² Energiglas'],
+            $rows,
+        );
+    }
+
+    /**
+     * @return list<list<string|null>>
+     */
+    private function csvRows(string $csv): array
+    {
+        $csv = preg_replace('/^\xEF\xBB\xBF/', '', $csv) ?? $csv;
+        $handle = fopen('php://temp', 'w+b');
+        $this->assertNotFalse($handle);
+        fwrite($handle, $csv);
+        rewind($handle);
+
+        $rows = [];
+        while (($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+            $rows[] = $row;
+        }
+
+        fclose($handle);
+
+        return $rows;
     }
 }

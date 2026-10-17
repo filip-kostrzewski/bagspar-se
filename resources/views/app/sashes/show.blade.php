@@ -147,7 +147,7 @@
                         @foreach ($events as $event)
                             <li class="sash-history__item">
                                 <p class="sash-history__meta">
-                                    <time datetime="{{ $event->created_at?->toAtomString() }}">{{ $event->created_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</time>
+                                    <time datetime="{{ $event->created_at?->toAtomString() }}">{{ \App\Support\SwedishDate::formatDateTime($event->created_at) }}</time>
                                     <span>{{ $event->user_name }}</span>
                                 </p>
                                 @if ($event->kind === 'stage')
@@ -165,12 +165,17 @@
 
             <section class="sash-log" aria-labelledby="time-title">
                 <p class="workshop-eyebrow">NEDLAGD TID</p>
-                <h2 class="workshop-section-heading" id="time-title">Arbetstid</h2>
+                <h2 class="workshop-section-heading" id="time-title">Arbetstid @if ($timeEntries->isNotEmpty())<span>{{ \App\Support\WorkDuration::label((int) $timeEntries->sum('minutes')) }}</span>@endif</h2>
                 @if ($timeEntries->isEmpty())
                     <p class="sash-history__empty">Ingen tid är registrerad ännu.</p>
                 @else
+                    <p>Totalt {{ \App\Support\WorkDuration::label((int) $timeEntries->sum('minutes')) }} på den här bågen.</p>
                     <ul class="sash-log__list">
                         @foreach ($timeEntries as $entry)
+                            @php
+                                $timeContext = 'time-'.$entry->getKey();
+                                $editingTime = old('form_context') === $timeContext;
+                            @endphp
                             <li>
                                 <span>{{ \App\Support\SwedishDate::format($entry->worked_on) }}</span>
                                 <span>{{ \App\Support\WorkDuration::label($entry->minutes) }}</span>
@@ -179,7 +184,47 @@
                                     <span>{{ $entry->note }}</span>
                                 @endif
                                 @if (auth()->user()?->isOwner() || $entry->user_id === auth()->id())
-                                    <form method="POST" action="{{ route('app.sashes.time.destroy', [$project, $sash, $entry]) }}">
+                                    <details class="sash-log__edit" @if ($editingTime) open @endif>
+                                        <summary>Ändra</summary>
+                                        <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.time.update', [$project, $sash, $entry]) }}" novalidate>
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="form_context" value="{{ $timeContext }}">
+                                            <div class="form-field">
+                                                <label for="worked-on-{{ $entry->getKey() }}">Datum</label>
+                                                <input id="worked-on-{{ $entry->getKey() }}" name="worked_on" type="date" value="{{ $editingTime && is_string(old('worked_on')) ? old('worked_on') : $entry->worked_on?->toDateString() }}">
+                                                @error('worked_on')
+                                                    @if ($editingTime)
+                                                        <p class="form-field__error">{{ $message }}</p>
+                                                    @endif
+                                                @enderror
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="hours-{{ $entry->getKey() }}">Timmar</label>
+                                                <input id="hours-{{ $entry->getKey() }}" name="hours" type="text" inputmode="numeric" value="{{ $editingTime && is_string(old('hours')) ? old('hours') : (string) intdiv($entry->minutes, 60) }}">
+                                                @error('hours')
+                                                    @if ($editingTime)
+                                                        <p class="form-field__error">{{ $message }}</p>
+                                                    @endif
+                                                @enderror
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="minutes-{{ $entry->getKey() }}">Minuter</label>
+                                                <input id="minutes-{{ $entry->getKey() }}" name="minutes" type="text" inputmode="numeric" value="{{ $editingTime && is_string(old('minutes')) ? old('minutes') : (string) ($entry->minutes % 60) }}">
+                                                @error('minutes')
+                                                    @if ($editingTime)
+                                                        <p class="form-field__error">{{ $message }}</p>
+                                                    @endif
+                                                @enderror
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="note-{{ $entry->getKey() }}">Anteckning <span class="form-optional">Valfritt</span></label>
+                                                <input id="note-{{ $entry->getKey() }}" name="note" type="text" maxlength="500" value="{{ $editingTime && is_string(old('note')) ? old('note') : $entry->note }}">
+                                            </div>
+                                            <button class="workshop-button workshop-button--primary" type="submit">Spara ändring</button>
+                                        </form>
+                                    </details>
+                                    <form method="POST" action="{{ route('app.sashes.time.destroy', [$project, $sash, $entry]) }}" data-confirm="Tiden tas bort från bågen." data-confirm-title="Ta bort tidsposten?">
                                         @csrf
                                         @method('DELETE')
                                         <button class="workshop-button workshop-button--quiet" type="submit">Ta bort</button>
@@ -189,12 +234,12 @@
                         @endforeach
                     </ul>
                 @endif
-                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.time.store', [$project, $sash]) }}">
+                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.time.store', [$project, $sash]) }}" novalidate>
                     @csrf
                     <input type="hidden" name="form_context" value="time">
                     <div class="form-field">
                         <label for="worked_on">Datum</label>
-                        <input id="worked_on" name="worked_on" type="date" value="{{ old('form_context') === 'time' && is_string(old('worked_on')) ? old('worked_on') : now()->timezone('Europe/Stockholm')->toDateString() }}" required @if ($errors->has('worked_on') && old('form_context') === 'time') aria-invalid="true" aria-describedby="worked-on-error" @endif>
+                        <input id="worked_on" name="worked_on" type="date" value="{{ old('form_context') === 'time' && is_string(old('worked_on')) ? old('worked_on') : now()->timezone('Europe/Stockholm')->toDateString() }}" @if ($errors->has('worked_on') && old('form_context') === 'time') aria-invalid="true" aria-describedby="worked-on-error" @endif>
                         @error('worked_on')
                             @if (old('form_context') === 'time')
                                 <p class="form-field__error" id="worked-on-error">{{ $message }}</p>
@@ -203,7 +248,7 @@
                     </div>
                     <div class="form-field">
                         <label for="hours">Timmar</label>
-                        <input id="hours" name="hours" type="number" min="0" max="99" step="1" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('hours')) ? old('hours') : '0' }}" @if ($errors->has('hours') && old('form_context') === 'time') aria-invalid="true" aria-describedby="hours-error" @endif>
+                        <input id="hours" name="hours" type="text" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('hours')) ? old('hours') : '0' }}" @if ($errors->has('hours') && old('form_context') === 'time') aria-invalid="true" aria-describedby="hours-error" @endif>
                         @error('hours')
                             @if (old('form_context') === 'time')
                                 <p class="form-field__error" id="hours-error">{{ $message }}</p>
@@ -212,7 +257,7 @@
                     </div>
                     <div class="form-field">
                         <label for="minutes">Minuter</label>
-                        <input id="minutes" name="minutes" type="number" min="0" max="59" step="1" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('minutes')) ? old('minutes') : '0' }}" @if ($errors->has('minutes') && old('form_context') === 'time') aria-invalid="true" aria-describedby="minutes-error" @endif>
+                        <input id="minutes" name="minutes" type="text" inputmode="numeric" value="{{ old('form_context') === 'time' && is_string(old('minutes')) ? old('minutes') : '0' }}" @if ($errors->has('minutes') && old('form_context') === 'time') aria-invalid="true" aria-describedby="minutes-error" @endif>
                         @error('minutes')
                             @if (old('form_context') === 'time')
                                 <p class="form-field__error" id="minutes-error">{{ $message }}</p>
@@ -229,17 +274,71 @@
 
             <section class="sash-materials" aria-labelledby="materials-title">
                 <p class="workshop-eyebrow">DET SOM GÅTT ÅT</p>
-                <h2 class="workshop-section-heading" id="materials-title">Material</h2>
+                <h2 class="workshop-section-heading" id="materials-title">Material på den här bågen</h2>
                 @if ($materials->isEmpty())
-                    <p class="sash-history__empty">Inget material är registrerat ännu.</p>
+                    <p class="sash-history__empty">Inget material är registrerat på den här bågen ännu.</p>
                 @else
+                    <p>{{ $materials->count() === 1 ? '1 rad' : $materials->count().' rader' }} på den här bågen.</p>
                     <ul class="sash-log__list">
                         @foreach ($materials as $material)
+                            @php
+                                $materialContext = 'material-'.$material->getKey();
+                                $editingMaterial = old('form_context') === $materialContext;
+                            @endphp
                             <li>
                                 <span>{{ \App\Models\SashMaterial::labelForType($material->type) }}</span>
                                 <span>{{ $material->description }}</span>
                                 <span>{{ \App\Models\SashMaterial::quantityLabel($material->quantity) }} {{ $material->unit }}</span>
-                                <form method="POST" action="{{ route('app.sashes.materials.destroy', [$project, $sash, $material]) }}">
+                                <details class="sash-log__edit" @if ($editingMaterial) open @endif>
+                                    <summary>Ändra</summary>
+                                    <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.materials.update', [$project, $sash, $material]) }}" novalidate>
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="form_context" value="{{ $materialContext }}">
+                                        <div class="form-field">
+                                            <label for="material-type-{{ $material->getKey() }}">Typ</label>
+                                            <select id="material-type-{{ $material->getKey() }}" name="type" @if ($errors->has('type') && $editingMaterial) aria-invalid="true" @endif>
+                                                @foreach (\App\Models\SashMaterial::TYPES as $type)
+                                                    <option value="{{ $type }}" @selected(($editingMaterial ? old('type') : $material->type) === $type)>{{ \App\Models\SashMaterial::labelForType($type) }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('type')
+                                                @if ($editingMaterial)
+                                                    <p class="form-field__error">{{ $message }}</p>
+                                                @endif
+                                            @enderror
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="material-description-{{ $material->getKey() }}">Beskrivning</label>
+                                            <input id="material-description-{{ $material->getKey() }}" name="description" type="text" maxlength="160" value="{{ $editingMaterial && is_string(old('description')) ? old('description') : $material->description }}" @if ($errors->has('description') && $editingMaterial) aria-invalid="true" @endif>
+                                            @error('description')
+                                                @if ($editingMaterial)
+                                                    <p class="form-field__error">{{ $message }}</p>
+                                                @endif
+                                            @enderror
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="material-quantity-{{ $material->getKey() }}">Mängd</label>
+                                            <input id="material-quantity-{{ $material->getKey() }}" name="quantity" type="text" inputmode="decimal" value="{{ $editingMaterial && is_string(old('quantity')) ? old('quantity') : \App\Models\SashMaterial::quantityLabel($material->quantity) }}" @if ($errors->has('quantity') && $editingMaterial) aria-invalid="true" @endif>
+                                            @error('quantity')
+                                                @if ($editingMaterial)
+                                                    <p class="form-field__error">{{ $message }}</p>
+                                                @endif
+                                            @enderror
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="material-unit-{{ $material->getKey() }}">Enhet</label>
+                                            <input id="material-unit-{{ $material->getKey() }}" name="unit" type="text" maxlength="20" value="{{ $editingMaterial && is_string(old('unit')) ? old('unit') : $material->unit }}" @if ($errors->has('unit') && $editingMaterial) aria-invalid="true" @endif>
+                                            @error('unit')
+                                                @if ($editingMaterial)
+                                                    <p class="form-field__error">{{ $message }}</p>
+                                                @endif
+                                            @enderror
+                                        </div>
+                                        <button class="workshop-button workshop-button--primary" type="submit">Spara ändring</button>
+                                    </form>
+                                </details>
+                                <form method="POST" action="{{ route('app.sashes.materials.destroy', [$project, $sash, $material]) }}" data-confirm="Materialraden tas bort från bågen." data-confirm-title="Ta bort materialet?">
                                     @csrf
                                     @method('DELETE')
                                     <button class="workshop-button workshop-button--quiet" type="submit">Ta bort</button>
@@ -248,46 +347,46 @@
                         @endforeach
                     </ul>
                 @endif
-                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.materials.store', [$project, $sash]) }}">
+                <form class="workshop-form sash-log__form" method="POST" action="{{ route('app.sashes.materials.store', [$project, $sash]) }}" novalidate>
                     @csrf
                     <input type="hidden" name="form_context" value="material">
                     <div class="form-field">
                         <label for="material-type">Typ</label>
-                        <select id="material-type" name="type" required @if ($errors->has('type') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        <select id="material-type" name="type" @if ($errors->has('type') && old('form_context') === 'material') aria-invalid="true" aria-describedby="material-type-error" @endif>
                             @foreach (\App\Models\SashMaterial::TYPES as $type)
                                 <option value="{{ $type }}" @selected((old('form_context') === 'material' ? old('type') : 'glas') === $type)>{{ \App\Models\SashMaterial::labelForType($type) }}</option>
                             @endforeach
                         </select>
                         @error('type')
                             @if (old('form_context') === 'material')
-                                <p class="form-field__error">{{ $message }}</p>
+                                <p class="form-field__error" id="material-type-error">{{ $message }}</p>
                             @endif
                         @enderror
                     </div>
                     <div class="form-field">
                         <label for="material-description">Beskrivning</label>
-                        <input id="material-description" name="description" type="text" maxlength="160" required value="{{ old('form_context') === 'material' && is_string(old('description')) ? old('description') : '' }}" @if ($errors->has('description') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        <input id="material-description" name="description" type="text" maxlength="160" value="{{ old('form_context') === 'material' && is_string(old('description')) ? old('description') : '' }}" @if ($errors->has('description') && old('form_context') === 'material') aria-invalid="true" aria-describedby="material-description-error" @endif>
                         @error('description')
                             @if (old('form_context') === 'material')
-                                <p class="form-field__error">{{ $message }}</p>
+                                <p class="form-field__error" id="material-description-error">{{ $message }}</p>
                             @endif
                         @enderror
                     </div>
                     <div class="form-field">
                         <label for="material-quantity">Mängd</label>
-                        <input id="material-quantity" name="quantity" type="text" inputmode="decimal" required value="{{ old('form_context') === 'material' && is_string(old('quantity')) ? old('quantity') : '' }}" @if ($errors->has('quantity') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        <input id="material-quantity" name="quantity" type="text" inputmode="decimal" value="{{ old('form_context') === 'material' && is_string(old('quantity')) ? old('quantity') : '' }}" @if ($errors->has('quantity') && old('form_context') === 'material') aria-invalid="true" aria-describedby="material-quantity-error" @endif>
                         @error('quantity')
                             @if (old('form_context') === 'material')
-                                <p class="form-field__error">{{ $message }}</p>
+                                <p class="form-field__error" id="material-quantity-error">{{ $message }}</p>
                             @endif
                         @enderror
                     </div>
                     <div class="form-field">
                         <label for="material-unit">Enhet</label>
-                        <input id="material-unit" name="unit" type="text" maxlength="20" required value="{{ old('form_context') === 'material' && is_string(old('unit')) ? old('unit') : '' }}" @if ($errors->has('unit') && old('form_context') === 'material') aria-invalid="true" @endif>
+                        <input id="material-unit" name="unit" type="text" maxlength="20" value="{{ old('form_context') === 'material' && is_string(old('unit')) ? old('unit') : '' }}" @if ($errors->has('unit') && old('form_context') === 'material') aria-invalid="true" aria-describedby="material-unit-error" @endif>
                         @error('unit')
                             @if (old('form_context') === 'material')
-                                <p class="form-field__error">{{ $message }}</p>
+                                <p class="form-field__error" id="material-unit-error">{{ $message }}</p>
                             @endif
                         @enderror
                     </div>

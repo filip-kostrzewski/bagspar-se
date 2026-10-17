@@ -15,6 +15,10 @@ class SashEvent extends Model
 
     public const KIND_PHOTO = 'photo';
 
+    public const KIND_TIME = 'time';
+
+    public const KIND_MATERIAL = 'material';
+
     public const UPDATED_AT = null;
 
     /** @use HasFactory<SashEventFactory> */

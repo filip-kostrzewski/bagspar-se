@@ -35,13 +35,13 @@ class DeliveryDateTest extends TestCase
 
         $this->get(route('app.projects.show', $project))
             ->assertOk()
-            ->assertSee('Leveransdatum', false)
+            ->assertSee('Beräknad leverans', false)
             ->assertSee('20 okt 2026', false)
             ->assertSee('2026-10-20', false);
 
         $this->get(route('app.projects.report', $project))
             ->assertOk()
-            ->assertSee('Leveransdatum', false)
+            ->assertSee('Beräknad leverans', false)
             ->assertSee('20 okt 2026', false);
 
         $this->patch(route('app.projects.update', $project), [
@@ -99,8 +99,10 @@ class DeliveryDateTest extends TestCase
         $export = $this->get(route('app.customers.export.json', $customer));
         $export->assertOk();
         $export->assertJsonPath('projekt.0.leveransdatum', '2026-10-20');
-        $this->assertStringContainsString('Leveransdatum', $this->get(route('app.customers.export.csv', $customer))->streamedContent());
-        $this->assertStringContainsString('2026-10-20', $this->get(route('app.customers.export.csv', $customer))->streamedContent());
+        $csv = $this->get(route('app.customers.export.csv', $customer))->streamedContent();
+        $this->assertStringContainsString('Beräknad leverans', $csv);
+        $this->assertStringContainsString('20 okt 2026', $csv);
+        $this->assertStringNotContainsString('2026-10-20', $csv);
     }
 
     public function test_the_dashboard_groups_overdue_and_this_weeks_deliveries(): void
@@ -152,7 +154,7 @@ class DeliveryDateTest extends TestCase
         $this->assertStringNotContainsString('Villa Sen', $upcomingSection);
         $this->assertStringNotContainsString('Villa Klar', $upcomingSection);
         $this->assertStringNotContainsString('Villa Tom', $upcomingSection);
-        $this->assertStringContainsString('Leveransdatum 18 okt 2026', $html);
+        $this->assertStringContainsString('Beräknad leverans 18 okt 2026', $html);
         $this->assertNotNull($lateThisWeek->getKey());
         $this->assertNotNull($today->getKey());
         $this->assertNotNull($edge->getKey());
@@ -173,7 +175,11 @@ class DeliveryDateTest extends TestCase
         $this->assertStringNotContainsString('Villa Utan', $list);
         $this->assertStringNotContainsString('Villa Främmande', $list);
 
-        $week = $this->after($this->get(route('app.dashboard', ['leverans' => 'kommande']))->assertOk()->getContent(), 'id="projects-title"');
+        $kommande = $this->get(route('app.dashboard', ['leverans' => 'kommande']))->assertOk();
+        $kommandeHtml = $kommande->getContent();
+        $this->assertIsString($kommandeHtml);
+        $this->assertStringNotContainsString('id="overdue-title"', $kommandeHtml);
+        $week = $this->after($kommandeHtml, 'id="projects-title"');
         $this->assertStringContainsString('Villa Idag', $week);
         $this->assertStringContainsString('Villa Söndag', $week);
         $this->assertStringContainsString('Villa Sex', $week);

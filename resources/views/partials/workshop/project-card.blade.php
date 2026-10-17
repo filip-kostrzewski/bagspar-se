@@ -21,7 +21,7 @@
             </p>
         @endif
         @if ($project->delivery_date)
-            <p class="project-card__location">Leveransdatum {{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
+            <p class="project-card__location">Beräknad leverans {{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
         @endif
         <div class="project-card__footer">
             <span>Öppna arbetsöversikten</span>

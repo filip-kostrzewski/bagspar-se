@@ -29,4 +29,15 @@ final class SwedishDate
 
         return $date->format('j').' '.$months[(int) $date->format('n')].' '.$date->format('Y');
     }
+
+    public static function formatDateTime(mixed $date): string
+    {
+        if (! $date instanceof Carbon) {
+            return '';
+        }
+
+        $local = $date->copy()->timezone('Europe/Stockholm');
+
+        return self::format($local).' '.$local->format('H:i');
+    }
 }

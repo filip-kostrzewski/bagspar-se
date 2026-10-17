@@ -46,7 +46,7 @@
                         <p><span>Plats</span>{{ $project->location }}</p>
                     @endif
                     @if ($project->delivery_date)
-                        <p><span>Leveransdatum</span>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
+                        <p><span>Beräknad leverans</span>{{ \App\Support\SwedishDate::format($project->delivery_date) }}</p>
                     @endif
                     <p><span>Arbetskort</span>{{ $sashCount }} {{ $sashCount === 1 ? 'båge' : 'bågar' }}</p>
                 </div>
@@ -136,7 +136,7 @@
                         'selectedCustomerId' => old('form_context') === 'project' ? old('customer_id') : $project->customer_id,
                     ])
                     <div class="form-field">
-                        <label for="edit-delivery-date">Leveransdatum</label>
+                        <label for="edit-delivery-date">Beräknad leverans</label>
                         <input id="edit-delivery-date" name="delivery_date" type="date" value="{{ old('form_context') === 'project' ? (is_string(old('delivery_date')) ? old('delivery_date') : '') : ($project->delivery_date?->toDateString() ?? '') }}" @if ($errors->has('delivery_date') && old('form_context') === 'project') aria-invalid="true" aria-describedby="edit-delivery-date-error" @endif>
                         @error('delivery_date')
                             @if (old('form_context') === 'project')
@@ -234,7 +234,7 @@
                     @foreach ($projectEvents as $event)
                         <li class="sash-history__item">
                             <p class="sash-history__meta">
-                                <time datetime="{{ $event->created_at?->toAtomString() }}">{{ $event->created_at?->timezone('Europe/Stockholm')->format('Y-m-d H:i') }}</time>
+                                <time datetime="{{ $event->created_at?->toAtomString() }}">{{ \App\Support\SwedishDate::formatDateTime($event->created_at) }}</time>
                                 <span>{{ $event->user_name }}</span>
                             </p>
                             @if (is_string($event->body) && $event->body !== '')

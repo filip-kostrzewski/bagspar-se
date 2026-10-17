@@ -59,8 +59,10 @@ class WorkshopExportTest extends TestCase
         $this->assertStringContainsString('BRF Eken', $csv);
         $this->assertStringContainsString('V2-H', $csv);
         $this->assertStringContainsString('Glasning', $csv);
-        $this->assertStringContainsString('2026-10-02', $csv);
-        $this->assertStringContainsString('2026-10-16', $csv);
+        $this->assertStringContainsString('2 okt 2026', $csv);
+        $this->assertStringContainsString('16 okt 2026', $csv);
+        $this->assertStringNotContainsString('2026-10-02', $csv);
+        $this->assertStringNotContainsString('2026-10-16', $csv);
         $this->assertStringNotContainsString('Annat företags projekt', $csv);
         $this->assertStringNotContainsString('Hemlig kund', $csv);
     }
