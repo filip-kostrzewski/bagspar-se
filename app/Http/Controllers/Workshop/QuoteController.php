@@ -34,6 +34,7 @@ class QuoteController extends Controller
         $quote = $this->quoteFor($project);
 
         return view('app.projects.quote', [
+            'workshop' => $project->workshop,
             'project' => $project,
             'quote' => $quote,
             'rows' => $this->formRows($quote),

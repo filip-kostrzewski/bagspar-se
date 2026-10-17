@@ -104,7 +104,7 @@
                                 <tr>
                                     <td>
                                         <label class="visually-hidden" for="quote-line-{{ $index }}-description">Beskrivning, rad {{ $number }}</label>
-                                        <input id="quote-line-{{ $index }}-description" name="lines[{{ $index }}][description]" type="text" maxlength="200" value="{{ $row['description'] }}" @if ($errors->has('lines.'.$index.'.description')) aria-invalid="true" @endif>
+                                        <input id="quote-line-{{ $index }}-description" name="lines[{{ $index }}][description]" type="text" maxlength="200" placeholder="Beskrivning, till exempel Renovering av båge 2-KÖK-F1-B1" value="{{ $row['description'] }}" @if ($errors->has('lines.'.$index.'.description')) aria-invalid="true" @endif>
                                     </td>
                                     <td>
                                         <label class="visually-hidden" for="quote-line-{{ $index }}-quantity">Antal, rad {{ $number }}</label>

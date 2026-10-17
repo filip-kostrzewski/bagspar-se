@@ -19,6 +19,7 @@ final class ProjectReport
             ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])
             ->orderBy('code')
             ->get();
+        $quote = $project->quote()->sentOrAccepted()->with('lines')->first();
         $clientStatusUrl = $project->clientStatusIsPublic()
             ? route('client-status.show', ['token' => $project->client_status_token])
             : null;
@@ -49,6 +50,7 @@ final class ProjectReport
             'workshop' => $workshop,
             'project' => $project,
             'sashes' => $sashes,
+            'quote' => $quote,
             'clientStatusUrl' => $clientStatusUrl,
             'clientStatusQr' => $clientStatusQr,
             'clientStatusQrImage' => $clientStatusQrImage,

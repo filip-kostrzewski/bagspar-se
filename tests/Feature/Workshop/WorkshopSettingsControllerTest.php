@@ -279,7 +279,7 @@ class WorkshopSettingsControllerTest extends TestCase
 
         $path = 'workshop-logos/'.$owner->workshop->getKey().'/logo.png';
         Storage::disk('local')->put($path, $png);
-        $owner->workshop->update(['logo_path' => $path]);
+        $owner->workshop->update(['logo_path' => $path, 'name' => 'Ekens Fönster']);
 
         $preview = 'data:image/png;base64,'.base64_encode($png);
 

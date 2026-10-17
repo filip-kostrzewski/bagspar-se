@@ -42,6 +42,7 @@ This repository is the public site and the example card.
 | `/app/projekt/{id}/offert` and `/offert/{token}` | The workshop writes, sends, and downloads a quote. The customer opens the public link and accepts with a name |
 | `/app/projekt/{id}/mottagning`, `/app/projekt/{id}/mottagning.pdf`, `POST /app/projekt/{id}/mottagning/godkann` and `DELETE /app/projekt/{id}/mottagning/godkannande` | The intake protocol: sash condition and the before photos, as a page and a PDF. The workshop records an on-site approval; the owner can remove an approval |
 | `POST /status/{token}/mottagning/godkann` | The customer approves the intake protocol on the status link with a name. Stored once |
+| `/app/konto` | Every user changes their own name, e-mail, and password. A new e-mail must be confirmed again; a new password ends the user's other sessions |
 | `/app/abonnemang` | Billing page inside the workshop app. The owner orders or changes the subscription |
 | `/up` | Laravel health check |
 

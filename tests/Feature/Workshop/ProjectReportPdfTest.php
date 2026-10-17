@@ -4,6 +4,8 @@ namespace Tests\Feature\Workshop;
 
 use App\Models\Customer;
 use App\Models\Project;
+use App\Models\Quote;
+use App\Models\QuoteLine;
 use App\Models\User;
 use App\Models\WindowSash;
 use App\Support\EmbeddedImage;
@@ -224,6 +226,50 @@ class ProjectReportPdfTest extends TestCase
         $this->assertTrue($this->pdfStreamContains($statusPage, 'Skanna koden'));
         $this->assertStringContainsString(' Do', $statusPage);
         $this->assertStringNotContainsString(' Do', $openingPage);
+    }
+
+    public function test_the_pdf_markup_shows_intake_approval_sash_condition_and_the_quote(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $project->forceFill([
+            'intake_approved_at' => now(),
+            'intake_approved_name' => 'Anna Ek',
+            'intake_approved_via' => 'on_site',
+        ])->save();
+        WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'intake_notes' => 'Spricka i nedre vänstra hörnet',
+        ]);
+        $quote = Quote::factory()->accepted()->create([
+            'project_id' => $project->getKey(),
+            'accepted_name' => 'Anna Ek',
+        ]);
+        QuoteLine::factory()->create(['quote_id' => $quote->getKey(), 'unit_price_ore' => 400000]);
+
+        $render = fn (): string => view('app.projects.report-pdf', [
+            ...ProjectReport::data($owner->workshop, $project->fresh(), false, false),
+            'photoEmbeds' => [],
+            'logoEmbed' => null,
+        ])->render();
+
+        $html = $render();
+
+        $this->assertStringContainsString($project->fresh()->intakeApprovalLabel(), $html);
+        $this->assertStringContainsString('Skick vid mottagning: Spricka i nedre vänstra hörnet', $html);
+        $this->assertStringContainsString('5 000 kr inkl. moms, godkänd', $html);
+        $this->assertStringContainsString('av Anna Ek', $html);
+
+        $quote->update(['status' => Quote::STATUS_SENT, 'accepted_at' => null, 'accepted_name' => null]);
+        $sent = $render();
+
+        $this->assertStringContainsString('Offert skickad', $sent);
+        $this->assertStringContainsString('inte godkänd', $sent);
+
+        $this->actingAs($owner)
+            ->get(route('app.projects.report.pdf', $project))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
     }
 
     /**

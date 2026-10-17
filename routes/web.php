@@ -15,6 +15,7 @@ use App\Http\Controllers\PilotLeadController;
 use App\Http\Controllers\QuotePublicController;
 use App\Http\Controllers\SignupAdminController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Workshop\AccountController;
 use App\Http\Controllers\Workshop\BillingController;
 use App\Http\Controllers\Workshop\CustomerController;
 use App\Http\Controllers\Workshop\DashboardController;
@@ -146,6 +147,9 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'auth.session', 'verified.production', 'workshop.access'])->prefix('app')->name('app.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/konto', [AccountController::class, 'edit'])->name('account.edit');
+    Route::patch('/konto', [AccountController::class, 'update'])->middleware('throttle:10,1')->name('account.update');
+    Route::patch('/konto/losenord', [AccountController::class, 'updatePassword'])->middleware('throttle:10,1')->name('account.password');
     Route::get('/abonnemang', [BillingController::class, 'edit'])->name('billing.edit');
     Route::post('/abonnemang', [BillingController::class, 'store'])->middleware('throttle:10,1')->name('billing.store');
     Route::get('/export.csv', WorkshopExportController::class)->name('export');

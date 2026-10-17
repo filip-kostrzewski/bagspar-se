@@ -3920,3 +3920,128 @@ body.label-print-sheet {
         max-width: none;
     }
 }
+
+.account-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px 28px;
+    max-width: 560px;
+    margin: 28px 0 0;
+    padding: 18px 22px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--white);
+}
+
+.account-summary div {
+    min-width: 0;
+}
+
+.account-summary dt {
+    margin: 0 0 4px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.account-summary dd {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.account-note {
+    max-width: 560px;
+    margin: 10px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.account-section {
+    max-width: 560px;
+    margin-top: 44px;
+}
+
+/* Quote editor on a phone: one card per line instead of a wide table. */
+
+@media (max-width: 640px) {
+    .quote-lines--edit,
+    .quote-lines--edit tbody,
+    .quote-lines--edit tr,
+    .quote-lines--edit td {
+        display: block;
+        width: auto;
+    }
+
+    .quote-lines--edit thead {
+        display: none;
+    }
+
+    .quote-lines--edit caption {
+        display: block;
+    }
+
+    .quote-lines--edit tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+        gap: 8px 10px;
+        padding: 12px 0;
+        border-top: 1px solid var(--rule);
+    }
+
+    .quote-lines--edit td {
+        padding: 0;
+        border: 0;
+        text-align: left;
+    }
+
+    .quote-lines--edit td:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .quote-lines--edit td:nth-child(2),
+    .quote-lines--edit td:nth-child(3),
+    .quote-lines--edit td:nth-child(4) {
+        width: auto;
+    }
+
+    .quote-lines--edit td:nth-child(2)::before,
+    .quote-lines--edit td:nth-child(3)::before,
+    .quote-lines--edit td:nth-child(4)::before {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink-soft);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .quote-lines--edit td:nth-child(2)::before {
+        content: 'Antal';
+    }
+
+    .quote-lines--edit td:nth-child(3)::before {
+        content: 'À-pris exkl. moms';
+    }
+
+    .quote-lines--edit td:nth-child(4)::before {
+        content: 'Summa';
+    }
+
+    .quote-lines--edit td:nth-child(4) {
+        align-self: end;
+        padding-bottom: 9px;
+        white-space: nowrap;
+    }
+}
+
+.report-sash__intake {
+    margin: 6px 0 0;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.5;
+}

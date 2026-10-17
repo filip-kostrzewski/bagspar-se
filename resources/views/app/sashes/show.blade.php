@@ -513,7 +513,7 @@
             <div class="photo-upload-panel">
                 <div>
                     <h3>Lägg till en bild</h3>
-                    <p>JPG, PNG eller WebP. Högst 5 MB, 16 megapixlar och 6 000 pixlar per sida. Upp till 20 bilder per båge.</p>
+                    <p>JPG, PNG eller WebP. Högst 5 MB, 12 megapixlar och 6 000 pixlar per sida. Upp till 20 bilder per båge.</p>
                 </div>
                 <form class="workshop-form photo-upload-form" method="POST" action="{{ route('app.sashes.photos.store', [$project, $sash]) }}" enctype="multipart/form-data" data-photo-upload>
                     @csrf

@@ -64,6 +64,21 @@
                     </td>
                 </tr>
             @endif
+            @if ($project->intakeIsApproved())
+                <tr><th>Mottagning</th><td>{{ $project->intakeApprovalLabel() }}</td></tr>
+            @endif
+            @if ($quote)
+                <tr>
+                    <th>Offert</th>
+                    <td>
+                        @if ($quote->isAccepted())
+                            {{ \App\Support\Kronor::format($quote->totalOre()) }} inkl. moms, godkänd {{ \App\Support\SwedishDate::formatDateTime($quote->accepted_at) }}@if (is_string($quote->accepted_name) && $quote->accepted_name !== '') av {{ $quote->accepted_name }}@endif
+                        @else
+                            Offert skickad {{ \App\Support\SwedishDate::format($quote->sent_at ?? $quote->created_at) }}, inte godkänd
+                        @endif
+                    </td>
+                </tr>
+            @endif
             @if ($includeWorkTime)
                 <tr><th>Arbetstid totalt</th><td>{{ \App\Support\WorkDuration::label($timeTotalMinutes) }}</td></tr>
             @endif
@@ -99,6 +114,9 @@
             <h3>{{ $sash->code }}</h3>
             <p>{{ collect([$sash->room, $sash->location])->filter()->join(' · ') ?: 'Plats inte angiven' }}</p>
             <p>@include('partials.workshop.stage-label', ['stage' => $sash->stage])</p>
+            @if (is_string($sash->intake_notes) && $sash->intake_notes !== '')
+                <p>Skick vid mottagning: {{ $sash->intake_notes }}</p>
+            @endif
             @if ($includeWorkTime)
                 @php
                     $sashTime = $timeEntries->where('sash_id', $sash->getKey());

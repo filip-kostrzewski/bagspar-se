@@ -3,6 +3,8 @@
 namespace Tests\Feature\Workshop;
 
 use App\Models\Project;
+use App\Models\Quote;
+use App\Models\QuoteLine;
 use App\Models\SashPhoto;
 use App\Models\User;
 use App\Models\WindowSash;
@@ -94,5 +96,55 @@ class ProjectReportTest extends TestCase
             ->assertSee('kittet löst i nederkant', false)
             ->assertSee('HEMLIG PROJEKTANTECKNING', false)
             ->assertSee('Före · 16 okt 2026', false);
+    }
+
+    public function test_report_shows_intake_approval_sash_condition_and_the_quote(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $project->forceFill([
+            'intake_approved_at' => Carbon::parse('2026-10-14 09:30:00', 'Europe/Stockholm'),
+            'intake_approved_name' => 'Anna Ek',
+            'intake_approved_via' => 'link',
+        ])->save();
+        WindowSash::factory()->create([
+            'project_id' => $project->getKey(),
+            'code' => 'B-1',
+            'intake_notes' => 'Spricka i nedre vänstra hörnet',
+        ]);
+        WindowSash::factory()->create(['project_id' => $project->getKey(), 'code' => 'B-2']);
+        $quote = Quote::factory()->accepted()->create([
+            'project_id' => $project->getKey(),
+            'accepted_name' => 'Anna Ek',
+        ]);
+        QuoteLine::factory()->create(['quote_id' => $quote->getKey(), 'unit_price_ore' => 400000]);
+
+        $this->actingAs($owner)
+            ->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertSee($project->fresh()->intakeApprovalLabel(), false)
+            ->assertSee('Skick vid mottagning: Spricka i nedre vänstra hörnet', false)
+            ->assertSee('5 000 kr inkl. moms, godkänd', false)
+            ->assertSee('av Anna Ek', false)
+            ->assertDontSee('inte godkänd', false);
+        $this->assertSame(1, substr_count(
+            $this->get(route('app.projects.report', $project))->getContent(),
+            'Skick vid mottagning',
+        ));
+
+        $quote->update(['status' => Quote::STATUS_SENT, 'accepted_at' => null, 'accepted_name' => null]);
+
+        $this->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertSee('Offert skickad', false)
+            ->assertSee('inte godkänd', false)
+            ->assertDontSee('inkl. moms', false);
+
+        $quote->update(['status' => Quote::STATUS_DRAFT]);
+
+        $this->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertDontSee('Offert skickad', false)
+            ->assertDontSee('inkl. moms', false);
     }
 }
