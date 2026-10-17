@@ -17,10 +17,7 @@ class ClientStatusController extends Controller
         $project = $this->projectForToken($token);
         $workshop = $project->workshop()->firstOrFail();
         $sashes = $project->windowSashes()
-            ->with(['photos' => fn (HasMany $query) => $query
-                ->whereIn('moment', SashPhoto::MOMENTS)
-                ->orderBy('created_at')
-                ->orderBy('id')])
+            ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])
             ->orderBy('code')
             ->get();
 
@@ -31,8 +28,6 @@ class ClientStatusController extends Controller
     {
         $project = $this->projectForToken($token);
         $photo = SashPhoto::query()->whereKey($photo->getKey())->firstOrFail();
-        abort_unless(in_array($photo->moment, SashPhoto::MOMENTS, true), 404);
-
         $sash = $photo->sash()->first();
         abort_unless($sash !== null && $sash->project_id === $project->getKey(), 404);
 

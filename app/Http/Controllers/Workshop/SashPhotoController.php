@@ -93,6 +93,24 @@ class SashPhotoController extends Controller
         return back()->with('status', 'Bilden har sparats på arbetskortet.');
     }
 
+    public function update(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): RedirectResponse
+    {
+        $workshop = $this->currentWorkshop($request);
+        $project = $this->projectForWorkshop($workshop, $project);
+        $sash = $this->sashForProject($project, $sash);
+        $photo = $sash->photos()->whereKey($photo->getKey())->firstOrFail();
+        $validated = $request->validate([
+            'moment' => ['required', Rule::in(SashPhoto::MOMENTS)],
+        ], [
+            'moment.required' => 'Välj om bilden är tagen före eller efter.',
+            'moment.in' => 'Välj före eller efter.',
+        ]);
+
+        $photo->update(['moment' => $validated['moment']]);
+
+        return back()->with('status', 'Bildens tillfälle har sparats.');
+    }
+
     public function show(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): BinaryFileResponse
     {
         $workshop = $this->currentWorkshop($request);

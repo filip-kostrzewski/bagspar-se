@@ -49,8 +49,14 @@
                         @if ($sash->photos->isNotEmpty())
                             <div class="report-photo-grid" aria-label="Bilder för båge {{ $sash->code }}">
                                 @foreach ($sash->photos as $photo)
+                                    @php
+                                        $photoUrl = route('client-status.photos', ['token' => $token, 'photo' => $photo]);
+                                        $photoAlt = ($photo->documentMomentLabel() ?? 'Foto').' för båge '.$sash->code;
+                                    @endphp
                                     <figure>
-                                        <img src="{{ route('client-status.photos', ['token' => $token, 'photo' => $photo]) }}" alt="{{ $photo->documentMomentLabel() ?? 'Foto' }} för båge {{ $sash->code }}" width="640" height="480">
+                                        <a class="status-photo" href="{{ $photoUrl }}" data-enlarge>
+                                            <img src="{{ $photoUrl }}" alt="{{ $photoAlt }}" width="640" height="480" loading="lazy" decoding="async">
+                                        </a>
                                         <figcaption>{{ $photo->documentCaption() }}</figcaption>
                                     </figure>
                                 @endforeach

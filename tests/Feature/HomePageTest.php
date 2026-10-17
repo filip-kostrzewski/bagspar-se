@@ -64,9 +64,9 @@ class HomePageTest extends TestCase
         $response->assertSee('width="468"', false);
         $response->assertSee('height="218"', false);
         $response->assertSee('images/product/projektrapport.webp', false);
-        $response->assertSee('alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2"', false);
-        $response->assertSee('width="1960"', false);
-        $response->assertSee('height="3102"', false);
+        $response->assertSee('alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H"', false);
+        $response->assertSee('width="2200"', false);
+        $response->assertSee('height="3066"', false);
         $response->assertSee('Skärmbilder från ett exempel med testuppgifter.', false);
         $response->assertDontSee('wisegent', false);
         $response->assertDontSee('Wisegent', false);

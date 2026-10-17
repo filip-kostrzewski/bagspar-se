@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\SashPhotoFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,11 +33,23 @@ class SashPhoto extends Model
         return $this->belongsTo(WindowSash::class, 'sash_id');
     }
 
+    /**
+     * @param  Builder<SashPhoto>  $query
+     * @return Builder<SashPhoto>
+     */
+    public function scopeInDocumentOrder(Builder $query): Builder
+    {
+        return $query
+            ->orderByRaw("CASE WHEN moment = 'after' THEN 1 ELSE 0 END")
+            ->orderBy('created_at')
+            ->orderBy('id');
+    }
+
     public function documentMomentLabel(): ?string
     {
         return match ($this->moment) {
-            'before' => 'Före',
             'after' => 'Efter',
+            'before', null => 'Före',
             default => null,
         };
     }

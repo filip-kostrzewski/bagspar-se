@@ -231,7 +231,7 @@
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="1960" height="3102" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="2200" height="3066" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
         </div>
@@ -253,7 +253,7 @@
                 <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning. Kunden får en separat statuslänk.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2" width="1960" height="3102" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H" width="2200" height="3066" loading="lazy" decoding="async">
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
             </figure>
         </div>

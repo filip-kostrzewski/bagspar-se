@@ -122,5 +122,6 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'show'])->whereNumber(['project', 'sash'])->name('sashes.show');
     Route::patch('/projekt/{project}/bagar/{sash}', [WindowSashController::class, 'update'])->whereNumber(['project', 'sash'])->name('sashes.update');
     Route::post('/projekt/{project}/bagar/{sash}/bilder', [SashPhotoController::class, 'store'])->middleware('throttle:10,1')->whereNumber(['project', 'sash'])->name('sashes.photos.store');
+    Route::patch('/projekt/{project}/bagar/{sash}/bilder/{photo}', [SashPhotoController::class, 'update'])->whereNumber(['project', 'sash', 'photo'])->name('sashes.photos.update');
     Route::get('/projekt/{project}/bagar/{sash}/bilder/{photo}', [SashPhotoController::class, 'show'])->whereNumber(['project', 'sash', 'photo'])->name('sashes.photos.show');
 });

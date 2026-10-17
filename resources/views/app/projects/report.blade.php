@@ -33,6 +33,13 @@
                 </div>
             </div>
             <div class="report-header__actions no-print">
+                <form class="report-notes-toggle" method="GET" action="{{ route('app.projects.report', $project) }}">
+                    <label class="workshop-checkbox" for="include-work-notes">
+                        <input id="include-work-notes" name="anteckningar" type="checkbox" value="1" @checked($includeWorkNotes)>
+                        <span>Visa arbetsanteckningar i rapporten</span>
+                    </label>
+                    <button class="workshop-button workshop-button--quiet" type="submit">Uppdatera rapporten</button>
+                </form>
                 <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.show', $project) }}">Till projektet</a>
                 <button class="workshop-button workshop-button--primary" type="button" data-print-report>Skriv ut / spara som PDF</button>
             </div>
@@ -57,7 +64,7 @@
                     <div><dt>Skapat</dt><dd>{{ $project->created_at->timezone('Europe/Stockholm')->format('Y-m-d') }}</dd></div>
                 @endif
             </dl>
-            @if ($project->notes)
+            @if ($includeWorkNotes && $project->notes)
                 <div class="report-project__notes">
                     <h2>Projektanteckningar</h2>
                     <p>{{ $project->notes }}</p>
@@ -83,7 +90,7 @@
                             </div>
                             <p class="report-sash__state">@include('partials.workshop.stage-label', ['stage' => $sash->stage])</p>
                         </header>
-                        @if ($sash->notes)
+                        @if ($includeWorkNotes && $sash->notes)
                             <div class="report-sash__notes">
                                 <h4>Arbetsanteckningar</h4>
                                 <p>{{ $sash->notes }}</p>

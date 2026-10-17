@@ -48,6 +48,7 @@ class ClientStatusTest extends TestCase
             'moment' => null,
             'original_filename' => 'intern-fil.jpg',
         ]);
+        Storage::disk('local')->put($hidden->path, 'older-photo');
 
         $this->actingAs($owner)->patch(route('app.settings.update'), [
             'name' => 'Ekens Fönster',
@@ -76,6 +77,7 @@ class ClientStatusTest extends TestCase
         $this->assertIsString($token);
 
         $before = SashPhoto::query()->where('moment', 'before')->firstOrFail();
+        $after = SashPhoto::query()->where('moment', 'after')->firstOrFail();
         $status = $this->get(route('client-status.show', ['token' => $token]));
 
         $status->assertOk()
@@ -93,7 +95,13 @@ class ClientStatusTest extends TestCase
             ->assertSee('Glasning', false)
             ->assertSee('Före · 2026-10-16', false)
             ->assertSee('Efter · 2026-10-16', false)
-            ->assertSee(route('client-status.photos', ['token' => $token, 'photo' => $before]), false)
+            ->assertSee('loading="lazy"', false)
+            ->assertSee('data-enlarge', false)
+            ->assertSeeInOrder([
+                route('client-status.photos', ['token' => $token, 'photo' => $hidden]),
+                route('client-status.photos', ['token' => $token, 'photo' => $before]),
+                route('client-status.photos', ['token' => $token, 'photo' => $after]),
+            ], false)
             ->assertDontSee('HEMLIG PROJEKTANTECKNING', false)
             ->assertDontSee('HEMLIG BÅGANTECKNING', false)
             ->assertDontSee('BRF Hemlig', false)
@@ -103,7 +111,9 @@ class ClientStatusTest extends TestCase
         $this->get(route('client-status.photos', ['token' => $token, 'photo' => $before]))
             ->assertOk()
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
-        $this->get(route('client-status.photos', ['token' => $token, 'photo' => $hidden]))->assertNotFound();
+        $this->get(route('client-status.photos', ['token' => $token, 'photo' => $hidden]))
+            ->assertOk()
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
         $this->get(route('client-status.logo', ['token' => $token]))->assertOk();
 
         $report = $this->actingAs($member)->get(route('app.projects.report', $project));

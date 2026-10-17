@@ -214,8 +214,21 @@
                                 <img src="{{ route('app.sashes.photos.show', [$project, $sash, $photo]) }}" alt="{{ $photo->original_filename ?? 'Foto' }} för båge {{ $sash->code }}" loading="lazy">
                             </a>
                             <figcaption>
-                                <strong>{{ $photo->original_filename ?? 'Foto' }}</strong>
+                                <strong>{{ $photo->documentMomentLabel() ?? 'Foto' }}</strong>
                                 <span>{{ $photo->created_at?->timezone('Europe/Stockholm')->format('Y-m-d') }}</span>
+                                <form method="POST" action="{{ route('app.sashes.photos.update', [$project, $sash, $photo]) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <label class="visually-hidden" for="moment-{{ $photo->getKey() }}">Tillfälle för bilden</label>
+                                    <select id="moment-{{ $photo->getKey() }}" name="moment" required>
+                                        @if ($photo->moment === null)
+                                            <option value="" selected>Välj före eller efter</option>
+                                        @endif
+                                        <option value="before" @selected($photo->moment === 'before')>Före</option>
+                                        <option value="after" @selected($photo->moment === 'after')>Efter</option>
+                                    </select>
+                                    <button class="workshop-button workshop-button--quiet" type="submit">Spara tillfälle</button>
+                                </form>
                             </figcaption>
                         </figure>
                     @endforeach
@@ -238,19 +251,26 @@
                 <form class="workshop-form photo-upload-form" method="POST" action="{{ route('app.sashes.photos.store', [$project, $sash]) }}" enctype="multipart/form-data" data-photo-upload>
                     @csrf
                     <input type="hidden" name="form_context" value="photo">
-                    <div class="form-field">
-                        <label for="moment">Tillfälle</label>
-                        <select id="moment" name="moment" required @if ($errors->has('moment') && old('form_context') === 'photo') aria-invalid="true" aria-describedby="moment-error" @endif>
-                            <option value="" @selected(! in_array(old('moment'), ['before', 'after'], true))>Välj före eller efter</option>
-                            <option value="before" @selected(old('moment') === 'before')>Före</option>
-                            <option value="after" @selected(old('moment') === 'after')>Efter</option>
-                        </select>
+                    @php
+                        $hasAfterPhoto = $photos->contains(fn ($existingPhoto): bool => $existingPhoto->moment === 'after');
+                        $selectedMoment = old('form_context') === 'photo' ? old('moment') : ($hasAfterPhoto ? null : 'before');
+                    @endphp
+                    <fieldset class="moment-choice">
+                        <legend>Tillfälle</legend>
+                        <label for="moment-before">
+                            <input id="moment-before" name="moment" type="radio" value="before" required @checked($selectedMoment === 'before') @if ($errors->has('moment') && old('form_context') === 'photo') aria-invalid="true" aria-describedby="moment-error" @endif>
+                            <span>Före</span>
+                        </label>
+                        <label for="moment-after">
+                            <input id="moment-after" name="moment" type="radio" value="after" @checked($selectedMoment === 'after')>
+                            <span>Efter</span>
+                        </label>
                         @error('moment')
                             @if (old('form_context') === 'photo')
                                 <p class="form-field__error" id="moment-error">{{ $message }}</p>
                             @endif
                         @enderror
-                    </div>
+                    </fieldset>
                     <div class="form-field">
                         <label class="visually-hidden" for="photo">Bildfil</label>
                         <div class="file-picker">

@@ -32,11 +32,13 @@ class ProjectReportTest extends TestCase
             'workshop_id' => $owner->workshop_id,
             'name' => 'Villa Ek',
         ]);
+        $project->update(['notes' => 'HEMLIG PROJEKTANTECKNING']);
         $sash = WindowSash::factory()->create([
             'project_id' => $project->getKey(),
             'code' => 'B-24',
             'stage' => 'painting',
             'room' => 'Kök',
+            'notes' => 'kittet löst i nederkant',
         ]);
 
         $this->actingAs($owner)
@@ -73,6 +75,21 @@ class ProjectReportTest extends TestCase
             ->assertDontSee('Glasning', false)
             ->assertDontSee('report-header__brand', false)
             ->assertDontSee('Pågår', false)
-            ->assertDontSee('Avslutat', false);
+            ->assertDontSee('Avslutat', false)
+            ->assertDontSee('kittet löst i nederkant', false)
+            ->assertDontSee('HEMLIG PROJEKTANTECKNING', false)
+            ->assertDontSee('Arbetsanteckningar', false)
+            ->assertSee('Visa arbetsanteckningar i rapporten', false);
+
+        $this->get(route('app.settings.logo'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/webp');
+
+        $this->get(route('app.projects.report', ['project' => $project, 'anteckningar' => 1]))
+            ->assertOk()
+            ->assertSee('Arbetsanteckningar', false)
+            ->assertSee('kittet löst i nederkant', false)
+            ->assertSee('HEMLIG PROJEKTANTECKNING', false)
+            ->assertSee('Före · 2026-10-16', false);
     }
 }

@@ -347,6 +347,48 @@ class WorkshopWorkspaceTest extends TestCase
         $this->assertDatabaseCount('sash_photos', 0);
     }
 
+    public function test_photo_upload_defaults_to_before_until_an_after_exists_and_the_moment_can_change(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $this->actingAs($owner);
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('name="moment" type="radio" value="before" required checked', false)
+            ->assertDontSee('name="moment" type="radio" value="after" checked', false);
+
+        $this->post(route('app.sashes.photos.store', [$project, $sash]), [
+            'photo' => UploadedFile::fake()->image('fore.jpg', 80, 60),
+            'moment' => 'before',
+        ])->assertRedirect();
+
+        $photo = SashPhoto::query()->firstOrFail();
+        $this->assertSame('before', $photo->moment);
+        $this->assertNotNull($photo->path);
+
+        $this->patch(route('app.sashes.photos.update', [$project, $sash, $photo]), [
+            'moment' => 'after',
+        ])->assertRedirect()->assertSessionHas('status', 'Bildens tillfälle har sparats.');
+
+        $photo->refresh();
+        $this->assertSame('after', $photo->moment);
+        $this->assertTrue(Storage::disk('local')->exists($photo->path));
+
+        $this->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertSee('>Efter</strong>', false)
+            ->assertDontSee('name="moment" type="radio" value="before" required checked', false);
+
+        $this->actingAs($other)
+            ->patch(route('app.sashes.photos.update', [$project, $sash, $photo]), ['moment' => 'before'])
+            ->assertNotFound();
+        $this->assertSame('after', $photo->fresh()?->moment);
+    }
+
     public function test_guest_cannot_open_private_workshop_routes_or_photo_urls(): void
     {
         $owner = User::factory()->create();

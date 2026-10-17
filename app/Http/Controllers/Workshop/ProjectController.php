@@ -88,7 +88,7 @@ class ProjectController extends Controller
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
         $sashes = $project->windowSashes()
-            ->with(['photos' => fn (HasMany $query) => $query->orderBy('created_at')->orderBy('id')])
+            ->with(['photos' => fn (HasMany $query) => $query->inDocumentOrder()])
             ->orderBy('code')
             ->get();
         $clientStatusUrl = $project->clientStatusIsPublic()
@@ -104,6 +104,15 @@ class ProjectController extends Controller
             );
         }
 
-        return view('app.projects.report', compact('workshop', 'project', 'sashes', 'clientStatusUrl', 'clientStatusQr'));
+        $includeWorkNotes = $request->boolean('anteckningar');
+
+        return view('app.projects.report', compact(
+            'workshop',
+            'project',
+            'sashes',
+            'clientStatusUrl',
+            'clientStatusQr',
+            'includeWorkNotes',
+        ));
     }
 }

@@ -2502,6 +2502,12 @@ svg {
         padding-bottom: 12px;
     }
 
+    .report-workshop__logo {
+        display: block !important;
+        width: 18mm;
+        height: 18mm;
+    }
+
     .report-workshop__name {
         font-size: 18pt;
     }
@@ -2897,8 +2903,86 @@ body.label-print-sheet {
 
 .client-status-main {
     width: min(920px, 100%);
-    margin: 0 auto;
-    padding: 32px 0 64px;
+    margin-inline: auto;
+    padding: 32px 16px 64px;
+}
+
+.client-status .report-sash__heading h2 {
+    overflow-wrap: anywhere;
+    margin: 0;
+    font-family: Fraunces, Georgia, serif;
+    font-size: clamp(26px, 6vw, 30px);
+    font-weight: 500;
+    line-height: 1.15;
+}
+
+.status-photo {
+    display: block;
+}
+
+.status-photo img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+}
+
+.status-lightbox {
+    width: min(960px, calc(100% - 32px));
+    padding: 16px;
+    border: 0;
+    background: #fff;
+}
+
+.status-lightbox img {
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+.status-lightbox::backdrop {
+    background: rgb(23 49 59 / 72%);
+}
+
+.moment-choice {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.moment-choice legend {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.moment-choice label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin: 0 8px 8px 0;
+    padding: 8px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+}
+
+.photo-card figcaption form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.photo-card figcaption select {
+    min-height: 40px;
+}
+
+.report-notes-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
 }
 
 .client-status__location {
