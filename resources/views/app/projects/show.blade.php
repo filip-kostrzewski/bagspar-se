@@ -27,9 +27,9 @@
 
         <section class="project-hero" aria-labelledby="page-title">
             <div class="project-hero__main">
-                <span class="project-card__status @if ($projectIsComplete) project-card__status--complete @endif">
+                <span class="project-card__status @if ($project->isArchived()) project-card__status--archived @elseif ($projectIsComplete) project-card__status--complete @endif">
                     <span class="status-dot" aria-hidden="true"></span>
-                    {{ $projectIsComplete ? 'Avslutat projekt' : 'Pågående projekt' }}
+                    {{ $project->isArchived() ? 'Arkiverad' : ($projectIsComplete ? 'Avslutat projekt' : 'Pågående projekt') }}
                 </span>
                 <h1 class="workshop-heading" id="page-title">{{ $project->name }}</h1>
                 <div class="project-hero__facts">
@@ -38,6 +38,9 @@
                     @endif
                     @if ($project->customer?->contact_name)
                         <p><span>Kontakt</span>{{ $project->customer->contact_name }}</p>
+                    @endif
+                    @if ($project->customer?->phone)
+                        <p><span>Telefon</span>@include('partials.workshop.phone-link', ['phone' => $project->customer->phone, 'href' => $project->customer->phoneHref()])</p>
                     @endif
                     @if ($project->location)
                         <p><span>Plats</span>{{ $project->location }}</p>
@@ -62,12 +65,11 @@
                     <button class="workshop-button workshop-button--quiet" type="submit">{{ $projectIsComplete ? 'Återöppna projekt' : 'Markera som avslutat' }}</button>
                 </form>
                 @if (auth()->user()?->isOwner())
-                    <form method="POST" action="{{ route('app.projects.archive', $project) }}">
+                    <form method="POST" action="{{ route('app.projects.archive', $project) }}" data-confirm="{{ $project->isArchived() ? 'Återställ projektet till den vanliga listan?' : 'Arkivera projektet? Det döljs i den vanliga listan.' }}">
                         @csrf
                         <input type="hidden" name="action" value="{{ $project->isArchived() ? 'restore' : 'archive' }}">
                         <button class="workshop-button workshop-button--secondary" type="submit">{{ $project->isArchived() ? 'Återställ projekt' : 'Arkivera projekt' }}</button>
                     </form>
-                    <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.confirm-destroy', $project) }}">Ta bort projekt</a>
                 @endif
             </div>
         </section>
@@ -129,7 +131,6 @@
                         'prefix' => 'edit-',
                         'customers' => $customers,
                         'selectedCustomerId' => old('form_context') === 'project' ? old('customer_id') : $project->customer_id,
-                        'customerName' => old('form_context') === 'project' && is_string(old('customer_name')) ? old('customer_name') : ($project->customer_name ?? ''),
                     ])
                     <div class="form-field">
                         <label for="edit-project-location">Adress eller plats</label>
@@ -202,6 +203,14 @@
                 </div>
             @endif
         </section>
+
+        @if (auth()->user()?->isOwner())
+            <section class="project-danger-zone" aria-labelledby="danger-title">
+                <h2 class="workshop-section-heading" id="danger-title">Ta bort projekt</h2>
+                <p>Borttagning raderar projektet och bildfilerna. Det går inte att ångra.</p>
+                <a class="workshop-button workshop-button--danger" href="{{ route('app.projects.confirm-destroy', $project) }}">Ta bort projekt</a>
+            </section>
+        @endif
 
     </div>
 @endsection

@@ -65,10 +65,27 @@ class ProjectListFilterTest extends TestCase
             ->assertDontSee('Villa Ek', false)
             ->assertSee('Inga projekt matchar sökningen.', false);
 
+        $this->get(route('app.dashboard'))
+            ->assertOk()
+            ->assertSee('value="skrapning"', false)
+            ->assertSee('value="klar"', false)
+            ->assertDontSee('value="scraping"', false)
+            ->assertDontSee('value="ready"', false);
+
+        $this->get(route('app.dashboard', ['rum' => 'Kök', 'etapp' => 'glasning']))
+            ->assertOk()
+            ->assertSee('Villa Ek', false)
+            ->assertDontSee('Villa Björk', false);
+
         $this->get(route('app.dashboard', ['rum' => 'Kök', 'etapp' => 'glazing']))
             ->assertOk()
             ->assertSee('Villa Ek', false)
             ->assertDontSee('Villa Björk', false);
+
+        $this->get(route('app.dashboard', ['etapp' => 'skrapning']))
+            ->assertOk()
+            ->assertDontSee('Villa Ek', false)
+            ->assertSee('Inga projekt matchar sökningen.', false);
 
         $this->get(route('app.dashboard', ['etapp' => 'not-a-stage']))
             ->assertOk()

@@ -59,6 +59,9 @@
                 @if ($project->customer?->contact_name)
                     <div><dt>Kontakt</dt><dd>{{ $project->customer->contact_name }}</dd></div>
                 @endif
+                @if ($project->customer?->phone)
+                    <div><dt>Telefon</dt><dd>@include('partials.workshop.phone-link', ['phone' => $project->customer->phone, 'href' => $project->customer->phoneHref()])</dd></div>
+                @endif
                 @if ($project->customer?->email)
                     <div><dt>E-post</dt><dd>{{ $project->customer->email }}</dd></div>
                 @endif

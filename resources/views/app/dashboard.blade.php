@@ -89,8 +89,8 @@
                     <label for="filter-stage">Etapp</label>
                     <select id="filter-stage" name="etapp">
                         <option value="">Alla etapper</option>
-                        @foreach (['received' => 'Mottagen', 'scraping' => 'Skrapning', 'repair' => 'Trälagning', 'glazing' => 'Glasning', 'painting' => 'Målning', 'ready' => 'Klar'] as $value => $label)
-                            <option value="{{ $value }}" @selected($filters['etapp'] === $value)>{{ $label }}</option>
+                        @foreach (\App\Models\WindowSash::filterStages() as $slug => $label)
+                            <option value="{{ $slug }}" @selected($filters['etapp'] === \App\Models\WindowSash::stageFromFilter($slug))>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -127,9 +127,9 @@
                         <article class="project-card">
                             <a class="project-card__link" href="{{ route('app.projects.show', $project) }}">
                                 <div class="project-card__topline">
-                                    <span class="project-card__status @if ($projectIsComplete) project-card__status--complete @endif">
+                                    <span class="project-card__status @if ($project->isArchived()) project-card__status--archived @elseif ($projectIsComplete) project-card__status--complete @endif">
                                         <span class="status-dot" aria-hidden="true"></span>
-                                        {{ $projectIsComplete ? 'Avslutat' : 'Pågår' }}
+                                        {{ $project->isArchived() ? 'Arkiverad' : ($projectIsComplete ? 'Avslutat' : 'Pågår') }}
                                     </span>
                                     <span class="project-card__arrow" aria-hidden="true">↗</span>
                                 </div>

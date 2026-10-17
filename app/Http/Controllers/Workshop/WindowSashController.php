@@ -68,7 +68,7 @@ class WindowSashController extends Controller
         $workshop = $this->currentWorkshop($request);
         $project = $this->projectForWorkshop($workshop, $project);
         $sash = $this->sashForProject($project, $sash);
-        $photos = $sash->photos()->latest()->get();
+        $photos = $sash->photos()->inDocumentOrder()->get();
         $events = $sash->events()->orderBy('id')->get();
 
         return view('app.sashes.show', compact('workshop', 'project', 'sash', 'photos', 'events'));

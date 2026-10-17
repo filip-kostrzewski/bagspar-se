@@ -17,12 +17,8 @@ class DashboardController extends Controller
         $filters = [
             'kund' => mb_substr(trim($request->string('kund')->toString()), 0, 160),
             'rum' => mb_substr(trim($request->string('rum')->toString()), 0, 120),
-            'etapp' => $request->string('etapp')->toString(),
+            'etapp' => WindowSash::stageFromFilter($request->string('etapp')->toString()),
         ];
-
-        if (! in_array($filters['etapp'], WindowSash::STAGES, true)) {
-            $filters['etapp'] = '';
-        }
 
         $currentProjects = $workshop->projects()->notArchived();
         $projects = $workshop->projects()

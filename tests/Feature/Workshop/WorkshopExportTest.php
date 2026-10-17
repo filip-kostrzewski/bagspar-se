@@ -54,7 +54,7 @@ class WorkshopExportTest extends TestCase
         $csv = $response->streamedContent();
 
         $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
-        $this->assertStringContainsString('Projekt,Kund,Plats,Projektstatus,Arkiverad,Båge,Rum,Placering,Etapp,Skapad,Uppdaterad', $csv);
+        $this->assertStringContainsString('Projekt;Kund;Plats;Projektstatus;Arkiverad;Båge;Rum;Placering;Etapp;Skapad;Uppdaterad', $csv);
         $this->assertStringContainsString("'=Villa Ek", $csv);
         $this->assertStringContainsString('BRF Eken', $csv);
         $this->assertStringContainsString('V2-H', $csv);

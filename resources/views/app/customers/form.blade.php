@@ -38,6 +38,13 @@
                     <input id="contact_name" name="contact_name" type="text" value="{{ is_string(old('contact_name')) ? old('contact_name') : $customer->contact_name }}" maxlength="160">
                 </div>
                 <div class="form-field">
+                    <label for="phone">Telefon</label>
+                    <input id="phone" name="phone" type="tel" value="{{ is_string(old('phone')) ? old('phone') : $customer->phone }}" maxlength="40" autocomplete="tel">
+                    @if ($customer->phoneHref())
+                        <p class="form-field__hint"><a href="{{ $customer->phoneHref() }}">Ring {{ $customer->phone }}</a></p>
+                    @endif
+                </div>
+                <div class="form-field">
                     <label for="address">Adress</label>
                     <input id="address" name="address" type="text" value="{{ is_string(old('address')) ? old('address') : $customer->address }}" maxlength="255">
                 </div>

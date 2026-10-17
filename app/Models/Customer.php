@@ -17,6 +17,7 @@ class Customer extends Model
         'workshop_id',
         'name',
         'contact_name',
+        'phone',
         'address',
         'email',
     ];
@@ -31,6 +32,21 @@ class Customer extends Model
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function phoneHref(): ?string
+    {
+        if (! is_string($this->phone) || trim($this->phone) === '') {
+            return null;
+        }
+
+        $digits = preg_replace('/[^\d+]/', '', $this->phone);
+
+        if (! is_string($digits) || $digits === '' || $digits === '+') {
+            return null;
+        }
+
+        return 'tel:'.$digits;
     }
 
     public static function findOrCreateForWorkshop(Workshop $workshop, string $name): self

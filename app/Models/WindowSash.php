@@ -51,7 +51,12 @@ class WindowSash extends Model
 
     public function stageLabel(): string
     {
-        return match ($this->stage) {
+        return self::labelForStage($this->stage);
+    }
+
+    public static function labelForStage(?string $stage): string
+    {
+        return match ($stage) {
             'scraping' => 'Skrapning',
             'repair' => 'Trälagning',
             'glazing' => 'Glasning',
@@ -59,6 +64,48 @@ class WindowSash extends Model
             'ready' => 'Klar',
             default => 'Mottagen',
         };
+    }
+
+    public static function stageSlug(?string $stage): string
+    {
+        return match ($stage) {
+            'received' => 'mottagen',
+            'scraping' => 'skrapning',
+            'repair' => 'tralagning',
+            'glazing' => 'glasning',
+            'painting' => 'malning',
+            'ready' => 'klar',
+            default => '',
+        };
+    }
+
+    public static function stageFromFilter(string $value): string
+    {
+        $normalized = mb_strtolower(trim($value));
+
+        return match ($normalized) {
+            'mottagen', 'received' => 'received',
+            'skrapning', 'scraping' => 'scraping',
+            'tralagning', 'trälagning', 'repair' => 'repair',
+            'glasning', 'glazing' => 'glazing',
+            'malning', 'målning', 'painting' => 'painting',
+            'klar', 'ready' => 'ready',
+            default => '',
+        };
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function filterStages(): array
+    {
+        $stages = [];
+
+        foreach (self::STAGES as $stage) {
+            $stages[self::stageSlug($stage)] = self::labelForStage($stage);
+        }
+
+        return $stages;
     }
 
     public function recordEvent(User $user, string $kind, ?string $stage = null, ?string $body = null): SashEvent

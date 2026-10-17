@@ -21,8 +21,19 @@
                     <li class="staff-list__item">
                         <div>
                             <a class="workshop-text-link" href="{{ route('app.customers.edit', $customer) }}">{{ $customer->name }}</a>
+                            @php
+                                $customerDetails = collect([$customer->contact_name, $customer->email, $customer->address])->filter();
+                            @endphp
                             <p class="staff-list__meta">
-                                {{ collect([$customer->contact_name, $customer->email, $customer->address])->filter()->join(' · ') ?: 'Inga kontaktuppgifter' }}
+                                @if ($customerDetails->isEmpty() && ! $customer->phone)
+                                    Inga kontaktuppgifter
+                                @else
+                                    {{ $customerDetails->join(' · ') }}
+                                    @if ($customer->phone)
+                                        @if ($customerDetails->isNotEmpty()) · @endif
+                                        @include('partials.workshop.phone-link', ['phone' => $customer->phone, 'href' => $customer->phoneHref()])
+                                    @endif
+                                @endif
                                 · {{ $customer->projects_count }} projekt
                             </p>
                         </div>

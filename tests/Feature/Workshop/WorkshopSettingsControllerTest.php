@@ -76,7 +76,8 @@ class WorkshopSettingsControllerTest extends TestCase
             ->patch(route('app.settings.update'), [
                 'name' => $owner->workshop->name,
                 'logo' => UploadedFile::fake()->image('logo.png', 80, 60),
-            ])->assertRedirect();
+            ])->assertRedirect()
+            ->assertSessionHas('status', 'Sparat');
 
         $workshop = $owner->workshop->fresh();
         $this->assertIsString($workshop->logo_path);

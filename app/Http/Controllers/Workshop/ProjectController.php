@@ -14,7 +14,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
@@ -34,7 +36,7 @@ class ProjectController extends Controller
         $workshop = $this->currentWorkshop($request);
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:160'],
-            'customer_id' => ['nullable', 'integer'],
+            'customer_id' => ['nullable'],
             'customer_name' => ['nullable', 'string', 'max:160'],
             'location' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:5000'],
@@ -51,7 +53,7 @@ class ProjectController extends Controller
         ]);
 
         $validated['notify_customer_when_ready'] = $request->boolean('notify_customer_when_ready');
-        $validated = $this->withCustomer($workshop, $validated);
+        $validated = $this->withCustomer($workshop, $request, $validated);
         $project = $workshop->projects()->create($validated);
 
         return redirect()->route('app.projects.show', $project)->with('status', 'Projektet har sparats.');
@@ -74,7 +76,7 @@ class ProjectController extends Controller
         $project = $this->projectForWorkshop($workshop, $project);
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:160'],
-            'customer_id' => ['sometimes', 'nullable', 'integer'],
+            'customer_id' => ['sometimes', 'nullable'],
             'customer_name' => ['sometimes', 'nullable', 'string', 'max:160'],
             'location' => ['sometimes', 'nullable', 'string', 'max:255'],
             'notes' => ['sometimes', 'nullable', 'string', 'max:5000'],
@@ -98,7 +100,7 @@ class ProjectController extends Controller
             $validated['notify_customer_when_ready'] = $request->boolean('notify_customer_when_ready');
         }
 
-        $validated = $this->withCustomer($workshop, $validated);
+        $validated = $this->withCustomer($workshop, $request, $validated);
         $project->update($validated);
         $sent = app(ReadyCustomerNotifier::class)->sync($project);
         $message = $sent
@@ -189,13 +191,45 @@ class ProjectController extends Controller
      * @param  array<string, mixed>  $validated
      * @return array<string, mixed>
      */
-    private function withCustomer(Workshop $workshop, array $validated): array
+    private function withCustomer(Workshop $workshop, Request $request, array $validated): array
     {
+        $rawChoice = $request->input('customer_id');
+
+        if (is_array($rawChoice)) {
+            throw ValidationException::withMessages([
+                'customer_id' => 'Välj en kund i listan eller skapa en ny.',
+            ]);
+        }
+
+        $choice = $request->exists('customer_id') ? trim((string) $rawChoice) : null;
+        unset($validated['customer_id']);
+
+        if ($choice === 'new') {
+            return $this->withNewCustomer($workshop, $request, $validated);
+        }
+
+        if (is_string($choice) && $choice !== '' && ! is_numeric($choice)) {
+            throw ValidationException::withMessages([
+                'customer_id' => 'Välj en kund i listan eller skapa en ny.',
+            ]);
+        }
+
+        if (is_numeric($choice)) {
+            $customer = $workshop->customers()->whereKey((int) $choice)->first();
+
+            if (! $customer instanceof Customer) {
+                abort(404);
+            }
+
+            $validated['customer_id'] = $customer->getKey();
+            $validated['customer_name'] = $customer->name;
+
+            return $validated;
+        }
+
         $name = isset($validated['customer_name']) && is_string($validated['customer_name'])
             ? trim($validated['customer_name'])
             : '';
-        $customerId = $validated['customer_id'] ?? null;
-        unset($validated['customer_id']);
 
         if ($name !== '') {
             $customer = Customer::findOrCreateForWorkshop($workshop, $name);
@@ -205,25 +239,74 @@ class ProjectController extends Controller
             return $validated;
         }
 
-        if (array_key_exists('customer_name', $validated) && ! is_numeric($customerId)) {
+        if ($choice === '' || (array_key_exists('customer_name', $validated) && $name === '')) {
             $validated['customer_id'] = null;
             $validated['customer_name'] = null;
-
-            return $validated;
-        }
-
-        if (is_numeric($customerId)) {
-            $customer = $workshop->customers()->whereKey((int) $customerId)->first();
-
-            if (! $customer instanceof Customer) {
-                abort(404);
-            }
-
-            $validated['customer_id'] = $customer->getKey();
-            $validated['customer_name'] = $customer->name;
         }
 
         return $validated;
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function withNewCustomer(Workshop $workshop, Request $request, array $validated): array
+    {
+        $email = $request->input('new_customer_email');
+        if (is_string($email)) {
+            $request->merge(['new_customer_email' => Str::lower(trim($email))]);
+        }
+
+        $new = $request->validate([
+            'new_customer_name' => ['required', 'string', 'max:160'],
+            'new_customer_contact_name' => ['nullable', 'string', 'max:160'],
+            'new_customer_phone' => ['nullable', 'string', 'max:40'],
+            'new_customer_address' => ['nullable', 'string', 'max:255'],
+            'new_customer_email' => ['nullable', 'string', 'email:rfc', 'max:254'],
+        ], [
+            'new_customer_name.required' => 'Ange kundens namn.',
+            'new_customer_name.max' => 'Kundens namn får vara högst 160 tecken.',
+            'new_customer_contact_name.max' => 'Kontaktpersonen får vara högst 160 tecken.',
+            'new_customer_phone.max' => 'Telefonnumret får vara högst 40 tecken.',
+            'new_customer_address.max' => 'Adressen får vara högst 255 tecken.',
+            'new_customer_email.email' => 'Ange en giltig e-postadress.',
+            'new_customer_email.max' => 'E-postadressen får vara högst 254 tecken.',
+        ]);
+
+        $name = trim($new['new_customer_name']);
+        $existing = $workshop->customers()->get()->first(
+            fn (Customer $customer): bool => mb_strtolower($customer->name) === mb_strtolower($name),
+        );
+
+        if ($existing instanceof Customer) {
+            throw ValidationException::withMessages([
+                'new_customer_name' => 'Kunden finns redan. Välj den i listan.',
+            ]);
+        }
+
+        $customer = $workshop->customers()->create([
+            'name' => mb_substr($name, 0, 160),
+            'contact_name' => $this->blankToNull($new['new_customer_contact_name'] ?? null),
+            'phone' => $this->blankToNull($new['new_customer_phone'] ?? null),
+            'address' => $this->blankToNull($new['new_customer_address'] ?? null),
+            'email' => $this->blankToNull($new['new_customer_email'] ?? null),
+        ]);
+        $validated['customer_id'] = $customer->getKey();
+        $validated['customer_name'] = $customer->name;
+
+        return $validated;
+    }
+
+    private function blankToNull(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+
+        return $value === '' ? null : $value;
     }
 
     private function ownedProject(Request $request, Project $project): Project

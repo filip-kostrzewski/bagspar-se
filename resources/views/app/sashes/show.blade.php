@@ -221,10 +221,7 @@
                                     @method('PATCH')
                                     <label class="visually-hidden" for="moment-{{ $photo->getKey() }}">Tillfälle för bilden</label>
                                     <select id="moment-{{ $photo->getKey() }}" name="moment" required>
-                                        @if ($photo->moment === null)
-                                            <option value="" selected>Välj före eller efter</option>
-                                        @endif
-                                        <option value="before" @selected($photo->moment === 'before')>Före</option>
+                                        <option value="before" @selected($photo->moment !== 'after')>Före</option>
                                         <option value="after" @selected($photo->moment === 'after')>Efter</option>
                                     </select>
                                     <button class="workshop-button workshop-button--quiet" type="submit">Spara tillfälle</button>

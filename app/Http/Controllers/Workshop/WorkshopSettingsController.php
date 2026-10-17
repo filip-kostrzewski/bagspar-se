@@ -98,7 +98,9 @@ class WorkshopSettingsController extends Controller
             $this->deleteStoredLogo($previousLogoPath);
         }
 
-        return back()->with('status', 'Verkstadens uppgifter har sparats.');
+        $message = $request->hasFile('logo') ? 'Sparat' : 'Verkstadens uppgifter har sparats.';
+
+        return back()->with('status', $message);
     }
 
     public function logo(Request $request): BinaryFileResponse

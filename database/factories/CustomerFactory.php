@@ -20,6 +20,7 @@ class CustomerFactory extends Factory
             'workshop_id' => Workshop::factory(),
             'name' => fake()->company(),
             'contact_name' => fake()->name(),
+            'phone' => fake()->optional()->numerify('070-### ## ##'),
             'address' => fake()->streetAddress(),
             'email' => fake()->safeEmail(),
         ];

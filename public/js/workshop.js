@@ -139,6 +139,112 @@ document.querySelectorAll('[data-print-labels]').forEach((button) => {
     });
 });
 
+document.querySelectorAll('form[data-confirm]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        const message = form.getAttribute('data-confirm');
+
+        if (message && ! window.confirm(message)) {
+            event.preventDefault();
+        }
+    });
+});
+
+document.querySelectorAll('[data-customer-combobox]').forEach((root) => {
+    const select = root.querySelector('[data-customer-select]');
+    const search = root.querySelector('[data-customer-search]');
+    const list = root.querySelector('[data-customer-list]');
+
+    if (! (select instanceof HTMLSelectElement) || ! (search instanceof HTMLInputElement) || ! list) {
+        return;
+    }
+
+    const options = Array.from(select.options).map((option) => ({
+        value: option.value,
+        label: option.textContent.trim(),
+    }));
+
+    const hideList = () => {
+        list.hidden = true;
+        search.setAttribute('aria-expanded', 'false');
+    };
+
+    const choose = (option) => {
+        select.value = option.value;
+        search.value = option.value === 'new' ? '' : option.label;
+        hideList();
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    const render = () => {
+        const query = search.value.trim().toLocaleLowerCase('sv');
+        const matches = options.filter((option) => {
+            if (option.value === '') {
+                return false;
+            }
+
+            if (option.value === 'new' || query === '') {
+                return true;
+            }
+
+            return option.label.toLocaleLowerCase('sv').includes(query);
+        });
+
+        list.replaceChildren();
+        matches.forEach((option) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'customer-combobox__option';
+            item.setAttribute('role', 'option');
+            item.textContent = option.label;
+            item.addEventListener('click', () => choose(option));
+            list.append(item);
+        });
+        list.hidden = matches.length === 0;
+        search.setAttribute('aria-expanded', list.hidden ? 'false' : 'true');
+    };
+
+    root.dataset.enhanced = 'true';
+    select.classList.add('visually-hidden');
+    select.tabIndex = -1;
+
+    const selected = options.find((option) => option.value === select.value && option.value !== '' && option.value !== 'new');
+    if (selected) {
+        search.value = selected.label;
+    }
+
+    search.addEventListener('focus', render);
+    search.addEventListener('input', () => {
+        const exact = options.find((option) => option.value !== 'new' && option.label.toLocaleLowerCase('sv') === search.value.trim().toLocaleLowerCase('sv'));
+
+        if (search.value.trim() === '') {
+            select.value = '';
+        } else if (exact) {
+            select.value = exact.value;
+        }
+
+        render();
+    });
+
+    root.closest('form')?.addEventListener('submit', (event) => {
+        if (select.value === '' || select.value === 'new') {
+            return;
+        }
+
+        const current = options.find((option) => option.value === select.value);
+        if (current && search.value.trim() !== current.label) {
+            event.preventDefault();
+            search.focus();
+            render();
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (! root.contains(event.target)) {
+            hideList();
+        }
+    });
+});
+
 document.querySelectorAll('[data-photo-upload]').forEach((form) => {
     const input = form.querySelector('input[type="file"]');
     const preview = form.querySelector('[data-photo-preview]');

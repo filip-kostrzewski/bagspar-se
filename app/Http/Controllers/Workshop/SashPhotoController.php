@@ -90,7 +90,7 @@ class SashPhotoController extends Controller
             throw $exception;
         }
 
-        return back()->with('status', 'Bilden har sparats på arbetskortet.');
+        return back()->with('status', 'Sparat');
     }
 
     public function update(Request $request, Project $project, WindowSash $sash, SashPhoto $photo): RedirectResponse

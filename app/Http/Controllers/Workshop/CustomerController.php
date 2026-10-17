@@ -61,7 +61,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * @return array{name: string, contact_name: ?string, address: ?string, email: ?string}
+     * @return array{name: string, contact_name: ?string, phone: ?string, address: ?string, email: ?string}
      */
     private function validated(Request $request): array
     {
@@ -73,18 +73,20 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:160'],
             'contact_name' => ['nullable', 'string', 'max:160'],
+            'phone' => ['nullable', 'string', 'max:40'],
             'address' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'email:rfc', 'max:254'],
         ], [
             'name.required' => 'Ange kundens namn.',
             'name.max' => 'Kundens namn får vara högst 160 tecken.',
             'contact_name.max' => 'Kontaktpersonen får vara högst 160 tecken.',
+            'phone.max' => 'Telefonnumret får vara högst 40 tecken.',
             'address.max' => 'Adressen får vara högst 255 tecken.',
             'email.email' => 'Ange en giltig e-postadress.',
             'email.max' => 'E-postadressen får vara högst 254 tecken.',
         ]);
 
-        foreach (['contact_name', 'address', 'email'] as $field) {
+        foreach (['contact_name', 'phone', 'address', 'email'] as $field) {
             $value = $validated[$field] ?? null;
             $validated[$field] = is_string($value) && trim($value) !== '' ? trim($value) : null;
         }

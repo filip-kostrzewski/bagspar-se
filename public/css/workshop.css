@@ -575,7 +575,8 @@ svg {
     font-weight: 800;
 }
 
-.project-card__status--complete {
+.project-card__status--complete,
+.project-card__status--archived {
     color: var(--ink-soft);
 }
 
@@ -1953,16 +1954,26 @@ svg {
     }
 
     .workshop-header__inner {
-        min-height: 68px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        min-height: 0;
+        padding-block: 12px;
+        gap: 8px 16px;
+    }
+
+    .workshop-header__account,
+    .workshop-nav {
+        flex-wrap: wrap;
     }
 
     .workshop-header__account {
+        flex: 1 1 100%;
         gap: 8px;
     }
 
     .workshop-header__workspace {
         display: block;
-        max-width: 34vw;
+        max-width: 100%;
         font-size: 12px;
     }
 
@@ -2376,6 +2387,48 @@ svg {
 
     .photo-upload-form .workshop-button {
         width: 100%;
+    }
+
+    .report-page,
+    .report-header,
+    .report-workshop,
+    .report-sash__heading,
+    .report-facts,
+    .report-footer,
+    .report-notes-toggle,
+    .report-client-status {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .report-sash__heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: start;
+    }
+
+    .report-sash__state {
+        text-align: left;
+    }
+
+    .report-page .workshop-heading,
+    .report-workshop__name,
+    .report-facts dd,
+    .report-sash__location,
+    .report-sash__heading h3,
+    .report-client-status__url,
+    .report-notes-toggle {
+        overflow-wrap: anywhere;
+    }
+
+    .report-photo-grid img,
+    .report-client-status__qr svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .report-header__actions .workshop-button {
+        white-space: normal;
     }
 
     .report-header {
@@ -2919,11 +2972,67 @@ body.label-print-sheet {
     color: var(--ink-soft);
 }
 
+.project-danger-zone {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+}
+
+.project-danger-zone p {
+    max-width: 62ch;
+    margin: 8px 0 16px;
+    color: var(--ink-soft);
+}
+
 .project-danger-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
+}
+
+.customer-combobox {
+    position: relative;
+}
+
+.customer-combobox__list {
+    position: absolute;
+    z-index: 5;
+    top: 78px;
+    right: 0;
+    left: 0;
+    max-height: 240px;
+    overflow: auto;
+    border: 1px solid #aeb8b3;
+    border-radius: 5px;
+    background: var(--white);
+}
+
+.customer-combobox__option {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+}
+
+.customer-combobox__option:hover,
+.customer-combobox__option:focus-visible {
+    background: var(--paper-deep);
+}
+
+.customer-combobox__new {
+    display: none;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.customer-combobox:has(option[value='new']:checked) .customer-combobox__new {
+    display: grid;
 }
 
 .workshop-button--danger {

@@ -40,7 +40,6 @@
                     'prefix' => '',
                     'customers' => $customers,
                     'selectedCustomerId' => old('customer_id'),
-                    'customerName' => is_string(old('customer_name')) ? old('customer_name') : '',
                 ])
 
                 <div class="form-field">

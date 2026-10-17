@@ -200,4 +200,76 @@ class CustomerRegistryTest extends TestCase
         $this->assertNull($project->fresh()?->customer_id);
         $this->assertSame('Egen kund', $project->fresh()?->customer_name);
     }
+
+    public function test_the_customer_field_keeps_the_selected_customer_and_can_create_one_with_a_phone(): void
+    {
+        $owner = User::factory()->create();
+        $chosen = Customer::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'BRF Eken',
+            'phone' => '070-111 22 33',
+        ]);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Villa Ek',
+            'customer_name' => null,
+        ]);
+
+        $this->actingAs($owner)->get(route('app.projects.create'))
+            ->assertOk()
+            ->assertSee('data-customer-combobox', false)
+            ->assertSee('+ Ny kund', false)
+            ->assertDontSee('Kund i registret', false)
+            ->assertDontSee('Ny eller befintlig kund', false)
+            ->assertDontSee('name="customer_name"', false);
+
+        $this->patch(route('app.projects.update', $project), [
+            'form_context' => 'project',
+            'name' => 'Villa Ek',
+            'customer_id' => (string) $chosen->getKey(),
+            'customer_name' => 'BRF Björken',
+        ])->assertRedirect();
+
+        $project->refresh();
+        $this->assertSame($chosen->getKey(), $project->customer_id);
+        $this->assertSame('BRF Eken', $project->customer_name);
+        $this->assertNull(Customer::query()->where('name', 'BRF Björken')->first());
+
+        $this->post(route('app.projects.store'), [
+            'name' => 'Nytt hus',
+            'customer_id' => 'new',
+            'new_customer_name' => 'BRF Alm',
+            'new_customer_contact_name' => 'Bo Alm',
+            'new_customer_phone' => '070-123 45 67',
+            'new_customer_email' => 'Alm@Example.test',
+            'new_customer_address' => 'Almgatan 1',
+        ])->assertRedirect();
+
+        $created = Project::query()->where('name', 'Nytt hus')->firstOrFail();
+        $this->assertSame('BRF Alm', $created->customer?->name);
+        $this->assertSame('Bo Alm', $created->customer?->contact_name);
+        $this->assertSame('070-123 45 67', $created->customer?->phone);
+        $this->assertSame('alm@example.test', $created->customer?->email);
+        $this->assertSame('Almgatan 1', $created->customer?->address);
+
+        $this->post(route('app.projects.store'), [
+            'name' => 'Dubblett',
+            'customer_id' => 'new',
+            'new_customer_name' => 'brf alm',
+        ])->assertSessionHasErrors(['new_customer_name' => 'Kunden finns redan. Välj den i listan.']);
+        $this->assertNull(Project::query()->where('name', 'Dubblett')->first());
+
+        $this->get(route('app.customers.index'))->assertSee('tel:0701112233', false);
+        $this->get(route('app.customers.edit', $chosen))->assertSee('tel:0701112233', false)->assertSee('name="phone"', false);
+        $this->get(route('app.projects.show', $project))->assertSee('tel:0701112233', false);
+        $this->get(route('app.projects.report', $project))->assertSee('tel:0701112233', false)->assertSee('Telefon', false);
+
+        $this->post(route('app.projects.client-status.update', $project), ['action' => 'enable'])->assertRedirect();
+        $token = $project->fresh()?->client_status_token;
+        $this->assertIsString($token);
+        $this->get(route('client-status.show', ['token' => $token]))
+            ->assertSee('BRF Eken', false)
+            ->assertDontSee('070-111 22 33', false)
+            ->assertDontSee('tel:', false);
+    }
 }

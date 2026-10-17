@@ -42,17 +42,17 @@ class WorkshopExportController extends Controller
                 'Etapp',
                 'Skapad',
                 'Uppdaterad',
-            ], escape: '\\');
+            ], ';', '"', '\\');
 
             foreach ($projects as $project) {
                 if ($project->windowSashes->isEmpty()) {
-                    fputcsv($handle, $this->row($project, null), escape: '\\');
+                    fputcsv($handle, $this->row($project, null), ';', '"', '\\');
 
                     continue;
                 }
 
                 foreach ($project->windowSashes->sortBy('code') as $sash) {
-                    fputcsv($handle, $this->row($project, $sash), escape: '\\');
+                    fputcsv($handle, $this->row($project, $sash), ';', '"', '\\');
                 }
             }
 

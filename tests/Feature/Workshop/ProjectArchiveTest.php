@@ -46,27 +46,43 @@ class ProjectArchiveTest extends TestCase
 
         $this->actingAs($member)->get(route('app.projects.show', $project))
             ->assertOk()
-            ->assertDontSee('Arkivera projekt', false);
+            ->assertDontSee('Arkivera projekt', false)
+            ->assertDontSee('project-danger-zone', false);
         $this->post(route('app.projects.archive', $project), ['action' => 'archive'])->assertForbidden();
         $this->delete(route('app.projects.destroy', $project), ['confirmation' => 'ta-bort'])->assertForbidden();
 
         $this->actingAs($other)->post(route('app.projects.archive', $project), ['action' => 'archive'])->assertNotFound();
         $this->get(route('app.projects.confirm-destroy', $project))->assertNotFound();
 
-        $this->actingAs($owner)->post(route('app.projects.archive', $project), ['action' => 'archive'])
+        $this->actingAs($owner)->get(route('app.projects.show', $project))
+            ->assertOk()
+            ->assertSee('data-confirm="Arkivera projektet? Det döljs i den vanliga listan."', false)
+            ->assertSee('project-danger-zone', false)
+            ->assertSee('Pågående projekt', false);
+
+        $this->post(route('app.projects.archive', $project), ['action' => 'archive'])
             ->assertRedirect(route('app.dashboard', ['arkiv' => 1]))
             ->assertSessionHas('status', 'Projektet har arkiverats.');
 
         $this->assertNotNull($project->fresh()?->archived_at);
         $this->get(route('app.dashboard'))
             ->assertOk()
+            ->assertSee('Projektet har arkiverats.', false)
+            ->assertSeeInOrder(['Pågående projekt', '0'], false)
             ->assertDontSee('Villa Ek', false)
             ->assertDontSee('Ge första projektet en plats.', false)
             ->assertSee('Visa arkiverade (1)', false);
         $this->get(route('app.dashboard', ['arkiv' => 1]))
             ->assertOk()
             ->assertSee('Villa Ek', false)
-            ->assertSee('Arkiverade projekt', false);
+            ->assertSee('Arkiverade projekt', false)
+            ->assertSee('Arkiverad', false)
+            ->assertDontSee('Pågår', false);
+        $this->get(route('app.projects.show', $project))
+            ->assertOk()
+            ->assertSee('Arkiverad', false)
+            ->assertDontSee('Pågående projekt', false)
+            ->assertSee('data-confirm="Återställ projektet till den vanliga listan?"', false);
 
         $this->post(route('app.projects.archive', $project), ['action' => 'restore'])
             ->assertRedirect(route('app.dashboard'))

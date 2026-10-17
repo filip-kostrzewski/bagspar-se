@@ -364,7 +364,7 @@ class WorkshopWorkspaceTest extends TestCase
         $this->post(route('app.sashes.photos.store', [$project, $sash]), [
             'photo' => UploadedFile::fake()->image('fore.jpg', 80, 60),
             'moment' => 'before',
-        ])->assertRedirect();
+        ])->assertRedirect()->assertSessionHas('status', 'Sparat');
 
         $photo = SashPhoto::query()->firstOrFail();
         $this->assertSame('before', $photo->moment);
@@ -387,6 +387,41 @@ class WorkshopWorkspaceTest extends TestCase
             ->patch(route('app.sashes.photos.update', [$project, $sash, $photo]), ['moment' => 'before'])
             ->assertNotFound();
         $this->assertSame('after', $photo->fresh()?->moment);
+    }
+
+    public function test_sash_photos_without_a_moment_show_fore_and_are_ordered_before_then_after(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+        $sash = WindowSash::factory()->create(['project_id' => $project->getKey()]);
+        $after = SashPhoto::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'moment' => 'after',
+            'original_filename' => 'efter.jpg',
+        ]);
+        $before = SashPhoto::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'moment' => 'before',
+            'original_filename' => 'fore.jpg',
+        ]);
+        $untagged = SashPhoto::factory()->create([
+            'sash_id' => $sash->getKey(),
+            'moment' => null,
+            'original_filename' => 'utan.jpg',
+        ]);
+        $after->forceFill(['created_at' => '2026-10-01 08:00:00', 'updated_at' => '2026-10-01 08:00:00'])->save();
+        $untagged->forceFill(['created_at' => '2026-10-02 08:00:00', 'updated_at' => '2026-10-02 08:00:00'])->save();
+        $before->forceFill(['created_at' => '2026-10-16 08:00:00', 'updated_at' => '2026-10-16 08:00:00'])->save();
+
+        $this->actingAs($owner)->get(route('app.sashes.show', [$project, $sash]))
+            ->assertOk()
+            ->assertDontSee('Välj före eller efter', false)
+            ->assertSee('value="before" selected', false)
+            ->assertSeeInOrder([
+                route('app.sashes.photos.show', [$project, $sash, $untagged]),
+                route('app.sashes.photos.show', [$project, $sash, $before]),
+                route('app.sashes.photos.show', [$project, $sash, $after]),
+            ], false);
     }
 
     public function test_guest_cannot_open_private_workshop_routes_or_photo_urls(): void
