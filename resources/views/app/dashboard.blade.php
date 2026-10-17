@@ -71,6 +71,34 @@
                 </article>
             </section>
 
+            <form class="project-filters" method="GET" action="{{ route('app.dashboard') }}">
+                <div class="form-field">
+                    <label for="filter-customer">Kund</label>
+                    <input id="filter-customer" name="kund" type="search" value="{{ $filters['kund'] }}" maxlength="160">
+                </div>
+                <div class="form-field">
+                    <label for="filter-room">Rum</label>
+                    <input id="filter-room" name="rum" type="search" value="{{ $filters['rum'] }}" maxlength="120">
+                </div>
+                <div class="form-field">
+                    <label for="filter-stage">Etapp</label>
+                    <select id="filter-stage" name="etapp">
+                        <option value="">Alla etapper</option>
+                        @foreach (['received' => 'Mottagen', 'scraping' => 'Skrapning', 'repair' => 'Trälagning', 'glazing' => 'Glasning', 'painting' => 'Målning', 'ready' => 'Klar'] as $value => $label)
+                            <option value="{{ $value }}" @selected($filters['etapp'] === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <label class="workshop-checkbox" for="filter-archived">
+                    <input id="filter-archived" name="arkiv" type="checkbox" value="1" @checked($showingArchived)>
+                    <span>Visa arkiverade</span>
+                </label>
+                <button class="workshop-button workshop-button--secondary" type="submit">Filtrera</button>
+                @if ($hasActiveFilters || $showingArchived)
+                    <a class="workshop-text-link" href="{{ route('app.dashboard') }}">Rensa</a>
+                @endif
+            </form>
+
             <section class="project-list-section" aria-labelledby="projects-title">
                 <div class="section-heading-row">
                     <div>
@@ -83,7 +111,7 @@
                 </div>
 
                 @if ($projects->isEmpty())
-                    <p>{{ $showingArchived ? 'Inga arkiverade projekt.' : 'Inga aktuella projekt.' }}</p>
+                    <p>{{ $hasActiveFilters ? 'Inga projekt matchar sökningen.' : ($showingArchived ? 'Inga arkiverade projekt.' : 'Inga aktuella projekt.') }}</p>
                 @endif
 
                 <div class="project-grid">
