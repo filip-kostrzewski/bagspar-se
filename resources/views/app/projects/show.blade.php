@@ -58,8 +58,19 @@
                     <input type="hidden" name="status" value="{{ $projectIsComplete ? 'active' : 'completed' }}">
                     <button class="workshop-button workshop-button--quiet" type="submit">{{ $projectIsComplete ? 'Återöppna projekt' : 'Markera som avslutat' }}</button>
                 </form>
+                @if (auth()->user()?->isOwner())
+                    <form method="POST" action="{{ route('app.projects.archive', $project) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="{{ $project->isArchived() ? 'restore' : 'archive' }}">
+                        <button class="workshop-button workshop-button--secondary" type="submit">{{ $project->isArchived() ? 'Återställ projekt' : 'Arkivera projekt' }}</button>
+                    </form>
+                    <a class="workshop-button workshop-button--quiet" href="{{ route('app.projects.confirm-destroy', $project) }}">Ta bort projekt</a>
+                @endif
             </div>
         </section>
+        @if ($project->isArchived())
+            <p class="project-archived-note">Projektet är arkiverat och visas inte i den vanliga listan.</p>
+        @endif
 
         <section class="client-status-share" aria-labelledby="client-status-title">
             <p class="workshop-eyebrow">TILL KUNDEN</p>

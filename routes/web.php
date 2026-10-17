@@ -111,6 +111,9 @@ Route::middleware(['auth', 'auth.session', 'verified.production'])->prefix('app'
     Route::get('/projekt/nytt', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projekt', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projekt/{project}/rapport', [ProjectController::class, 'report'])->whereNumber('project')->name('projects.report');
+    Route::post('/projekt/{project}/arkiv', [ProjectController::class, 'archive'])->whereNumber('project')->name('projects.archive');
+    Route::get('/projekt/{project}/ta-bort', [ProjectController::class, 'confirmDestroy'])->whereNumber('project')->name('projects.confirm-destroy');
+    Route::delete('/projekt/{project}', [ProjectController::class, 'destroy'])->whereNumber('project')->name('projects.destroy');
     Route::post('/projekt/{project}/statuslank', [ProjectClientStatusController::class, 'update'])->whereNumber('project')->name('projects.client-status.update');
     Route::get('/projekt/{project}/etiketter', [LabelPrintController::class, 'sheet'])->whereNumber('project')->name('projects.labels');
     Route::get('/projekt/{project}', [ProjectController::class, 'show'])->whereNumber('project')->name('projects.show');

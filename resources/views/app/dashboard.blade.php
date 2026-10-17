@@ -17,7 +17,7 @@
             @endif
         </div>
 
-        @if ($projects->isEmpty())
+        @if (! $hasAnyProjects)
             <section class="dashboard-empty" aria-labelledby="empty-title">
                 <div class="dashboard-empty__intro">
                     <span class="dashboard-empty__mark" aria-hidden="true">
@@ -75,9 +75,16 @@
                 <div class="section-heading-row">
                     <div>
                         <p class="workshop-eyebrow">VERKSTADENS ARBETE</p>
-                        <h2 class="workshop-section-heading" id="projects-title">Alla projekt <span>{{ $projects->count() }}</span></h2>
+                        <h2 class="workshop-section-heading" id="projects-title">{{ $showingArchived ? 'Arkiverade projekt' : 'Alla projekt' }} <span>{{ $projects->count() }}</span></h2>
                     </div>
+                    @if ($archivedCount > 0 || $showingArchived)
+                        <a class="workshop-text-link" href="{{ $showingArchived ? route('app.dashboard') : route('app.dashboard', ['arkiv' => 1]) }}">{{ $showingArchived ? 'Visa aktuella projekt' : 'Visa arkiverade ('.$archivedCount.')' }}</a>
+                    @endif
                 </div>
+
+                @if ($projects->isEmpty())
+                    <p>{{ $showingArchived ? 'Inga arkiverade projekt.' : 'Inga aktuella projekt.' }}</p>
+                @endif
 
                 <div class="project-grid">
                     @foreach ($projects as $project)

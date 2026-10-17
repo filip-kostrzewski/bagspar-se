@@ -2901,6 +2901,24 @@ body.label-print-sheet {
     font-size: 13px;
 }
 
+.project-archived-note {
+    margin: 16px 0 0;
+    color: var(--ink-soft);
+}
+
+.project-danger-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.workshop-button--danger {
+    border-color: #8a2f2f;
+    background: #8a2f2f;
+    color: #fff;
+}
+
 .client-status-main {
     width: min(920px, 100%);
     margin-inline: auto;

@@ -21,4 +21,9 @@ class ProjectPolicy
     {
         return $user->isOwner() && $this->view($user, $project);
     }
+
+    public function archive(User $user, Project $project): bool
+    {
+        return $this->delete($user, $project);
+    }
 }
