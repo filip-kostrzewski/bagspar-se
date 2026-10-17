@@ -205,6 +205,10 @@
         </div>
     </section>
 
+    @php
+        $labelShotVersion = substr(hash_file('sha256', public_path('images/product/qr-etikett.webp')), 0, 12);
+        $reportShotVersion = substr(hash_file('sha256', public_path('images/product/projektrapport.webp')), 0, 12);
+    @endphp
     <section class="guide-ribbon section-space page-shell" aria-labelledby="guide-ribbon-title">
         <div class="guide-ribbon__heading" data-reveal>
             <div>
@@ -227,7 +231,7 @@
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="1960" height="3102" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="1960" height="3102" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
         </div>
@@ -245,11 +249,11 @@
                 <figcaption><strong>Arbetskort</strong> Plats, anteckning och arbetssteg för en båge.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/qr-etikett.webp') }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/qr-etikett.webp') }}?v={{ $labelShotVersion }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
                 <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/projektrapport.webp') }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2" width="1960" height="3102" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder för bågarna 2-KÖK-F1-B1 och 2-KÖK-F1-B2" width="1960" height="3102" loading="lazy" decoding="async">
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, utskrivna eller sparade som PDF.</figcaption>
             </figure>
         </div>
