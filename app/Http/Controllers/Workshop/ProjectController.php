@@ -38,6 +38,7 @@ class ProjectController extends Controller
             'customer_name' => ['nullable', 'string', 'max:160'],
             'location' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:5000'],
+            'delivery_date' => ['nullable', 'date_format:Y-m-d'],
         ], [
             'name.required' => 'Ange ett projektnamn.',
             'name.string' => 'Ange projektnamnet som text.',
@@ -48,6 +49,7 @@ class ProjectController extends Controller
             'location.max' => 'Platsen får vara högst 255 tecken.',
             'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
+            'delivery_date.date_format' => 'Ange leveransdatumet som ett datum.',
         ]);
 
         $validated['notify_customer_when_ready'] = $request->boolean('notify_customer_when_ready');
@@ -83,6 +85,7 @@ class ProjectController extends Controller
             'location' => ['sometimes', 'nullable', 'string', 'max:255'],
             'notes' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'status' => ['sometimes', 'required', Rule::in(['active', 'completed'])],
+            'delivery_date' => ['nullable', 'date_format:Y-m-d'],
         ], [
             'name.required' => 'Ange ett projektnamn.',
             'name.string' => 'Ange projektnamnet som text.',
@@ -94,6 +97,7 @@ class ProjectController extends Controller
             'notes.string' => 'Ange anteckningarna som text.',
             'notes.max' => 'Anteckningarna får vara högst 5 000 tecken.',
             'status.in' => 'Välj en giltig projektstatus.',
+            'delivery_date.date_format' => 'Ange leveransdatumet som ett datum.',
         ]);
 
         abort_if($validated === [], 422);

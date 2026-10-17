@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Workshop;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
 use App\Models\WindowSash;
+use App\Models\Workshop;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -14,11 +18,14 @@ class DashboardController extends Controller
     {
         $workshop = $this->currentWorkshop($request);
         $showingArchived = $request->boolean('arkiv');
+        $deliveryFilter = $request->string('leverans')->toString();
         $filters = [
             'kund' => mb_substr(trim($request->string('kund')->toString()), 0, 160),
             'rum' => mb_substr(trim($request->string('rum')->toString()), 0, 120),
             'etapp' => WindowSash::stageFromFilter($request->string('etapp')->toString()),
+            'leverans' => in_array($deliveryFilter, ['forsenade', 'denna-vecka'], true) ? $deliveryFilter : '',
         ];
+        [$today, $weekStart, $weekEnd] = $this->deliveryWindow();
 
         $currentProjects = $workshop->projects()->notArchived();
         $projects = $workshop->projects()
@@ -41,6 +48,8 @@ class DashboardController extends Controller
                     }
                 });
             })
+            ->when($filters['leverans'] === 'forsenade', fn (Builder $query) => $query->deliveryOverdue($today))
+            ->when($filters['leverans'] === 'denna-vecka', fn (Builder $query) => $query->deliveryDuring($weekStart, $weekEnd))
             ->with('customer')
             ->withCount('windowSashes')
             ->latest()
@@ -51,7 +60,9 @@ class DashboardController extends Controller
             'projects' => $projects,
             'showingArchived' => $showingArchived,
             'filters' => $filters,
-            'hasActiveFilters' => $filters['kund'] !== '' || $filters['rum'] !== '' || $filters['etapp'] !== '',
+            'hasActiveFilters' => $filters['kund'] !== '' || $filters['rum'] !== '' || $filters['etapp'] !== '' || $filters['leverans'] !== '',
+            'overdueProjects' => $showingArchived ? collect() : $this->deliveryProjects($workshop)->deliveryOverdue($today)->get(),
+            'weekProjects' => $showingArchived ? collect() : $this->deliveryProjects($workshop)->deliveryDuring($weekStart, $weekEnd)->get(),
             'archivedCount' => $workshop->projects()->archived()->count(),
             'hasAnyProjects' => $workshop->projects()->exists(),
             'activeProjectsCount' => (clone $currentProjects)->where('status', 'active')->count(),
@@ -61,6 +72,29 @@ class DashboardController extends Controller
                 ->where('stage', '!=', 'ready')
                 ->count(),
         ]);
+    }
+
+    /**
+     * @return array{0: string, 1: string, 2: string}
+     */
+    private function deliveryWindow(): array
+    {
+        $today = now()->timezone('Europe/Stockholm')->startOfDay();
+        $weekStart = $today->copy()->startOfWeek(Carbon::MONDAY);
+
+        return [$today->toDateString(), $weekStart->toDateString(), $weekStart->copy()->addDays(6)->toDateString()];
+    }
+
+    /**
+     * @return HasMany<Project, Workshop>
+     */
+    private function deliveryProjects(Workshop $workshop): HasMany
+    {
+        return $workshop->projects()
+            ->notArchived()
+            ->with('customer')
+            ->orderBy('delivery_date')
+            ->orderBy('id');
     }
 
     private function like(string $value): string

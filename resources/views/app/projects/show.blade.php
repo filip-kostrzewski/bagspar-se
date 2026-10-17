@@ -45,6 +45,9 @@
                     @if ($project->location)
                         <p><span>Plats</span>{{ $project->location }}</p>
                     @endif
+                    @if ($project->delivery_date)
+                        <p><span>Leveransdatum</span>{{ $project->delivery_date->toDateString() }}</p>
+                    @endif
                     <p><span>Arbetskort</span>{{ $sashCount }} {{ $sashCount === 1 ? 'båge' : 'bågar' }}</p>
                 </div>
                 @if ($project->notes)
@@ -132,6 +135,15 @@
                         'customers' => $customers,
                         'selectedCustomerId' => old('form_context') === 'project' ? old('customer_id') : $project->customer_id,
                     ])
+                    <div class="form-field">
+                        <label for="edit-delivery-date">Leveransdatum</label>
+                        <input id="edit-delivery-date" name="delivery_date" type="date" value="{{ old('form_context') === 'project' ? (is_string(old('delivery_date')) ? old('delivery_date') : '') : ($project->delivery_date?->toDateString() ?? '') }}" @if ($errors->has('delivery_date') && old('form_context') === 'project') aria-invalid="true" aria-describedby="edit-delivery-date-error" @endif>
+                        @error('delivery_date')
+                            @if (old('form_context') === 'project')
+                                <p class="form-field__error" id="edit-delivery-date-error">{{ $message }}</p>
+                            @endif
+                        @enderror
+                    </div>
                     <div class="form-field">
                         <label for="edit-project-location">Adress eller plats</label>
                         <input id="edit-project-location" name="location" type="text" value="{{ old('form_context') === 'project' && is_string(old('location')) ? old('location') : $project->location }}" maxlength="255" @if ($errors->has('location') && old('form_context') === 'project') aria-invalid="true" aria-describedby="edit-project-location-error" @endif>

@@ -86,6 +86,14 @@
                     <input id="filter-room" name="rum" type="search" value="{{ $filters['rum'] }}" maxlength="120">
                 </div>
                 <div class="form-field">
+                    <label for="filter-delivery">Leverans</label>
+                    <select id="filter-delivery" name="leverans">
+                        <option value="">Alla</option>
+                        <option value="forsenade" @selected($filters['leverans'] === 'forsenade')>Försenade</option>
+                        <option value="denna-vecka" @selected($filters['leverans'] === 'denna-vecka')>Denna vecka</option>
+                    </select>
+                </div>
+                <div class="form-field">
                     <label for="filter-stage">Etapp</label>
                     <select id="filter-stage" name="etapp">
                         <option value="">Alla etapper</option>
@@ -104,6 +112,28 @@
                 @endif
             </form>
 
+            @if ($overdueProjects->isNotEmpty())
+                <section class="project-list-section" aria-labelledby="overdue-title">
+                    <h2 class="workshop-section-heading" id="overdue-title">Försenade <span>{{ $overdueProjects->count() }}</span></h2>
+                    <div class="project-grid">
+                        @foreach ($overdueProjects as $project)
+                            @include('partials.workshop.project-card', ['project' => $project])
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if ($weekProjects->isNotEmpty())
+                <section class="project-list-section" aria-labelledby="week-title">
+                    <h2 class="workshop-section-heading" id="week-title">Denna vecka <span>{{ $weekProjects->count() }}</span></h2>
+                    <div class="project-grid">
+                        @foreach ($weekProjects as $project)
+                            @include('partials.workshop.project-card', ['project' => $project])
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
             <section class="project-list-section" aria-labelledby="projects-title">
                 <div class="section-heading-row">
                     <div>
@@ -121,34 +151,7 @@
 
                 <div class="project-grid">
                     @foreach ($projects as $project)
-                        @php
-                            $projectIsComplete = $project->status === 'completed';
-                        @endphp
-                        <article class="project-card">
-                            <a class="project-card__link" href="{{ route('app.projects.show', $project) }}">
-                                <div class="project-card__topline">
-                                    <span class="project-card__status @if ($project->isArchived()) project-card__status--archived @elseif ($projectIsComplete) project-card__status--complete @endif">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        {{ $project->isArchived() ? 'Arkiverad' : ($projectIsComplete ? 'Avslutat' : 'Pågår') }}
-                                    </span>
-                                    <span class="project-card__arrow" aria-hidden="true">↗</span>
-                                </div>
-                                <h3>{{ $project->name }}</h3>
-                                @if ($project->customerLabel())
-                                    <p class="project-card__customer">{{ $project->customerLabel() }}</p>
-                                @endif
-                                @if ($project->location)
-                                    <p class="project-card__location">
-                                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8.2c0 4-6 9-6 9s-6-5-6-9a6 6 0 1 1 12 0Z"/><circle cx="10" cy="8" r="2"/></svg>
-                                        {{ $project->location }}
-                                    </p>
-                                @endif
-                                <div class="project-card__footer">
-                                    <span>Öppna arbetsöversikten</span>
-                                    <span>Visa projekt <span aria-hidden="true">→</span></span>
-                                </div>
-                            </a>
-                        </article>
+                        @include('partials.workshop.project-card', ['project' => $project])
                     @endforeach
                 </div>
             </section>

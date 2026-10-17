@@ -25,6 +25,7 @@ class Project extends Model
         'notes',
         'status',
         'notify_customer_when_ready',
+        'delivery_date',
     ];
 
     /** @return BelongsTo<Workshop, $this> */
@@ -97,6 +98,42 @@ class Project extends Model
         return $query->whereNotNull('archived_at');
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeNotFullyReady(Builder $query): Builder
+    {
+        return $query->where(function (Builder $projects): void {
+            $projects->whereDoesntHave('windowSashes')
+                ->orWhereHas('windowSashes', fn (Builder $sashes): Builder => $sashes->where('stage', '!=', 'ready'));
+        });
+    }
+
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeDeliveryOverdue(Builder $query, string $today): Builder
+    {
+        return $query
+            ->whereNotNull('delivery_date')
+            ->whereDate('delivery_date', '<', $today)
+            ->notFullyReady();
+    }
+
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeDeliveryDuring(Builder $query, string $start, string $end): Builder
+    {
+        return $query
+            ->whereNotNull('delivery_date')
+            ->whereDate('delivery_date', '>=', $start)
+            ->whereDate('delivery_date', '<=', $end);
+    }
+
     public function isArchived(): bool
     {
         return $this->archived_at !== null;
@@ -121,6 +158,7 @@ class Project extends Model
             'archived_at' => 'datetime',
             'notify_customer_when_ready' => 'boolean',
             'customer_ready_notified_at' => 'datetime',
+            'delivery_date' => 'date',
         ];
     }
 }

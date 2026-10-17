@@ -43,6 +43,14 @@
                 ])
 
                 <div class="form-field">
+                    <label for="delivery_date">Leveransdatum <span class="form-optional">Valfritt</span></label>
+                    <input id="delivery_date" name="delivery_date" type="date" value="{{ is_string(old('delivery_date')) ? old('delivery_date') : '' }}" @if ($errors->has('delivery_date')) aria-invalid="true" aria-describedby="delivery-date-error" @endif>
+                    @error('delivery_date')
+                        <p class="form-field__error" id="delivery-date-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="form-field">
                     <label for="location">Adress eller plats <span class="form-optional">Valfritt</span></label>
                     <input id="location" name="location" type="text" value="{{ is_string(old('location')) ? old('location') : '' }}" autocomplete="street-address" maxlength="255" @if ($errors->has('location')) aria-invalid="true" aria-describedby="location-error" @endif>
                     @error('location')

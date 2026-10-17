@@ -43,6 +43,7 @@ final class CustomerDataExport
                     'plats' => $project->location,
                     'anteckningar' => $project->notes,
                     'status' => $project->status === 'completed' ? 'Avslutad' : 'Pågår',
+                    'leveransdatum' => $project->delivery_date?->toDateString(),
                     'kundnamn' => $project->customer_name,
                     'bagar' => $project->windowSashes
                         ->sortBy('code')
@@ -99,6 +100,7 @@ final class CustomerDataExport
                 'Plats' => $project['plats'] ?? null,
                 'Anteckningar' => $project['anteckningar'] ?? null,
                 'Status' => $project['status'] ?? null,
+                'Leveransdatum' => $project['leveransdatum'] ?? null,
                 'Kundnamn' => $project['kundnamn'] ?? null,
             ] as $label => $value) {
                 $this->put($handle, ['Projekt', $customerName, $projectName, '', $label, $this->text($value)]);
