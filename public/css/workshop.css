@@ -3390,7 +3390,7 @@ body.label-print-sheet {
     border: 1px solid var(--rule);
     background: transparent;
     object-fit: contain;
-    object-position: center;
+    object-position: center center;
 }
 
 .settings-logo-empty {
