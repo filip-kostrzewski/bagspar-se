@@ -12,7 +12,7 @@ class WorkshopSettingsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_owner_can_save_workshop_document_details_without_a_phone_field(): void
+    public function test_owner_can_save_workshop_document_details(): void
     {
         $owner = User::factory()->create();
 
@@ -22,9 +22,9 @@ class WorkshopSettingsControllerTest extends TestCase
             ->assertSee('Verkstadens uppgifter', false)
             ->assertSee('name="organization_number"', false)
             ->assertSee('name="contact_email"', false)
+            ->assertSee('name="phone"', false)
+            ->assertSee('Telefon', false)
             ->assertSee('name="address"', false)
-            ->assertDontSee('name="phone"', false)
-            ->assertDontSee('telefon', false)
             ->assertSee('data-file-picker="logo"', false)
             ->assertSee('Välj bild', false);
 
@@ -45,7 +45,85 @@ class WorkshopSettingsControllerTest extends TestCase
         $this->assertSame('559214-9370', $workshop->organization_number);
         $this->assertSame('verkstad@example.test', $workshop->contact_email);
         $this->assertSame('Storgatan 1, Uppsala', $workshop->address);
+        $this->assertNull($workshop->phone);
         $this->assertNull($workshop->logo_path);
+    }
+
+    public function test_owner_can_save_a_swedish_phone_without_clearing_the_hourly_rate(): void
+    {
+        $owner = User::factory()->create();
+        $owner->workshop->update(['hourly_rate_ore' => 65000]);
+
+        $this->actingAs($owner)
+            ->patch(route('app.settings.update'), [
+                'name' => $owner->workshop->name,
+                'phone' => '070-123 45 67',
+            ])->assertRedirect()
+            ->assertSessionHas('status', 'Sparat');
+
+        $workshop = $owner->workshop->fresh();
+        $this->assertSame('+46701234567', $workshop->phone);
+        $this->assertSame(65000, $workshop->hourly_rate_ore);
+
+        $this->get(route('app.settings.edit'))
+            ->assertOk()
+            ->assertSee('value="070-123 45 67"', false);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => $workshop->name,
+            'phone' => '+46 70 123 45 67',
+        ])->assertRedirect();
+
+        $workshop = $owner->workshop->fresh();
+        $this->assertSame('+46701234567', $workshop->phone);
+        $this->assertSame(65000, $workshop->hourly_rate_ore);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => $workshop->name,
+            'phone' => '',
+        ])->assertRedirect();
+
+        $workshop = $owner->workshop->fresh();
+        $this->assertNull($workshop->phone);
+        $this->assertSame(65000, $workshop->hourly_rate_ore);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => $workshop->name,
+            'phone' => '+46701234567',
+        ])->assertRedirect();
+
+        $this->patch(route('app.settings.update'), [
+            'name' => $workshop->name,
+        ])->assertRedirect();
+
+        $workshop = $owner->workshop->fresh();
+        $this->assertSame('+46701234567', $workshop->phone);
+        $this->assertSame(65000, $workshop->hourly_rate_ore);
+    }
+
+    public function test_an_invalid_phone_is_rejected_in_swedish(): void
+    {
+        $owner = User::factory()->create();
+
+        $this->actingAs($owner)
+            ->from(route('app.settings.edit'))
+            ->patch(route('app.settings.update'), [
+                'name' => $owner->workshop->name,
+                'phone' => 'hej',
+            ])->assertSessionHasErrors([
+                'phone' => 'Ange ett svenskt telefonnummer, till exempel 070-123 45 67.',
+            ]);
+
+        $this->assertNull($owner->workshop->fresh()->phone);
+
+        $this->patch(route('app.settings.update'), [
+            'name' => $owner->workshop->name,
+            'phone' => '+47 70 123 45 67',
+        ])->assertSessionHasErrors([
+            'phone' => 'Ange ett svenskt telefonnummer, till exempel 070-123 45 67.',
+        ]);
+
+        $this->assertNull($owner->workshop->fresh()->phone);
     }
 
     public function test_invalid_organization_number_is_rejected_in_swedish(): void
@@ -161,10 +239,12 @@ class WorkshopSettingsControllerTest extends TestCase
             ->patch(route('app.settings.update'), [
                 'name' => 'Annat namn',
                 'hourly_rate' => '100',
+                'phone' => '070-123 45 67',
             ])->assertForbidden();
 
         $workshop = $owner->workshop->fresh();
         $this->assertNotSame('Annat namn', $workshop->name);
         $this->assertNull($workshop->hourly_rate_ore);
+        $this->assertNull($workshop->phone);
     }
 }

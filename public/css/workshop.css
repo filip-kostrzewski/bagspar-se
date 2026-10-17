@@ -1787,8 +1787,12 @@ svg {
 }
 
 .report-workshop {
-    display: flex;
+    display: block;
     min-width: 0;
+}
+
+.report-workshop:has(.report-workshop__logo) {
+    display: flex;
     align-items: center;
     gap: 16px;
 }

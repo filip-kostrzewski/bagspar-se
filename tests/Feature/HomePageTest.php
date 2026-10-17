@@ -179,4 +179,18 @@ class HomePageTest extends TestCase
         $this->assertSame($hashes, array_values(array_unique($hashes)));
         $this->assertCount(12, $hashes);
     }
+
+    public function test_the_workflow_photo_keeps_its_frame_while_the_page_loads(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+        $this->assertIsString($html);
+        $this->assertDoesNotMatchRegularExpression('/class="atelier__visual"[^>]*data-reveal/', $html);
+        $this->assertMatchesRegularExpression('/class="atelier-photo__image"[\s\S]*?width="1200"[\s\S]*?height="800"[\s\S]*?loading="eager"/', $html);
+        $this->assertStringContainsString('Kitt stryks mot glaset i en äldre träbåge', $html);
+        $this->assertStringContainsString('Färg skrapas av en äldre träbåge', $html);
+
+        $css = file_get_contents(public_path('css/site.css'));
+        $this->assertIsString($css);
+        $this->assertMatchesRegularExpression('/\.atelier-photo__image\s*\{[^}]*position:\s*absolute/', $css);
+    }
 }

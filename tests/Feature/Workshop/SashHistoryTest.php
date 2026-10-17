@@ -58,6 +58,38 @@ class SashHistoryTest extends TestCase
         $this->assertSame(SashEvent::KIND_STAGE, $sash->events()->firstOrFail()->kind);
     }
 
+    public function test_saving_an_unchanged_sash_does_not_add_another_received_stage(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create(['workshop_id' => $owner->workshop_id]);
+
+        $this->actingAs($owner)->post(route('app.sashes.store', $project), [
+            'code' => 'B-24',
+            'room' => 'Kök',
+            'location' => 'Innerbåge',
+            'stage' => 'received',
+            'notes' => '',
+        ])->assertRedirect();
+
+        $sash = WindowSash::query()->where('code', 'B-24')->firstOrFail();
+        $this->assertSame(1, $sash->events()->where('kind', SashEvent::KIND_STAGE)->count());
+
+        $this->patch(route('app.sashes.update', [$project, $sash]), [
+            'form_context' => 'sash',
+            'code' => 'B-24',
+            'room' => 'Kök',
+            'location' => 'Innerbåge',
+            'stage' => 'received',
+            'notes' => '',
+        ])->assertRedirect();
+
+        $sash->refresh();
+        $this->assertSame('received', $sash->stage);
+        $this->assertNull($sash->notes);
+        $this->assertSame(1, $sash->events()->count());
+        $this->assertSame(1, $sash->events()->where('kind', SashEvent::KIND_STAGE)->where('stage', 'received')->count());
+    }
+
     public function test_stage_and_note_changes_are_appended_and_shown_with_the_author(): void
     {
         $this->travelTo(Carbon::parse('2026-10-16 08:15:00', 'UTC'));

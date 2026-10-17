@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Workshop;
 use App\Support\Kronor;
 use App\Support\PrivateImageResponse;
+use App\Support\SwedishPhone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -44,6 +45,13 @@ class WorkshopSettingsController extends Controller
             'name' => ['required', 'string', 'max:160'],
             'organization_number' => ['nullable', 'string', 'regex:/^\d{6}-\d{4}$/'],
             'contact_email' => ['nullable', 'string', 'email:rfc', 'max:254'],
+            'phone' => ['nullable', 'string', 'max:40', function (string $attribute, mixed $value, \Closure $fail): void {
+                try {
+                    SwedishPhone::parseOptional($value);
+                } catch (InvalidArgumentException) {
+                    $fail('Ange ett svenskt telefonnummer, till exempel 070-123 45 67.');
+                }
+            }],
             'address' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=2000,max_height=2000'],
             'remove_logo' => ['sometimes', 'boolean'],
@@ -61,6 +69,7 @@ class WorkshopSettingsController extends Controller
             'organization_number.regex' => 'Ange organisationsnumret med sex siffror, bindestreck och fyra siffror.',
             'contact_email.email' => 'Ange en giltig e-postadress.',
             'contact_email.max' => 'E-postadressen får vara högst 254 tecken.',
+            'phone.max' => 'Telefonnumret får vara högst 40 tecken.',
             'address.max' => 'Adressen får vara högst 255 tecken.',
             'logo.image' => 'Logotypen måste vara en bild.',
             'logo.mimes' => 'Logotypen måste vara i formatet JPG, PNG eller WebP.',
@@ -96,6 +105,10 @@ class WorkshopSettingsController extends Controller
             'contact_email' => $validated['contact_email'] ?? null,
             'address' => $address,
         ]);
+
+        if ($request->exists('phone')) {
+            $workshop->phone = SwedishPhone::parseOptional($validated['phone'] ?? null);
+        }
 
         if ($request->exists('hourly_rate')) {
             $workshop->hourly_rate_ore = Kronor::parseOptional($validated['hourly_rate'] ?? null);

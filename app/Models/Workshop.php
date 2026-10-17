@@ -16,6 +16,7 @@ class Workshop extends Model
         'name',
         'organization_number',
         'contact_email',
+        'phone',
         'address',
         'logo_path',
         'trial_ends_at',

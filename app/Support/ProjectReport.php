@@ -23,13 +23,16 @@ final class ProjectReport
             ? route('client-status.show', ['token' => $project->client_status_token])
             : null;
         $clientStatusQr = null;
+        $clientStatusQrImage = null;
 
         if (is_string($clientStatusUrl)) {
+            $qrCode = app(SashQrCodeRenderer::class);
             $clientStatusQr = preg_replace(
                 '/^<\?xml[^>]*>\s*/',
                 '',
-                app(SashQrCodeRenderer::class)->render($clientStatusUrl),
+                $qrCode->render($clientStatusUrl),
             );
+            $clientStatusQrImage = $qrCode->renderPngDataUri($clientStatusUrl);
         }
 
         $timeEntries = SashTimeEntry::query()
@@ -48,6 +51,7 @@ final class ProjectReport
             'sashes' => $sashes,
             'clientStatusUrl' => $clientStatusUrl,
             'clientStatusQr' => $clientStatusQr,
+            'clientStatusQrImage' => $clientStatusQrImage,
             'includeWorkNotes' => $includeWorkNotes,
             'includeWorkTime' => $includeWorkTime,
             'timeTotalMinutes' => (int) $timeEntries->sum('minutes'),

@@ -100,6 +100,7 @@ class ProjectReportPdfTest extends TestCase
     public function test_the_pdf_markup_includes_the_customer_phone_and_the_status_qr(): void
     {
         $owner = User::factory()->create();
+        $owner->workshop->update(['phone' => '+4681234567']);
         $customer = Customer::factory()->create([
             'workshop_id' => $owner->workshop_id,
             'phone' => '070-111 22 33',
@@ -120,8 +121,12 @@ class ProjectReportPdfTest extends TestCase
         ])->render();
 
         $this->assertStringContainsString('070-111 22 33', $html);
+        $this->assertStringContainsString('08-123 45 67', $html);
         $this->assertStringContainsString('Skanna koden', $html);
-        $this->assertStringContainsString('<svg', $html);
+        $this->assertStringContainsString('data:image/png;base64,', $html);
+        $this->assertStringContainsString('alt="QR-kod till kundens status"', $html);
+        $this->assertStringNotContainsString('<svg', $html);
+        $this->assertStringStartsWith("\x89PNG\r\n\x1a\n", $this->pngFromDataUri($html));
 
         $project->forceFill(['client_status_enabled' => false])->save();
 
@@ -132,6 +137,45 @@ class ProjectReportPdfTest extends TestCase
         ])->render();
 
         $this->assertStringContainsString('070-111 22 33', $withoutLink);
+        $this->assertStringContainsString('08-123 45 67', $withoutLink);
         $this->assertStringNotContainsString('Skanna koden', $withoutLink);
+        $this->assertStringNotContainsString('data:image/png;base64,', $withoutLink);
+    }
+
+    public function test_the_downloaded_pdf_contains_the_qr_image_when_the_status_link_is_enabled(): void
+    {
+        $owner = User::factory()->create();
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Villa Ek',
+        ]);
+        $project->forceFill([
+            'client_status_enabled' => true,
+            'client_status_token' => str_repeat('d', 48),
+        ])->save();
+
+        $this->actingAs($owner);
+        $withQr = $this->get(route('app.projects.report.pdf', $project))->assertOk()->getContent();
+        $this->assertIsString($withQr);
+        $this->assertStringStartsWith('%PDF', $withQr);
+        $this->assertSame(1, preg_match_all('/\/Subtype\s*\/Image/', $withQr));
+        $this->assertMatchesRegularExpression('/\/Width\s+320/', $withQr);
+        $this->assertMatchesRegularExpression('/\/Height\s+320/', $withQr);
+
+        $project->forceFill(['client_status_enabled' => false])->save();
+        $withoutQr = $this->get(route('app.projects.report.pdf', $project))->assertOk()->getContent();
+        $this->assertIsString($withoutQr);
+        $this->assertStringStartsWith('%PDF', $withoutQr);
+        $this->assertSame(0, preg_match_all('/\/Subtype\s*\/Image/', $withoutQr));
+        $this->assertGreaterThan(strlen($withoutQr), strlen($withQr));
+    }
+
+    private function pngFromDataUri(string $html): string
+    {
+        $this->assertSame(1, preg_match('/src="data:image\/png;base64,([^"]+)"/', $html, $matches));
+        $png = base64_decode($matches[1], true);
+        $this->assertIsString($png);
+
+        return $png;
     }
 }

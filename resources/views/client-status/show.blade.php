@@ -17,6 +17,9 @@
                     @if ($workshop->contact_email)
                         <p class="report-workshop__contact">{{ $workshop->contact_email }}</p>
                     @endif
+                    @if (is_string($workshop->phone) && $workshop->phone !== '')
+                        <p class="report-workshop__contact">@include('partials.workshop.phone-link', ['phone' => \App\Support\SwedishPhone::format($workshop->phone), 'href' => \App\Support\SwedishPhone::telHref($workshop->phone)])</p>
+                    @endif
                     @if ($workshop->address)
                         <p class="report-workshop__contact">{{ $workshop->address }}</p>
                     @endif

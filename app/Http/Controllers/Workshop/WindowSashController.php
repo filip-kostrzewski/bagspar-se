@@ -109,16 +109,22 @@ class WindowSashController extends Controller
 
         abort_if($validated === [], 422);
         $previousStage = $sash->stage;
-        $previousNotes = $sash->notes;
+        $previousNotes = $this->normalizedNote($sash->notes);
+        $incomingStage = array_key_exists('stage', $validated) && is_string($validated['stage'])
+            ? $validated['stage']
+            : null;
+        $stageChanged = is_string($incomingStage) && $incomingStage !== $previousStage;
+        $notesChanged = array_key_exists('notes', $validated)
+            && $this->normalizedNote($validated['notes']) !== $previousNotes;
         $sash->update($validated);
         $actor = $request->user();
 
         if ($actor instanceof User) {
-            if (array_key_exists('stage', $validated) && $sash->stage !== $previousStage) {
-                $sash->recordEvent($actor, SashEvent::KIND_STAGE, $sash->stage);
+            if ($stageChanged) {
+                $sash->recordEvent($actor, SashEvent::KIND_STAGE, $incomingStage);
             }
 
-            if (array_key_exists('notes', $validated) && $sash->notes !== $previousNotes) {
+            if ($notesChanged) {
                 $sash->recordEvent($actor, SashEvent::KIND_NOTE, null, $sash->notes);
             }
         }
@@ -159,5 +165,10 @@ class WindowSashController extends Controller
         return redirect()
             ->route('app.projects.show', $project)
             ->with('status', 'Bågen och bildfilerna har tagits bort.');
+    }
+
+    private function normalizedNote(mixed $notes): string
+    {
+        return is_string($notes) ? $notes : '';
     }
 }

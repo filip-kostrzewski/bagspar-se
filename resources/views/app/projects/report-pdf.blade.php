@@ -25,6 +25,9 @@
     @if ($workshop->contact_email)
         <p class="muted">{{ $workshop->contact_email }}</p>
     @endif
+    @if (is_string($workshop->phone) && $workshop->phone !== '')
+        <p class="muted">{{ \App\Support\SwedishPhone::format($workshop->phone) }}</p>
+    @endif
     @if ($workshop->address)
         <p class="muted">{{ $workshop->address }}</p>
     @endif
@@ -124,9 +127,9 @@
 
     @if (is_string($clientStatusUrl))
         <h2>Status för kunden</h2>
-        @if (is_string($clientStatusQr) && $clientStatusQr !== '')
+        @if (is_string($clientStatusQrImage) && $clientStatusQrImage !== '')
             <p>Skanna koden för att se etapperna och bilderna före och efter. Anteckningar ingår inte.</p>
-            <div>{!! $clientStatusQr !!}</div>
+            <p><img src="{{ $clientStatusQrImage }}" alt="QR-kod till kundens status" width="160" height="160"></p>
         @endif
         <p>{{ $clientStatusUrl }}</p>
     @endif

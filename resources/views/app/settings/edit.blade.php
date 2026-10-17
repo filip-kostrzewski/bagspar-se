@@ -56,6 +56,15 @@
             </div>
 
             <div class="form-field">
+                <label for="phone">Telefon <span class="form-optional">Valfritt</span></label>
+                <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" placeholder="070-123 45 67" value="{{ is_string(old('phone')) ? old('phone') : (is_string($workshop->phone) && $workshop->phone !== '' ? \App\Support\SwedishPhone::format($workshop->phone) : '') }}" @if ($errors->has('phone')) aria-invalid="true" aria-describedby="phone-error" @endif>
+                <p class="form-field__hint" id="phone-hint">Visas på projektrapporten och kundens statussida.</p>
+                @error('phone')
+                    <p class="form-field__error" id="phone-error">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="form-field">
                 <label for="address">Adress</label>
                 <input id="address" name="address" type="text" value="{{ is_string(old('address')) ? old('address') : $workshop->address }}" maxlength="255" autocomplete="street-address" @if ($errors->has('address')) aria-invalid="true" aria-describedby="address-error" @endif>
                 @error('address')

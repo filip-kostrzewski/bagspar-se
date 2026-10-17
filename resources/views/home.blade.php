@@ -134,7 +134,7 @@
                 @php
                     $workflowSteps = [
                         ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'height' => 1402, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
-                        ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-scraping', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Färg skrapas av en äldre träbåge'],
+                        ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-scraping', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Färg skrapas av en äldre träbåge', 'version' => substr(hash_file('sha256', public_path('images/workshop-scraping.webp')), 0, 12)],
                         ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-repair', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Trä lagas i en fönsterbåge'],
                         ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-glazing', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Kitt stryks mot glaset i en äldre träbåge', 'version' => substr(hash_file('sha256', public_path('images/workshop-glazing.webp')), 0, 12)],
                         ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-painting', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En träbåge målas med pensel'],
@@ -170,7 +170,7 @@
                 <a class="text-link atelier__demo-link" href="{{ route('demo') }}">Prova exemplet med testuppgifter</a>
             </div>
 
-            <div class="atelier__visual" id="workflow-example" data-reveal>
+            <div class="atelier__visual" id="workflow-example">
                 <figure class="atelier-photo">
                     <span class="atelier-photo__light" aria-hidden="true"></span>
                     <img
@@ -179,9 +179,9 @@
                         srcset="{{ asset('images/workshop-hero-small.webp') }} 640w, {{ asset('images/workshop-hero.webp') }} 1122w"
                         sizes="(max-width: 720px) calc(100vw - 40px), (max-width: 1200px) 53vw, 680px"
                         alt="En äldre träbåge står på arbetsbänken redo att märkas"
-                        width="1122"
-                        height="1402"
-                        loading="lazy"
+                        width="1200"
+                        height="800"
+                        loading="eager"
                         decoding="async"
                         data-workflow-image
                     >

@@ -194,4 +194,40 @@ class ClientStatusTest extends TestCase
         $this->post(route('app.projects.client-status.update', $project), ['action' => 'disable'])
             ->assertRedirect(route('login'));
     }
+
+    public function test_the_public_status_page_shows_the_workshop_phone_and_no_logo_gap(): void
+    {
+        $owner = User::factory()->create();
+        $owner->workshop->update(['name' => 'Ekens Fönster']);
+        $project = Project::factory()->create([
+            'workshop_id' => $owner->workshop_id,
+            'name' => 'Villa Ek',
+        ]);
+        $project->forceFill([
+            'client_status_enabled' => true,
+            'client_status_token' => str_repeat('e', 48),
+        ])->save();
+
+        $this->get(route('client-status.show', ['token' => str_repeat('e', 48)]))
+            ->assertOk()
+            ->assertDontSee('070-123 45 67', false)
+            ->assertDontSee('tel:+46701234567', false)
+            ->assertDontSee('report-workshop__logo', false);
+
+        $css = file_get_contents(public_path('css/workshop.css'));
+        $this->assertIsString($css);
+        $this->assertMatchesRegularExpression('/\.report-workshop\s*\{[^}]*display:\s*block/', $css);
+        $this->assertStringContainsString('.report-workshop:has(.report-workshop__logo)', $css);
+
+        $owner->workshop->update(['phone' => '+46701234567']);
+
+        $this->get(route('client-status.show', ['token' => str_repeat('e', 48)]))
+            ->assertOk()
+            ->assertSee('<a href="tel:+46701234567">070-123 45 67</a>', false);
+
+        $this->actingAs($owner)
+            ->get(route('app.projects.report', $project))
+            ->assertOk()
+            ->assertSee('<a href="tel:+46701234567">070-123 45 67</a>', false);
+    }
 }
