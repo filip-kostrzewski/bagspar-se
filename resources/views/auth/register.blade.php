@@ -9,7 +9,7 @@
         <p class="auth-page__intro">Börja med verkstaden. Lägg sedan till projekt och bågar när arbetet tar form.</p>
 
         <aside class="registration-terms" aria-label="Pilot och pris">
-            <strong>Gratis pilot till 31 december</strong>
+            <strong>Gratis pilot till 31 december 2026</strong>
             <p>Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter. Ingen betalning dras förrän du själv väljer att aktivera abonnemanget.</p>
         </aside>
 

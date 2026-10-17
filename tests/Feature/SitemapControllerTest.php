@@ -89,7 +89,6 @@ class SitemapControllerTest extends TestCase
 
         $response->assertSee('<link rel="canonical" href="https://bagspar.se/">', false);
         $response->assertSee('href="https://bagspar.se/css/site.css?v='.config('bagspar.asset_version').'"', false);
-        $response->assertSee('action="https://bagspar.se/intresse"', false);
         $response->assertSee('href="https://bagspar.se/demo"', false);
         $response->assertSee('href="https://bagspar.se/fonsterrenovering-dokumentation"', false);
         $response->assertSee('href="https://bagspar.se/arbetskort-fonsterbagar"', false);

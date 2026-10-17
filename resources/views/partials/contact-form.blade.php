@@ -2,6 +2,10 @@
     $contactErrors = $errors->getBag('contact');
 @endphp
 
+@if (filled(config('bagspar.contact_email')))
+    <p class="interest-form__note"><a href="mailto:{{ config('bagspar.contact_email') }}">{{ config('bagspar.contact_email') }}</a></p>
+@endif
+
 @if (session('contact_message_received'))
     <div id="kontakt-resultat" class="form-result" role="status" aria-live="polite" tabindex="-1">
         <p>Tack! Vi har fått ditt meddelande och återkommer så snart vi kan.</p>

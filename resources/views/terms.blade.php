@@ -23,7 +23,7 @@
         <p>Ingen betalning dras automatiskt under piloten, och ingen betalning startar automatiskt när piloten tar slut. Vill verkstaden inte fortsätta behöver den inte säga upp en betalning som inte har börjat.</p>
 
         <h2>3. Pris efter piloten</h2>
-        <p>Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.</p>
+        <p>Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.</p>
         <p>Priset gäller verkstadens konto. Moms enligt gällande regler tillkommer på 790 kr per månad.</p>
 
         <h2>4. Betalning</h2>

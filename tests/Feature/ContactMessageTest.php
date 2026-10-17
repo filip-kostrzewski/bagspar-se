@@ -28,6 +28,8 @@ class ContactMessageTest extends TestCase
         $page->assertSee('<label for="page-contact-company">Företag</label>', false);
         $page->assertSee('<label for="page-contact-phone">Telefon</label>', false);
         $page->assertSee('Vi använder uppgifterna bara för att svara på ditt meddelande, se <a href="/integritet">integritetspolicyn</a>.', false);
+        $page->assertSee('mailto:'.config('bagspar.contact_email'), false);
+        $page->assertSee((string) config('bagspar.contact_email'), false);
         $page->assertSee('href="'.route('contact').'"', false);
         $page->assertDontSee('type="checkbox"', false);
         $page->assertDontSee('captcha', false);

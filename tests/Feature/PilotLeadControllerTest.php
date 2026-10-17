@@ -58,12 +58,12 @@ class PilotLeadControllerTest extends TestCase
             $mail->assertSeeInHtml('Det här formuläret skapar inget konto', false);
             $mail->assertSeeInHtml('Gratis pilot till 31 december', false);
             $mail->assertSeeInHtml('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
-            $mail->assertSeeInHtml('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+            $mail->assertSeeInHtml('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
             $mail->assertDontSeeInHtml('3 månader', false);
             $mail->assertDontSeeInHtml('Fortsättning avtalas separat', false);
             $mail->assertDontSeeInHtml('Därefter Efter piloten', false);
             $mail->assertSeeInText('Det här formuläret skapar inget konto');
-            $mail->assertSeeInText('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.');
+            $mail->assertSeeInText('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.');
             $mail->assertDontSeeInHtml('eget konto ingår i piloten');
             $mail->assertDontSeeInHtml('prototyp');
 
@@ -292,7 +292,8 @@ class PilotLeadControllerTest extends TestCase
         Mail::assertNotSent(PilotLeadConfirmation::class);
 
         $page = $this->get(route('home'));
-        $page->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
+        $page->assertSee('Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten.', false);
+        $page->assertDontSee('Be oss kontakta dig', false);
         $page->assertDontSee('bekräftelse', false);
     }
 

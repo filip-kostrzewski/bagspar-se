@@ -46,11 +46,11 @@ return [
      */
     'pilot_offer' => is_string($pilotOffer) && trim($pilotOffer) !== ''
         ? trim($pilotOffer)
-        : 'Gratis pilot till 31 december',
+        : 'Gratis pilot till 31 december 2026',
 
     'pilot_follow_up' => 'Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.',
 
-    'pilot_price_line' => 'Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.',
+    'pilot_price_line' => 'Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.',
 
     'demo_sync_days' => 14,
 

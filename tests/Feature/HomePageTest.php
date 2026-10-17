@@ -20,7 +20,7 @@ class HomePageTest extends TestCase
         $response->assertSee('Gratis pilot till 31 december', false);
         $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
         $response->assertSee('Vad kostar Bågspår efter piloten?', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
         $response->assertDontSee('3 månader', false);
         $response->assertDontSee('tre månader', false);
         $response->assertDontSee('Efter pilotperioden', false);
@@ -48,8 +48,12 @@ class HomePageTest extends TestCase
         $response->assertSee('Det här formuläret skapar inget konto.', false);
         $response->assertSee('Verkstadskontot behöver internetanslutning.', false);
         $response->assertSee('Prodi Digital AB, org.nr 559214-9370, Tegelbrukets väg 41, 195 59 Märsta', false);
-        $response->assertSee('name="company"', false);
-        $response->assertSee('name="email"', false);
+        $response->assertSee('name="contact_name"', false);
+        $response->assertSee('name="contact_company"', false);
+        $response->assertSee('name="contact_email"', false);
+        $response->assertSee('name="contact_message"', false);
+        $response->assertDontSee('name="company"', false);
+        $response->assertDontSee('name="email"', false);
         $response->assertSee('href="'.route('privacy').'"', false);
         $response->assertSee('href="'.route('guides.documentation').'"', false);
         $response->assertSee('href="'.route('guides.work-card').'"', false);
@@ -97,7 +101,8 @@ class HomePageTest extends TestCase
         $response->assertDontSee('tel:', false);
         $response->assertDontSee('bekräftelse', false);
         $response->assertDontSee('skickar en bekräftelse', false);
-        $response->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
+        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten.', false);
+        $response->assertDontSee('Be oss kontakta dig', false);
     }
 
     public function test_homepage_promises_an_email_confirmation_only_when_mail_can_be_sent(): void
@@ -110,7 +115,8 @@ class HomePageTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertSee('Du får en bekräftelse via e-post.', false);
-        $response->assertSee('Lämna verkstadens namn och e-post om du vill stämma av piloten.', false);
+        $response->assertSee('Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten.', false);
+        $response->assertDontSee('Be oss kontakta dig', false);
         $response->assertDontSee('skickar en bekräftelse', false);
     }
 
@@ -124,7 +130,7 @@ class HomePageTest extends TestCase
         $response->assertSee('Eget erbjudande för testet', false);
         $response->assertDontSee('Gratis pilot i 3 månader', false);
         $response->assertDontSee('Gratis pilot till 31 december', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
     }
 
     public function test_contact_email_is_shown_in_the_footer(): void

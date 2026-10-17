@@ -22,7 +22,7 @@ class TermsPageTest extends TestCase
         $response->assertSee('Därefter 790 kr/mån exkl. moms. Ingen bindningstid och ingen automatisk debitering – du väljer själv om du fortsätter.', false);
         $response->assertDontSee('3 månader', false);
         $response->assertSee('Ingen betalning dras automatiskt', false);
-        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, säg upp när du vill.', false);
+        $response->assertSee('Efter piloten: 790 kr/mån exkl. moms. Ingen bindningstid, du väljer själv om du fortsätter.', false);
         $response->assertSee('Ingen bindningstid och ingen uppsägningstid.', false);
         $response->assertSee('Verkstadens ägare skapar kontot och kan bjuda in medarbetare.', false);
         $response->assertSee('Medarbetare kan inte ändra verkstadens uppgifter eller ta bort projekt.', false);

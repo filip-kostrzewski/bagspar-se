@@ -61,7 +61,7 @@ class GuidePageTest extends TestCase
         $response->assertSee($secondRelatedLabel, false);
         $response->assertSee('href="'.route('demo').'"', false);
         $response->assertSee('Se exempel med testuppgifter', false);
-        $response->assertSee('href="'.route('home').'#intresse"', false);
+        $response->assertSee('href="'.route('home').'#kontakt"', false);
         $response->assertSee('Starta gratis pilot', false);
         $response->assertDontSee('tänkt', false);
         $response->assertDontSee('planerat', false);

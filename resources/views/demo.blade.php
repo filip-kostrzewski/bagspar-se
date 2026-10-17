@@ -151,7 +151,7 @@
             <p>Kortet ovan är öppet för alla. Starta en kostnadsfri pilot för din verkstad; arbetskort sparas på servern med internetanslutning.</p>
         </div>
         <a class="button" href="{{ route('register') }}">Starta gratis pilot</a>
-        <p><a href="{{ route('home') }}#intresse">Vill du stämma av piloten? Kontakta oss</a></p>
+        <p><a href="{{ route('home') }}#kontakt">Vill du stämma av piloten? Kontakta oss</a></p>
     </aside>
 
     <dialog class="site-dialog" data-confirm-dialog aria-labelledby="demo-confirm-title" aria-describedby="demo-confirm-text">

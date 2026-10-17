@@ -136,7 +136,7 @@
                         ['key' => 'received', 'number' => '01', 'label' => 'Mottagen', 'description' => 'Bågen är inne. Skriv rum, placering och en första anteckning på arbetskortet.', 'image' => 'workshop-hero', 'smallWidth' => 640, 'width' => 1122, 'height' => 1402, 'alt' => 'En äldre träbåge står på arbetsbänken redo att märkas'],
                         ['key' => 'scraping', 'number' => '02', 'label' => 'Skrapning', 'description' => 'Anteckna vad som skrapas och lägg bilder medan färgen går av.', 'image' => 'workshop-scraping', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Färg skrapas av en äldre träbåge'],
                         ['key' => 'repair', 'number' => '03', 'label' => 'Trälagning', 'description' => 'Skriv vilka delar som lagas, så nästa person ser vad som redan är gjort.', 'image' => 'workshop-repair', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Trä lagas i en fönsterbåge'],
-                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-craft', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Händer lägger nytt kitt i en träbåge'],
+                        ['key' => 'glazing', 'number' => '04', 'label' => 'Glasning', 'description' => 'Håll koll på kitt, stift och vilka rutor som sitter kvar.', 'image' => 'workshop-glazing', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'Nytt kitt stryks mot glaset i en träbåge'],
                         ['key' => 'painting', 'number' => '05', 'label' => 'Målning', 'description' => 'Anteckna färg och skikt medan bågen målas.', 'image' => 'workshop-painting', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En träbåge målas med pensel'],
                         ['key' => 'ready', 'number' => '06', 'label' => 'Klar', 'description' => 'Bågen är klar i verkstaden. Rapporten samlar nummer, rum, steg och bilder.', 'image' => 'workshop-restored', 'smallWidth' => 600, 'width' => 1200, 'height' => 800, 'alt' => 'En färdigrenoverad träbåge i dagsljus'],
                     ];
@@ -224,7 +224,7 @@
                 <span class="guide-teaser__copy"><span>Märkning</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.work-card') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-craft-small.webp') }}" srcset="{{ asset('images/workshop-craft-small.webp') }} 600w, {{ asset('images/workshop-craft.webp') }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Händer lägger nytt kitt i en träbåge" width="1200" height="800" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-glazing-small.webp') }}" srcset="{{ asset('images/workshop-glazing-small.webp') }} 600w, {{ asset('images/workshop-glazing.webp') }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Nytt kitt stryks mot glaset i en träbåge" width="1200" height="800" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Arbetskort</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.documentation') }}" data-reveal>
@@ -294,57 +294,6 @@
         </div>
     </section>
 
-    <section id="intresse" class="contact-note" aria-labelledby="interest-title">
-        <div class="contact-note__inner page-shell">
-            <div class="contact-note__intro" data-reveal>
-                <p class="eyebrow">FRÅGOR FÖRST?</p>
-                <h2 id="interest-title" class="section-heading">Vill du prata med oss?</h2>
-                <p>Lämna verkstadens namn och e-post om du vill stämma av piloten. Det här formuläret skapar inget konto.</p>
-                <p class="contact-note__privacy">Vi sparar uppgifterna för att följa upp din förfrågan. Läs mer i <a href="{{ route('privacy') }}">integritetspolicyn</a>.</p>
-            </div>
-
-            <div class="contact-note__form-wrap" data-reveal>
-                @if (session('pilot_lead_duplicate'))
-                    <div id="form-result" class="form-result form-result--info" role="status" aria-live="polite" tabindex="-1">
-                        <h3>Adressen finns redan i listan.</h3>
-                        <p>Vi har redan en förfrågan från den adressen. Frågor? <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakta oss</a>.</p>
-                        <a class="text-link" href="{{ route('demo') }}">Prova exempel</a>
-                    </div>
-                @elseif (session('pilot_lead_received'))
-                    <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
-                        <h3>Tack, vi har fått din förfrågan.</h3>
-                        <p>Verkstadens namn och din e-post är sparade. Frågor? <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakta oss</a>.</p>
-                        <a class="text-link" href="{{ route('demo') }}">Prova exempel</a>
-                    </div>
-                @else
-                    <form class="interest-form" action="{{ route('pilot-leads.store') }}" method="POST" data-interest-form>
-                        @csrf
-
-                        <div class="form-honeypot" aria-hidden="true">
-                            <label for="website">Lämna det här fältet tomt</label>
-                            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-                        </div>
-
-                        <div class="form-field">
-                            <label for="company">Företag / verkstad <span aria-hidden="true">*</span></label>
-                            <input id="company" name="company" type="text" autocomplete="organization" maxlength="160" required value="{{ old('company') }}" @if ($errors->has('company')) aria-invalid="true" aria-describedby="company-error" @endif>
-                            @error('company')<p id="company-error" class="field-error" role="alert">{{ $message }}</p>@enderror
-                        </div>
-
-                        <div class="form-field">
-                            <label for="email">E-post <span aria-hidden="true">*</span></label>
-                            <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required value="{{ old('email') }}" @if ($errors->has('email')) aria-invalid="true" aria-describedby="email-error" @endif>
-                            @error('email')<p id="email-error" class="field-error" role="alert">{{ $message }}</p>@enderror
-                        </div>
-
-                        <button class="button interest-form__submit" type="submit">Be oss kontakta dig</button>
-                        <p class="interest-form__note">Ingen betalning. Inget konto skapas. <a href="{{ route('privacy') }}">Integritetspolicy</a></p>
-                    </form>
-                @endif
-            </div>
-        </div>
-    </section>
-
     <section class="faq section-space page-shell" aria-labelledby="faq-title">
         <div class="faq__intro" data-reveal>
             <p class="eyebrow">BRA ATT VETA</p>
@@ -361,13 +310,27 @@
     </section>
 
     <section id="kontakt" class="contact-note" aria-labelledby="contact-title">
+        <div id="intresse"></div>
         <div class="contact-note__inner page-shell">
             <div class="contact-note__intro" data-reveal>
                 <p class="eyebrow">KONTAKT</p>
                 <h2 id="contact-title" class="section-heading">Skriv till oss</h2>
-                <p>Namn, e-post och ett meddelande räcker. Företag och telefon är valfria.</p>
+                <p>Namn, e-post och ett meddelande räcker, också om du vill stämma av piloten. Företag och telefon är valfria. Det här formuläret skapar inget konto.</p>
             </div>
             <div class="contact-note__form-wrap" data-reveal>
+                @if (session('pilot_lead_duplicate'))
+                    <div id="form-result" class="form-result form-result--info" role="status" aria-live="polite" tabindex="-1">
+                        <h3>Adressen finns redan i listan.</h3>
+                        <p>Vi har redan en förfrågan från den adressen. Frågor? <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakta oss</a>.</p>
+                        <a class="text-link" href="{{ route('demo') }}">Prova exempel</a>
+                    </div>
+                @elseif (session('pilot_lead_received'))
+                    <div id="form-result" class="form-result" role="status" aria-live="polite" tabindex="-1">
+                        <h3>Tack, vi har fått din förfrågan.</h3>
+                        <p>Verkstadens namn och din e-post är sparade. Frågor? <a href="mailto:{{ config('bagspar.contact_email') }}">Kontakta oss</a>.</p>
+                        <a class="text-link" href="{{ route('demo') }}">Prova exempel</a>
+                    </div>
+                @endif
                 @include('partials.contact-form', ['idPrefix' => 'home-contact', 'source' => 'home'])
             </div>
         </div>
