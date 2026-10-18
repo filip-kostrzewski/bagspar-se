@@ -545,9 +545,10 @@ class ContactMessageTest extends TestCase
         });
     }
 
-    public function test_requests_from_one_ip_are_limited_to_five_per_minute(): void
+    public function test_requests_from_one_ip_are_limited_to_five_per_hour(): void
     {
         Mail::fake();
+        $this->freezeTime();
         config(['bagspar.contact_email' => 'kontakt@bagspar.se']);
         $serverVariables = ['REMOTE_ADDR' => '192.0.2.44'];
 
@@ -567,8 +568,31 @@ class ContactMessageTest extends TestCase
             ->post(route('contact.store'), $extra)
             ->assertTooManyRequests();
 
-        $this->assertDatabaseCount('contact_messages', 5);
-        Mail::assertSent(ContactMessageNotification::class, 5);
+        $this->travel(59)->minutes();
+
+        $this->withServerVariables($serverVariables)
+            ->post(route('contact.store'), $extra)
+            ->assertTooManyRequests();
+
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.45'])
+            ->post(route('contact.store'), [
+                ...$this->validSubmission(),
+                'contact_email' => 'other@example.test',
+            ])
+            ->assertRedirect(route('contact').'#kontakt');
+
+        $this->travel(1)->minute();
+
+        $this->withServerVariables($serverVariables)
+            ->post(route('contact.store'), [
+                ...$this->validSubmission(),
+                'contact_email' => 'later@example.test',
+            ])
+            ->assertRedirect(route('contact').'#kontakt');
+
+        $this->assertDatabaseCount('contact_messages', 7);
+        $this->assertDatabaseMissing('contact_messages', ['email' => 'extra@example.test']);
+        Mail::assertSent(ContactMessageNotification::class, 7);
     }
 
     #[TestWith(['array', null])]

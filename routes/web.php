@@ -59,7 +59,7 @@ Route::view('/villkor', 'terms')->name('terms');
 Route::view('/personuppgiftsbitradesavtal', 'dpa')->name('dpa');
 Route::get('/kontakt', [ContactMessageController::class, 'create'])->name('contact');
 Route::post('/kontakt', [ContactMessageController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:5,60')
     ->name('contact.store');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/manifest.webmanifest', ManifestController::class)->name('manifest');
