@@ -2977,7 +2977,7 @@ html.cookie-choice-saved .cookie-banner {
 .pilot-pricing {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(270px, 0.58fr);
-    align-items: center;
+    align-items: start;
     gap: clamp(45px, 10vw, 135px);
     padding-top: clamp(68px, 8vw, 96px);
     padding-bottom: clamp(68px, 8vw, 96px);

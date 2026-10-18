@@ -283,56 +283,57 @@
         </div>
     </section>
 
-    <section id="pris" class="pilot-pricing page-shell" aria-labelledby="pilot-title">
-        <div id="pilot"></div>
-        <div class="pilot-pricing__copy" data-reveal>
-            <p class="eyebrow">PRIS</p>
-            <h2 id="pilot-title" class="section-heading">{{ \App\Support\Pricing::trialHeadline() }}. Sedan ett pris per verkstad.</h2>
-            <p class="body-copy">{{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::invoiceSentence() }}</p>
-            <ul class="pilot-features" aria-label="Det här ingår">
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
-                    <span><strong>Obegränsat med projekt och bågar</strong><small>Arbetskort med plats, anteckningar, tid och material för varje båge. Privata foton. Upp till 20 per båge · högst 5 MB per foto.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'tag'])</span>
-                    <span><strong>Utskrivbar QR-etikett</strong><small>Öppnar det privata arbetskortet efter inloggning. Kunden får en separat statuslänk.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
-                    <span><strong>Statuslänk till kunden</strong><small>Kunden ser etapp och bilder utan inloggning och kan godkänna leveransen med namn och tid.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
-                    <span><strong>Offert med godkännande via länk</strong><small>Skriv offerten per båge, skicka länken, och kunden godkänner med sitt namn. Samma projekt följer sedan hela vägen till leverans.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
-                    <span><strong>Mottagningsprotokoll</strong><small>Skick och bilder per båge när bågarna hämtas. Kunden godkänner via länken eller på plats, så ingen tvistar om sprickor i efterhand.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
-                    <span><strong>ROT-underlag</strong><small>Tid och material från arbetskorten summerade per projekt, som PDF eller CSV, redo för fakturan.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'print'])</span>
-                    <span><strong>Projektrapport</strong><small>Ladda ner som PDF eller skriv ut.</small></span>
-                </li>
-                <li class="pilot-feature">
-                    <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
-                    <span><strong>Medarbetare</strong><small>Ägaren bjuder in medarbetare till samma verkstad. {{ \App\Support\Pricing::seatsSentence() }}</small></span>
-                </li>
-            </ul>
-            <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
-        </div>
-        <div class="pilot-pricing__price" data-reveal>
-            <p class="pilot-pricing__label">Per verkstad, exkl. moms</p>
-            <p class="pilot-pricing__amount"><span>{{ \App\Support\Pricing::kr(\App\Support\Pricing::monthlyKr()) }}</span><span>kr/mån</span></p>
-            <p class="pilot-pricing__vat">{{ \App\Support\Pricing::seatsSentence() }}</p>
-            <p class="pilot-pricing__vat">{{ \App\Support\Pricing::yearlySentence() }}</p>
-            <p class="pilot-pricing__vat">Ingen bindningstid. Faktura, inget kort.</p>
-        </div>
-    </section>
+    <div id="pilot">
+        <section id="pris" class="pilot-pricing page-shell" aria-labelledby="pilot-title">
+            <div class="pilot-pricing__copy" data-reveal>
+                <p class="eyebrow">PRIS</p>
+                <h2 id="pilot-title" class="section-heading">{{ \App\Support\Pricing::trialHeadline() }}. Sedan ett pris per verkstad.</h2>
+                <p class="body-copy">{{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::invoiceSentence() }}</p>
+                <ul class="pilot-features" aria-label="Det här ingår">
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
+                        <span><strong>Obegränsat med projekt och bågar</strong><small>Arbetskort med plats, anteckningar, tid och material för varje båge. Privata foton. Upp till 20 per båge · högst 5 MB per foto.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'tag'])</span>
+                        <span><strong>Utskrivbar QR-etikett</strong><small>Öppnar det privata arbetskortet efter inloggning. Kunden får en separat statuslänk.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
+                        <span><strong>Statuslänk till kunden</strong><small>Kunden ser etapp och bilder utan inloggning och kan godkänna leveransen med namn och tid.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
+                        <span><strong>Offert med godkännande via länk</strong><small>Skriv offerten per båge, skicka länken, och kunden godkänner med sitt namn. Samma projekt följer sedan hela vägen till leverans.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'image'])</span>
+                        <span><strong>Mottagningsprotokoll</strong><small>Skick och bilder per båge när bågarna hämtas. Kunden godkänner via länken eller på plats, så ingen tvistar om sprickor i efterhand.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'check'])</span>
+                        <span><strong>ROT-underlag</strong><small>Tid och material från arbetskorten summerade per projekt, som PDF eller CSV, redo för fakturan.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'print'])</span>
+                        <span><strong>Projektrapport</strong><small>Ladda ner som PDF eller skriv ut.</small></span>
+                    </li>
+                    <li class="pilot-feature">
+                        <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'account'])</span>
+                        <span><strong>Medarbetare</strong><small>Ägaren bjuder in medarbetare till samma verkstad. {{ \App\Support\Pricing::seatsSentence() }}</small></span>
+                    </li>
+                </ul>
+                <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
+            </div>
+            <div class="pilot-pricing__price" data-reveal>
+                <p class="pilot-pricing__label">Per verkstad, exkl. moms</p>
+                <p class="pilot-pricing__amount"><span>{{ \App\Support\Pricing::kr(\App\Support\Pricing::monthlyKr()) }}</span><span>kr/mån</span></p>
+                <p class="pilot-pricing__vat">{{ \App\Support\Pricing::seatsSentence() }}</p>
+                <p class="pilot-pricing__vat">{{ \App\Support\Pricing::yearlySentence() }}</p>
+                <p class="pilot-pricing__vat">Ingen bindningstid. Faktura, inget kort.</p>
+            </div>
+        </section>
+    </div>
 
     <section class="faq section-space page-shell" aria-labelledby="faq-title">
         <div class="faq__intro" data-reveal>

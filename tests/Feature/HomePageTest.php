@@ -188,6 +188,21 @@ class HomePageTest extends TestCase
         $this->assertCount(12, $hashes);
     }
 
+    public function test_pricing_section_keeps_the_pilot_anchor_without_an_empty_grid_child(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+
+        $this->assertIsString($html);
+        $this->assertMatchesRegularExpression(
+            '/<div id="pilot">\s*<section id="pris" class="pilot-pricing page-shell"[^>]*>\s*<div class="pilot-pricing__copy"/',
+            $html,
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/<div id="pilot"><\/div>/',
+            $html,
+        );
+    }
+
     public function test_the_workflow_photo_keeps_its_frame_while_the_page_loads(): void
     {
         $html = $this->get(route('home'))->assertOk()->getContent();
