@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('bagspar:send-access-reminders')->dailyAt('08:00')->timezone('Europe/Stockholm');
 Schedule::command('bagspar:send-onboarding-nudges')->dailyAt('09:00')->timezone('Europe/Stockholm');
+Schedule::command('model:prune')->daily();

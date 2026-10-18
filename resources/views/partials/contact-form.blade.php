@@ -14,6 +14,7 @@
     <form class="interest-form contact-form" action="{{ route('contact.store') }}" method="POST" novalidate>
         @csrf
         <input type="hidden" name="source" value="{{ $source }}">
+        <input type="hidden" name="form_started_at" value="{{ \App\Support\ContactSpam::startedAtToken() }}">
 
         <div class="form-honeypot" aria-hidden="true">
             <label for="{{ $idPrefix }}-website">Lämna det här fältet tomt</label>
@@ -49,6 +50,13 @@
             <textarea id="{{ $idPrefix }}-message" name="contact_message" autocomplete="off" maxlength="2000" required rows="4" @if ($contactErrors->has('contact_message')) aria-invalid="true" aria-describedby="{{ $idPrefix }}-message-error" @endif>{{ old('contact_message') }}</textarea>
             @error('contact_message', 'contact')<p id="{{ $idPrefix }}-message-error" class="field-error" role="alert">{{ $message }}</p>@enderror
         </div>
+
+        @if (\App\Support\ContactSpam::isTurnstileEnabled())
+            <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.site_key') }}"></div>
+            @pushOnce('scripts')
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+            @endPushOnce
+        @endif
 
         <button class="button interest-form__submit" type="submit">Skicka meddelande</button>
         <p class="interest-form__note">Vi använder uppgifterna bara för att svara på ditt meddelande, se <a href="/integritet">integritetspolicyn</a>.</p>

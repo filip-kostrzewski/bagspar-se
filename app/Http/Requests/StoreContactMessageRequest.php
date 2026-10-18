@@ -39,7 +39,6 @@ class StoreContactMessageRequest extends FormRequest
             'contact_email' => ['required', 'string', 'email:rfc', 'max:254'],
             'contact_phone' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+()\-\s]+$/'],
             'contact_message' => ['required', 'string', 'max:2000'],
-            'website' => ['prohibited'],
         ];
     }
 
@@ -64,7 +63,6 @@ class StoreContactMessageRequest extends FormRequest
             'contact_message.required' => 'Skriv ett meddelande.',
             'contact_message.string' => 'Skriv meddelandet som text.',
             'contact_message.max' => 'Meddelandet får vara högst 2000 tecken.',
-            'website.prohibited' => 'Formuläret kunde inte skickas.',
         ];
     }
 

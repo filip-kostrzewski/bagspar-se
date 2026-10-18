@@ -7,6 +7,8 @@ use App\Mail\ContactMessageConfirmation;
 use App\Mail\ContactMessageNotification;
 use App\Mail\OutboundMail;
 use App\Models\ContactMessage;
+use App\Models\SpamSubmission;
+use App\Support\ContactSpam;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +25,19 @@ class ContactMessageController extends Controller
 
     public function store(StoreContactMessageRequest $request): RedirectResponse
     {
+        $spamReason = ContactSpam::rejectionReason($request);
+
+        if (is_string($spamReason)) {
+            SpamSubmission::query()->create([
+                'reason' => $spamReason,
+                'ip' => ContactSpam::clientIp($request),
+                'user_agent' => ContactSpam::userAgent($request),
+                'payload' => ContactSpam::payload($request),
+            ]);
+
+            return $this->receivedRedirect($request);
+        }
+
         $validated = $request->validated();
         $contactMessage = ContactMessage::query()->create([
             'name' => $validated['contact_name'],
@@ -50,6 +65,11 @@ class ContactMessageController extends Controller
             );
         }
 
+        return $this->receivedRedirect($request);
+    }
+
+    private function receivedRedirect(StoreContactMessageRequest $request): RedirectResponse
+    {
         $target = $request->input('source') === 'home'
             ? route('home').'#kontakt'
             : route('contact').'#kontakt';

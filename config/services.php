@@ -40,6 +40,15 @@ return [
     ],
 
     /*
+    | Cloudflare Turnstile on the public contact form.
+    | Empty keys skip the widget and server-side verification.
+    */
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
+    ],
+
+    /*
     | Google Analytics 4. The public measurement ID is the default.
     | A blank GA_MEASUREMENT_ID keeps that default. An invalid value disables
     | the tag. gtag.js is injected only after the visitor grants consent.
