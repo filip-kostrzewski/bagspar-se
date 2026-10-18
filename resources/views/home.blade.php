@@ -223,6 +223,7 @@
         $reportShotVersion = substr(hash_file('sha256', public_path('images/product/projektrapport.webp')), 0, 12);
         $rotShotVersion = substr(hash_file('sha256', public_path('images/product/rot-underlag.webp')), 0, 12);
         $statusShotVersion = substr(hash_file('sha256', public_path('images/product/statussida.webp')), 0, 12);
+        $pricingShotVersion = substr(hash_file('sha256', public_path('images/product/arbetskort-pris.webp')), 0, 12);
         $glazingVersion = substr(hash_file('sha256', public_path('images/workshop-glazing.webp')), 0, 12);
     @endphp
     <section class="guide-ribbon section-space page-shell" aria-labelledby="guide-ribbon-title">
@@ -247,7 +248,7 @@
                 <span class="guide-teaser__copy"><span>Dokumentation</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
             <a class="guide-teaser" href="{{ route('guides.document-renovation') }}" data-reveal>
-                <span class="guide-teaser__visual"><img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med före- och efterbilder" width="2200" height="3066" loading="lazy" decoding="async"></span>
+                <span class="guide-teaser__visual"><img src="{{ asset('images/workshop-painting-small.webp') }}" srcset="{{ asset('images/workshop-painting-small.webp') }} 600w, {{ asset('images/workshop-painting.webp') }} 1200w" sizes="(max-width: 520px) 38vw, (max-width: 720px) 30vw, 25vw" alt="Färg stryks på en äldre träbåge" width="1200" height="800" loading="lazy" decoding="async"></span>
                 <span class="guide-teaser__copy"><span>Renovering</span>@include('partials.icon', ['name' => 'arrow-right'])</span>
             </a>
         </div>
@@ -261,26 +262,48 @@
         </div>
         <div class="product-proof__items">
             <figure data-reveal>
-                <img src="{{ asset('images/product/arbetskort.webp') }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning och stegen Mottagen till Klar" width="2560" height="1800" loading="lazy" decoding="async">
+                <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
+                    <span class="visually-hidden">Visa i full storlek.</span>
+                    <img src="{{ asset('images/product/arbetskort.webp') }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning och stegen Mottagen till Klar" width="2560" height="1800" loading="lazy" decoding="async">
+                </button>
                 <figcaption><strong>Arbetskort</strong> Plats, anteckning och arbetssteg för en båge.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/qr-etikett.webp') }}?v={{ $labelShotVersion }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
+                <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
+                    <span class="visually-hidden">Visa i full storlek.</span>
+                    <img src="{{ asset('images/product/qr-etikett.webp') }}?v={{ $labelShotVersion }}" alt="QR-etikett för båge 2-KÖK-F1-B2, rummet Kök, i Exempelprojekt" width="468" height="218" loading="lazy" decoding="async">
+                </button>
                 <figcaption><strong>QR-etikett</strong> Bågens nummer på etiketten. Skanningen är till för verkstadens personal och kräver inloggning. Kunden får en separat statuslänk.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H" width="2200" height="3066" loading="lazy" decoding="async">
+                <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
+                    <span class="visually-hidden">Visa i full storlek.</span>
+                    <img src="{{ asset('images/product/projektrapport.webp') }}?v={{ $reportShotVersion }}" alt="Projektrapport för Exempelprojekt från Exempelverkstaden, med logotyp och bildtexterna Före och Efter för båge V2-H" width="2200" height="3066" loading="lazy" decoding="async">
+                </button>
                 <figcaption><strong>Projektrapport</strong> Samma uppgifter, nedladdade som PDF eller utskrivna.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/rot-underlag.webp') }}?v={{ $rotShotVersion }}" alt="ROT-underlag för Exempelprojekt i exempelverkstaden, med summerad arbetskostnad och material samt knapparna Ladda ner CSV och Ladda ner PDF" width="2560" height="1800" loading="lazy" decoding="async">
+                <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
+                    <span class="visually-hidden">Visa i full storlek.</span>
+                    <img src="{{ asset('images/product/rot-underlag.webp') }}?v={{ $rotShotVersion }}" alt="ROT-underlag för Exempelprojekt i exempelverkstaden, med summerad arbetskostnad och material samt knapparna Ladda ner CSV och Ladda ner PDF" width="2560" height="1800" loading="lazy" decoding="async">
+                </button>
                 <figcaption><strong>ROT-underlag</strong> Tid och material summerade per projekt, som PDF eller CSV.</figcaption>
             </figure>
             <figure data-reveal>
-                <img src="{{ asset('images/product/statussida.webp') }}?v={{ $statusShotVersion }}" alt="Statussida för Exempelprojekt som kunden ser utan inloggning, med fyra bågar och deras steg samt ett godkännande av leveransen. Exempeldata." width="2560" height="2640" loading="lazy" decoding="async">
+                <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
+                    <span class="visually-hidden">Visa i full storlek.</span>
+                    <img src="{{ asset('images/product/statussida.webp') }}?v={{ $statusShotVersion }}" alt="Statussida för Exempelprojekt som kunden ser utan inloggning, med fyra bågar och deras steg samt ett godkännande av leveransen. Exempeldata." width="2560" height="2640" loading="lazy" decoding="async">
+                </button>
                 <figcaption><strong>Statussida för kunden</strong> Etapp per båge utan inloggning, med godkännande av leveransen.</figcaption>
             </figure>
         </div>
+        <dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">
+            <div class="lightbox__panel">
+                <button class="lightbox__close" type="button" data-lightbox-close>Stäng</button>
+                <img data-lightbox-image alt="">
+                <p id="lightbox-title" data-lightbox-caption></p>
+            </div>
+        </dialog>
     </section>
 
     <div id="pilot">
@@ -289,6 +312,13 @@
                 <p class="eyebrow">PRIS</p>
                 <h2 id="pilot-title" class="section-heading">{{ \App\Support\Pricing::trialHeadline() }}. Sedan ett pris per verkstad.</h2>
                 <p class="body-copy">{{ \App\Support\Pricing::offerSentence() }} {{ \App\Support\Pricing::invoiceSentence() }}</p>
+                <div class="pilot-pricing__price">
+                    <p class="pilot-pricing__label">Per verkstad, exkl. moms</p>
+                    <p class="pilot-pricing__amount"><span>{{ \App\Support\Pricing::kr(\App\Support\Pricing::monthlyKr()) }}</span><span>kr/mån</span></p>
+                    <p class="pilot-pricing__vat">{{ \App\Support\Pricing::seatsSentence() }}</p>
+                    <p class="pilot-pricing__vat">{{ \App\Support\Pricing::yearlySentence() }}</p>
+                    <p class="pilot-pricing__vat">Ingen bindningstid. Faktura, inget kort.</p>
+                </div>
                 <ul class="pilot-features" aria-label="Det här ingår">
                     <li class="pilot-feature">
                         <span class="pilot-feature__icon" aria-hidden="true">@include('partials.icon', ['name' => 'project'])</span>
@@ -325,13 +355,9 @@
                 </ul>
                 <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
             </div>
-            <div class="pilot-pricing__price" data-reveal>
-                <p class="pilot-pricing__label">Per verkstad, exkl. moms</p>
-                <p class="pilot-pricing__amount"><span>{{ \App\Support\Pricing::kr(\App\Support\Pricing::monthlyKr()) }}</span><span>kr/mån</span></p>
-                <p class="pilot-pricing__vat">{{ \App\Support\Pricing::seatsSentence() }}</p>
-                <p class="pilot-pricing__vat">{{ \App\Support\Pricing::yearlySentence() }}</p>
-                <p class="pilot-pricing__vat">Ingen bindningstid. Faktura, inget kort.</p>
-            </div>
+            <figure class="pilot-pricing__shot" data-reveal>
+                <img src="{{ asset('images/product/arbetskort-pris.webp') }}?v={{ $pricingShotVersion }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning, stegen Mottagen till Klar och foton före och efter. Exempeldata." width="1600" height="1902" loading="lazy" decoding="async">
+            </figure>
         </section>
     </div>
 

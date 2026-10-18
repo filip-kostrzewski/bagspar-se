@@ -201,6 +201,60 @@ class HomePageTest extends TestCase
             '/<div id="pilot"><\/div>/',
             $html,
         );
+        $this->assertMatchesRegularExpression(
+            '/<div class="pilot-pricing__copy"[\s\S]*?<div class="pilot-pricing__price"[\s\S]*?<ul class="pilot-features"[\s\S]*?<figure class="pilot-pricing__shot"/',
+            $html,
+        );
+        $this->assertStringContainsString('images/product/arbetskort-pris.webp', $html);
+        $this->assertStringContainsString('alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning, stegen Mottagen till Klar och foton före och efter. Exempeldata."', $html);
+        $this->assertStringContainsString('width="1600"', $html);
+        $this->assertStringContainsString('height="1902"', $html);
+        $this->assertStringContainsString('loading="lazy"', $html);
+
+        $css = file_get_contents(public_path('css/site.css'));
+        $this->assertIsString($css);
+        $this->assertMatchesRegularExpression('/\.pilot-pricing\s*\{[^}]*grid-template-areas:\s*"shot copy"/', $css);
+        $this->assertMatchesRegularExpression('/grid-template-areas:\s*"copy"\s*"shot"/', $css);
+    }
+
+    public function test_account_screenshots_open_full_size_in_a_lightbox(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+
+        $this->assertIsString($html);
+        $this->assertSame(5, preg_match_all('/data-lightbox-open/', $html));
+        $this->assertStringContainsString('<dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">', $html);
+        $this->assertStringContainsString('data-lightbox-close>Stäng</button>', $html);
+        $this->assertStringContainsString('Visa i full storlek.', $html);
+
+        $script = file_get_contents(public_path('js/site.js'));
+        $this->assertIsString($script);
+        $this->assertStringContainsString("event.key === 'Escape'", $script);
+        $this->assertStringContainsString("event.key !== 'Tab'", $script);
+        $this->assertStringContainsString('lightbox.showModal()', $script);
+        $this->assertStringContainsString('lightboxOpener.focus()', $script);
+    }
+
+    public function test_renovation_guide_uses_a_workshop_photo_thumbnail(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+
+        $this->assertIsString($html);
+        $this->assertMatchesRegularExpression(
+            '/href="'.preg_quote(route('guides.document-renovation'), '/').'"[^>]*>\s*<span class="guide-teaser__visual"><img [^>]*src="[^"]*workshop-painting-small\.webp"[^>]*srcset="[^"]*workshop-painting\.webp 1200w"[^>]*alt="Färg stryks på en äldre träbåge"[^>]*width="1200"[^>]*height="800"/',
+            $html,
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/href="'.preg_quote(route('guides.document-renovation'), '/').'"[\s\S]{0,500}projektrapport\.webp/',
+            $html,
+        );
+        $this->assertFileExists(public_path('images/workshop-painting.webp'));
+        $painting = getimagesize(public_path('images/workshop-painting.webp'));
+        $glazing = getimagesize(public_path('images/workshop-glazing.webp'));
+        $this->assertIsArray($painting);
+        $this->assertIsArray($glazing);
+        $this->assertSame($glazing[0], $painting[0]);
+        $this->assertSame($glazing[1], $painting[1]);
     }
 
     public function test_the_workflow_photo_keeps_its_frame_while_the_page_loads(): void

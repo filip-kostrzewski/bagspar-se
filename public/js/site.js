@@ -158,6 +158,105 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
     });
 }
 
+const lightbox = document.querySelector('[data-lightbox]');
+
+if (lightbox instanceof HTMLDialogElement) {
+    const lightboxImage = lightbox.querySelector('[data-lightbox-image]');
+    const lightboxCaption = lightbox.querySelector('[data-lightbox-caption]');
+    const lightboxClose = lightbox.querySelector('[data-lightbox-close]');
+    let lightboxOpener = null;
+
+    const lightboxFocusable = () => [...lightbox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter((element) => element instanceof HTMLElement && !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true');
+
+    document.querySelectorAll('[data-lightbox-open]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const source = button.querySelector('img');
+
+            if (!(source instanceof HTMLImageElement) || !(lightboxImage instanceof HTMLImageElement)) {
+                return;
+            }
+
+            const caption = button.closest('figure')?.querySelector('figcaption')?.textContent?.replace(/\s+/g, ' ').trim() || source.alt;
+
+            lightboxImage.src = source.currentSrc || source.src;
+            lightboxImage.alt = source.alt;
+            lightboxImage.removeAttribute('width');
+            lightboxImage.removeAttribute('height');
+
+            if (lightboxCaption) {
+                lightboxCaption.textContent = caption;
+            }
+
+            lightboxOpener = button;
+            document.documentElement.classList.add('lightbox-open');
+            lightbox.showModal();
+
+            if (lightboxClose instanceof HTMLElement) {
+                lightboxClose.focus();
+            }
+        });
+    });
+
+    lightbox.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            lightbox.close();
+
+            return;
+        }
+
+        if (event.key !== 'Tab') {
+            return;
+        }
+
+        const items = lightboxFocusable();
+
+        if (items.length === 0) {
+            event.preventDefault();
+
+            return;
+        }
+
+        const first = items[0];
+        const last = items[items.length - 1];
+        const active = document.activeElement;
+
+        if (event.shiftKey && (active === first || !lightbox.contains(active))) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && (active === last || !lightbox.contains(active))) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+
+    lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+            lightbox.close();
+        }
+    });
+
+    if (lightboxClose instanceof HTMLElement) {
+        lightboxClose.addEventListener('click', () => {
+            lightbox.close();
+        });
+    }
+
+    lightbox.addEventListener('close', () => {
+        document.documentElement.classList.remove('lightbox-open');
+
+        if (lightboxImage instanceof HTMLImageElement) {
+            lightboxImage.removeAttribute('src');
+            lightboxImage.alt = '';
+        }
+
+        if (lightboxOpener instanceof HTMLElement) {
+            lightboxOpener.focus();
+        }
+    });
+}
+
 const serviceWorkerScript = document.querySelector('script[data-sw-url]');
 
 if ('serviceWorker' in navigator && serviceWorkerScript instanceof HTMLScriptElement) {
