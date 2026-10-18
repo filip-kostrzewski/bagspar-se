@@ -356,7 +356,7 @@
                 <a class="button" href="{{ route('register') }}">{{ \App\Support\Pricing::trialHeadline() }}</a>
             </div>
             <figure class="pilot-pricing__shot" data-reveal>
-                <img src="{{ asset('images/product/arbetskort-pris.webp') }}?v={{ $pricingShotVersion }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning, stegen Mottagen till Klar och foton före och efter. Exempeldata." width="1600" height="1902" loading="lazy" decoding="async">
+                <img src="{{ asset('images/product/arbetskort-pris.webp') }}?v={{ $pricingShotVersion }}" alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning, stegen Mottagen till Klar och foton före och efter. Exempeldata." width="1600" height="1702" loading="lazy" decoding="async">
             </figure>
         </section>
     </div>

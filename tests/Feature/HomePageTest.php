@@ -208,7 +208,11 @@ class HomePageTest extends TestCase
         $this->assertStringContainsString('images/product/arbetskort-pris.webp', $html);
         $this->assertStringContainsString('alt="Arbetskort för båge 2-KÖK-F1-B2 i exempelverkstaden, med steget Glasning, stegen Mottagen till Klar och foton före och efter. Exempeldata."', $html);
         $this->assertStringContainsString('width="1600"', $html);
-        $this->assertStringContainsString('height="1902"', $html);
+        $this->assertStringContainsString('height="1702"', $html);
+        $pricingShot = getimagesize(public_path('images/product/arbetskort-pris.webp'));
+        $this->assertIsArray($pricingShot);
+        $this->assertSame(1600, $pricingShot[0]);
+        $this->assertSame(1702, $pricingShot[1]);
         $this->assertStringContainsString('loading="lazy"', $html);
 
         $css = file_get_contents(public_path('css/site.css'));
@@ -233,6 +237,15 @@ class HomePageTest extends TestCase
         $this->assertStringContainsString("event.key !== 'Tab'", $script);
         $this->assertStringContainsString('lightbox.showModal()', $script);
         $this->assertStringContainsString('lightboxOpener.focus()', $script);
+
+        $css = file_get_contents(public_path('css/site.css'));
+        $this->assertIsString($css);
+        $this->assertMatchesRegularExpression(
+            '/\.lightbox img\s*\{[^}]*width:\s*auto;[^}]*max-width:\s*90vw;[^}]*height:\s*auto;[^}]*max-height:\s*90vh;[^}]*object-fit:\s*contain;/',
+            $css,
+        );
+        $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*overflow-x:\s*hidden;/', $css);
+        $this->assertDoesNotMatchRegularExpression('/\.lightbox img\s*\{[^}]*max-width:\s*none/', $css);
     }
 
     public function test_renovation_guide_uses_a_workshop_photo_thumbnail(): void
