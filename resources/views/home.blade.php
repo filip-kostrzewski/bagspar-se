@@ -298,9 +298,14 @@
             </figure>
         </div>
         <dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">
-            <div class="lightbox__panel">
+            <div class="lightbox__bar">
+                <a class="lightbox__full" data-lightbox-full target="_blank" rel="noopener">Visa i full storlek<span class="visually-hidden"> (öppnas i ny flik)</span></a>
                 <button class="lightbox__close" type="button" data-lightbox-close>Stäng</button>
-                <img data-lightbox-image alt="">
+            </div>
+            <div class="lightbox__panel">
+                <div class="lightbox__frame" data-lightbox-frame>
+                    <img data-lightbox-image alt="">
+                </div>
                 <p id="lightbox-title" data-lightbox-caption></p>
             </div>
         </dialog>

@@ -164,6 +164,8 @@ if (lightbox instanceof HTMLDialogElement) {
     const lightboxImage = lightbox.querySelector('[data-lightbox-image]');
     const lightboxCaption = lightbox.querySelector('[data-lightbox-caption]');
     const lightboxClose = lightbox.querySelector('[data-lightbox-close]');
+    const lightboxFull = lightbox.querySelector('[data-lightbox-full]');
+    const lightboxFrame = lightbox.querySelector('[data-lightbox-frame]');
     let lightboxOpener = null;
 
     const lightboxFocusable = () => [...lightbox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
@@ -183,6 +185,14 @@ if (lightbox instanceof HTMLDialogElement) {
             lightboxImage.alt = source.alt;
             lightboxImage.removeAttribute('width');
             lightboxImage.removeAttribute('height');
+
+            if (lightboxFull instanceof HTMLAnchorElement) {
+                lightboxFull.href = lightboxImage.src;
+            }
+
+            if (lightboxFrame instanceof HTMLElement) {
+                lightboxFrame.scrollTo(0, 0);
+            }
 
             if (lightboxCaption) {
                 lightboxCaption.textContent = caption;
@@ -249,6 +259,10 @@ if (lightbox instanceof HTMLDialogElement) {
         if (lightboxImage instanceof HTMLImageElement) {
             lightboxImage.removeAttribute('src');
             lightboxImage.alt = '';
+        }
+
+        if (lightboxFull instanceof HTMLAnchorElement) {
+            lightboxFull.removeAttribute('href');
         }
 
         if (lightboxOpener instanceof HTMLElement) {

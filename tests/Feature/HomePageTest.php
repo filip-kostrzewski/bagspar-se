@@ -230,6 +230,10 @@ class HomePageTest extends TestCase
         $this->assertStringContainsString('<dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">', $html);
         $this->assertStringContainsString('data-lightbox-close>Stäng</button>', $html);
         $this->assertStringContainsString('Visa i full storlek.', $html);
+        $this->assertStringContainsString('<a class="lightbox__full" data-lightbox-full target="_blank" rel="noopener">Visa i full storlek', $html);
+        $this->assertStringContainsString('<div class="lightbox__frame" data-lightbox-frame>', $html);
+        $this->assertStringNotContainsString('user-scalable', $html);
+        $this->assertStringNotContainsString('maximum-scale', $html);
 
         $script = file_get_contents(public_path('js/site.js'));
         $this->assertIsString($script);
@@ -237,6 +241,8 @@ class HomePageTest extends TestCase
         $this->assertStringContainsString("event.key !== 'Tab'", $script);
         $this->assertStringContainsString('lightbox.showModal()', $script);
         $this->assertStringContainsString('lightboxOpener.focus()', $script);
+        $this->assertStringContainsString('lightboxFull.href = lightboxImage.src', $script);
+        $this->assertStringNotContainsString('touchmove', $script);
 
         $css = file_get_contents(public_path('css/site.css'));
         $this->assertIsString($css);
@@ -246,6 +252,12 @@ class HomePageTest extends TestCase
         );
         $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*overflow-x:\s*hidden;/', $css);
         $this->assertDoesNotMatchRegularExpression('/\.lightbox img\s*\{[^}]*max-width:\s*none/', $css);
+        $this->assertMatchesRegularExpression('/\.lightbox__bar\s*\{[^}]*position:\s*fixed;/', $css);
+        $this->assertMatchesRegularExpression(
+            '/@media \(max-width: 768px\), \(pointer: coarse\) \{.*?\.lightbox__frame\s*\{[^}]*overflow:\s*auto;[^}]*-webkit-overflow-scrolling:\s*touch;[^}]*touch-action:\s*pan-x pan-y pinch-zoom;.*?\.lightbox__frame img\s*\{[^}]*max-height:\s*none;/s',
+            $css,
+        );
+        $this->assertDoesNotMatchRegularExpression('/touch-action:\s*none/', $css);
     }
 
     public function test_renovation_guide_uses_a_workshop_photo_thumbnail(): void
