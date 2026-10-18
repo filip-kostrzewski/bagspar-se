@@ -27,7 +27,7 @@ class AccountControllerTest extends TestCase
             ->assertOk()
             ->assertSee('Mitt konto', false)
             ->assertSee('Ägare', false)
-            ->assertSee($owner->workshop->name, false)
+            ->assertSee($owner->workshop->name)
             ->assertSee('Verkstadens uppgifter ändras av ägaren under Inställningar.', false)
             ->assertSee('href="'.route('app.account.edit').'"', false)
             ->assertSee('data-password-toggle="profile_current_password"', false);

@@ -171,6 +171,20 @@ if (lightbox instanceof HTMLDialogElement) {
     const lightboxFocusable = () => [...lightbox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
         .filter((element) => element instanceof HTMLElement && !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true');
 
+    const resetLightboxScroll = () => {
+        lightbox.scrollTop = 0;
+        lightbox.scrollLeft = 0;
+
+        if (lightboxFrame instanceof HTMLElement) {
+            lightboxFrame.scrollTop = 0;
+            lightboxFrame.scrollLeft = 0;
+        }
+    };
+
+    if (lightboxImage instanceof HTMLImageElement) {
+        lightboxImage.addEventListener('load', resetLightboxScroll);
+    }
+
     document.querySelectorAll('[data-lightbox-open]').forEach((button) => {
         button.addEventListener('click', () => {
             const source = button.querySelector('img');
@@ -185,13 +199,10 @@ if (lightbox instanceof HTMLDialogElement) {
             lightboxImage.alt = source.alt;
             lightboxImage.removeAttribute('width');
             lightboxImage.removeAttribute('height');
+            resetLightboxScroll();
 
             if (lightboxFull instanceof HTMLAnchorElement) {
                 lightboxFull.href = lightboxImage.src;
-            }
-
-            if (lightboxFrame instanceof HTMLElement) {
-                lightboxFrame.scrollTo(0, 0);
             }
 
             if (lightboxCaption) {
@@ -201,9 +212,14 @@ if (lightbox instanceof HTMLDialogElement) {
             lightboxOpener = button;
             document.documentElement.classList.add('lightbox-open');
             lightbox.showModal();
+            resetLightboxScroll();
 
             if (lightboxClose instanceof HTMLElement) {
                 lightboxClose.focus();
+            }
+
+            if (lightboxImage.complete) {
+                requestAnimationFrame(resetLightboxScroll);
             }
         });
     });
@@ -255,6 +271,7 @@ if (lightbox instanceof HTMLDialogElement) {
 
     lightbox.addEventListener('close', () => {
         document.documentElement.classList.remove('lightbox-open');
+        resetLightboxScroll();
 
         if (lightboxImage instanceof HTMLImageElement) {
             lightboxImage.removeAttribute('src');

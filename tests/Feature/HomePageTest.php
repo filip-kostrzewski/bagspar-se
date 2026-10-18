@@ -243,14 +243,23 @@ class HomePageTest extends TestCase
         $this->assertStringContainsString('lightboxOpener.focus()', $script);
         $this->assertStringContainsString('lightboxFull.href = lightboxImage.src', $script);
         $this->assertStringNotContainsString('touchmove', $script);
+        $this->assertStringContainsString('const resetLightboxScroll = () =>', $script);
+        $this->assertStringContainsString("lightboxImage.addEventListener('load', resetLightboxScroll)", $script);
+        $this->assertStringContainsString('lightboxFrame.scrollTop = 0', $script);
+        $this->assertStringContainsString('lightboxFrame.scrollLeft = 0', $script);
+        $this->assertStringContainsString('lightbox.scrollTop = 0', $script);
+        $this->assertStringContainsString('lightbox.scrollLeft = 0', $script);
 
         $css = file_get_contents(public_path('css/site.css'));
         $this->assertIsString($css);
         $this->assertMatchesRegularExpression(
-            '/\.lightbox img\s*\{[^}]*width:\s*auto;[^}]*max-width:\s*90vw;[^}]*height:\s*auto;[^}]*max-height:\s*90vh;[^}]*object-fit:\s*contain;/',
+            '/\.lightbox img\s*\{[^}]*width:\s*auto;[^}]*max-width:\s*90vw;[^}]*height:\s*auto;[^}]*max-height:\s*calc\(100vh - 160px\);[^}]*max-height:\s*calc\(100dvh - 160px\);[^}]*object-fit:\s*contain;/',
             $css,
         );
         $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*overflow-x:\s*hidden;/', $css);
+        $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*box-sizing:\s*border-box;/', $css);
+        $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*max-height:\s*100vh;[^}]*max-height:\s*100dvh;/', $css);
+        $this->assertMatchesRegularExpression('/\.lightbox\s*\{[^}]*overflow-y:\s*hidden;/', $css);
         $this->assertDoesNotMatchRegularExpression('/\.lightbox img\s*\{[^}]*max-width:\s*none/', $css);
         $this->assertMatchesRegularExpression('/\.lightbox__bar\s*\{[^}]*position:\s*fixed;/', $css);
         $this->assertMatchesRegularExpression(
