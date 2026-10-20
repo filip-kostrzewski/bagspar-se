@@ -304,4 +304,43 @@ class HomePageTest extends TestCase
         $this->assertIsString($css);
         $this->assertMatchesRegularExpression('/\.atelier-photo__image\s*\{[^}]*position:\s*absolute/', $css);
     }
+
+    public function test_homepage_shows_the_bunny_video_when_an_id_is_configured(): void
+    {
+        config([
+            'bagspar.video.id' => 'test-video-guid',
+            'bagspar.video.library_id' => '781538',
+        ]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('id="se-video"', false);
+        $response->assertSee('<iframe', false);
+        $response->assertSee('https://player.mediadelivery.net/embed/781538/test-video-guid?autoplay=false&amp;loop=false&amp;muted=true&amp;preload=false&amp;responsive=true', false);
+        $response->assertSee('title="Film: Bågspår i praktiken"', false);
+        $response->assertSee('href="https://player.mediadelivery.net/play/781538/test-video-guid"', false);
+        $response->assertSee('"@type":"VideoObject"', false);
+        $response->assertSee('"embedUrl":"https://iframe.mediadelivery.net/embed/781538/test-video-guid"', false);
+        $response->assertSee('/images/video-poster.jpg', false);
+        $response->assertDontSee('autoplay=true', false);
+    }
+
+    public function test_homepage_hides_the_video_section_without_an_id(): void
+    {
+        config(['bagspar.video.id' => null]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertDontSee('id="se-video"', false);
+        $response->assertDontSee('mediadelivery.net', false);
+        $response->assertDontSee('VideoObject', false);
+    }
+
+    public function test_video_defaults_to_the_uploaded_bunny_guid(): void
+    {
+        $this->assertSame('7ede6ddf-a133-4653-9a75-0b72b4b0d080', config('bagspar.video.id'));
+        $this->assertSame('781538', config('bagspar.video.library_id'));
+    }
 }

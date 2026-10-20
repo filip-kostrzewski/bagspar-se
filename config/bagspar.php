@@ -2,6 +2,7 @@
 
 $contactEmail = env('BAGSPAR_CONTACT_EMAIL');
 $adminToken = env('BAGSPAR_ADMIN_TOKEN');
+$videoId = env('BAGSPAR_VIDEO_ID', '7ede6ddf-a133-4653-9a75-0b72b4b0d080');
 
 /*
  * Query-string version for the public CSS, scripts, and service worker.
@@ -71,6 +72,18 @@ return [
     'demo_sync_days' => 14,
 
     'asset_version' => $assetVersion,
+
+    /*
+     * Promo video on the home page, hosted on Bunny Stream like klartfoto.se.
+     * Defaults to the uploaded Bunny GUID; BAGSPAR_VIDEO_ID overrides it and an
+     * empty value hides the section.
+     */
+    'video' => [
+        'library_id' => env('BAGSPAR_VIDEO_LIBRARY_ID', '781538'),
+        'id' => is_string($videoId) && trim($videoId) !== '' ? trim($videoId) : null,
+        'upload_date' => env('BAGSPAR_VIDEO_UPLOAD_DATE', '2026-10-20T14:00:00+02:00'),
+        'duration' => 'PT44S',
+    ],
 
     /*
      * Password for /admin/anmalningar. HTTP basic auth accepts any username.

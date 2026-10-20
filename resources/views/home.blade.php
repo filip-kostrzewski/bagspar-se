@@ -260,6 +260,46 @@
             <h2 id="product-proof-title" class="section-heading">Så ser kontot ut.</h2>
             <p class="product-proof__intro">Skärmbilder från ett exempel med testuppgifter. Ingen kund och inga omdömen.</p>
         </div>
+        @php
+            $video = config('bagspar.video');
+            $videoId = $video['id'] ?? null;
+            $videoLibrary = $video['library_id'] ?? null;
+        @endphp
+        @if ($videoId && $videoLibrary)
+            <div class="product-video" id="se-video" aria-labelledby="video-title" data-reveal>
+                <div class="product-video__heading">
+                    <div>
+                        <p class="eyebrow">BÅGSPÅR I PRAKTIKEN</p>
+                        <h3 id="video-title">Från QR-etikett till statuslänk.</h3>
+                    </div>
+                    <p>Se hur varje båge får en etikett, ett arbetskort med steg och bilder, och hur kunden följer jobbet via en länk.</p>
+                </div>
+                <p class="product-video__meta" id="video-language">44 sekunder · På svenska · Textad</p>
+                <iframe
+                    class="product-video__player"
+                    src="https://player.mediadelivery.net/embed/{{ $videoLibrary }}/{{ $videoId }}?autoplay=false&amp;loop=false&amp;muted=true&amp;preload=false&amp;responsive=true"
+                    title="Film: Bågspår i praktiken"
+                    loading="lazy"
+                    width="1920"
+                    height="1080"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowfullscreen
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    aria-describedby="video-language"></iframe>
+                <a class="text-link product-video__direct" href="https://player.mediadelivery.net/play/{{ $videoLibrary }}/{{ $videoId }}" target="_blank" rel="noopener noreferrer">Öppna filmen i en ny flik <span aria-hidden="true">↗</span></a>
+            </div>
+            <script type="application/ld+json">{!! json_encode([
+                '@@context' => 'https://schema.org',
+                '@type' => 'VideoObject',
+                'name' => 'Bågspår i praktiken',
+                'description' => 'Se hur varje båge får en QR-etikett, ett arbetskort med steg och bilder, och hur kunden följer jobbet via en statuslänk.',
+                'thumbnailUrl' => url('/images/video-poster.jpg'),
+                'uploadDate' => $video['upload_date'],
+                'duration' => $video['duration'],
+                'embedUrl' => 'https://iframe.mediadelivery.net/embed/'.$videoLibrary.'/'.$videoId,
+                'inLanguage' => 'sv',
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_THROW_ON_ERROR) !!}</script>
+        @endif
         <div class="product-proof__items">
             <figure data-reveal>
                 <button class="product-proof__open" type="button" data-lightbox-open aria-haspopup="dialog">
