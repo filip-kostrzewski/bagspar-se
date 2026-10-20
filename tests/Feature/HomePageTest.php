@@ -309,7 +309,7 @@ class HomePageTest extends TestCase
     {
         config([
             'bagspar.video.id' => 'test-video-guid',
-            'bagspar.video.library_id' => '781538',
+            'bagspar.video.library_id' => '785183',
         ]);
 
         $response = $this->get(route('home'));
@@ -317,11 +317,11 @@ class HomePageTest extends TestCase
         $response->assertOk();
         $response->assertSee('id="se-video"', false);
         $response->assertSee('<iframe', false);
-        $response->assertSee('https://player.mediadelivery.net/embed/781538/test-video-guid?autoplay=false&amp;loop=false&amp;muted=true&amp;preload=false&amp;responsive=true', false);
+        $response->assertSee('https://player.mediadelivery.net/embed/785183/test-video-guid?autoplay=false&amp;loop=false&amp;muted=false&amp;preload=false&amp;responsive=true', false);
         $response->assertSee('title="Film: Bågspår i praktiken"', false);
-        $response->assertSee('href="https://player.mediadelivery.net/play/781538/test-video-guid"', false);
+        $response->assertSee('href="https://player.mediadelivery.net/play/785183/test-video-guid"', false);
         $response->assertSee('"@type":"VideoObject"', false);
-        $response->assertSee('"embedUrl":"https://iframe.mediadelivery.net/embed/781538/test-video-guid"', false);
+        $response->assertSee('"embedUrl":"https://iframe.mediadelivery.net/embed/785183/test-video-guid"', false);
         $response->assertSee('/images/video-poster.jpg', false);
         $response->assertDontSee('autoplay=true', false);
     }
@@ -340,7 +340,7 @@ class HomePageTest extends TestCase
 
     public function test_video_defaults_to_the_uploaded_bunny_guid(): void
     {
-        $this->assertSame('7ede6ddf-a133-4653-9a75-0b72b4b0d080', config('bagspar.video.id'));
-        $this->assertSame('781538', config('bagspar.video.library_id'));
+        $this->assertSame('459e5746-38a0-4b21-ac4d-c6ad46731cb0', config('bagspar.video.id'));
+        $this->assertSame('785183', config('bagspar.video.library_id'));
     }
 }

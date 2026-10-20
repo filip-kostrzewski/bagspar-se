@@ -277,7 +277,7 @@
                 <p class="product-video__meta" id="video-language">44 sekunder · På svenska · Textad</p>
                 <iframe
                     class="product-video__player"
-                    src="https://player.mediadelivery.net/embed/{{ $videoLibrary }}/{{ $videoId }}?autoplay=false&amp;loop=false&amp;muted=true&amp;preload=false&amp;responsive=true"
+                    src="https://player.mediadelivery.net/embed/{{ $videoLibrary }}/{{ $videoId }}?autoplay=false&amp;loop=false&amp;muted=false&amp;preload=false&amp;responsive=true"
                     title="Film: Bågspår i praktiken"
                     loading="lazy"
                     width="1920"
