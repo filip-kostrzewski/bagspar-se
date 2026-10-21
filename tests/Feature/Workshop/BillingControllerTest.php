@@ -118,6 +118,7 @@ class BillingControllerTest extends TestCase
     public function test_changing_the_plan_keeps_the_original_order_time(): void
     {
         Mail::fake();
+        config(['bagspar.lead_notification_email' => 'faktura@example.test']);
         $this->travelTo('2026-10-17 12:00:00');
         $owner = User::factory()->create();
 
