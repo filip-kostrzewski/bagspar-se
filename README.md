@@ -13,6 +13,7 @@ Workshops that take wooden sashes out, restore them, and put each sash back in t
 Numbers live in `config/bagspar.php` and every public sentence about them is built by `App\Support\Pricing`:
 
 - 30-day free trial from registration (`trial_days`). No card.
+- `/registrera` uses the same Cloudflare Turnstile check as the contact form (skipped when either `TURNSTILE_*` key is empty). When a new owner confirms the email address, `LEAD_NOTIFICATION_EMAIL` gets a short “Nytt verkstadskonto” mail, once per workshop (`registration_notified_at`). Unverified signups send nothing.
 - 590 kr/month excluding VAT per workshop, 3 users included, 149 kr/month per extra user. 5 900 kr/year when paid annually.
 - The owner orders under `/app/abonnemang`, choosing monthly or yearly, and gives the organization number and an invoice address. The order mails `LEAD_NOTIFICATION_EMAIL` with everything needed for the invoice and sends the workshop a confirmation. Invoices are issued by hand (Fortnox); there is no card payment and no Stripe.
 - Access is the latest of `trial_ends_at`, `paid_until`, and `subscription_ordered_at` plus `order_grace_days` (30). When it has passed, the `workshop.access` middleware sends every `/app` request to the billing page. Exports stay open so no data is held hostage. The admin records `paid_until` under `/admin/verkstader` once an invoice is sent or paid.
@@ -89,7 +90,7 @@ Copy `.env.example`. Keep real values in `.env` and on the server. Do not commit
 | --- | --- |
 | `APP_URL` | Sitemap and canonical URLs. Production rewrites an `http` value to `https`. The sitemap falls back to `https://bagspar.se` when the value is not a usable URL |
 | `APP_KEY` | Application key from `php artisan key:generate` |
-| `LEAD_NOTIFICATION_EMAIL` | Recipient of new signups, contact messages, and subscription orders. Mail is skipped when this is empty. See `config/bagspar.php` |
+| `LEAD_NOTIFICATION_EMAIL` | Recipient of new signups, verified workshop accounts, contact messages, and subscription orders. Mail is skipped when this is empty. See `config/bagspar.php` |
 | `POSTMARK_API_KEY` | Postmark server token (`config/services.php`). Leave it empty in `.env.example` |
 | `MAIL_MAILER` | `postmark` on the server. Unset, Laravel uses `log` |
 | `MAIL_FROM_ADDRESS` | From address. `.env.example` uses `noreply@bagspar.se` |
