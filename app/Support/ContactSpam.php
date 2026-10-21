@@ -37,6 +37,14 @@ final class ContactSpam
             && self::configuredKey('services.turnstile.secret') !== null;
     }
 
+    /**
+     * True when Turnstile is off (keys missing) or Cloudflare accepted the submitted token.
+     */
+    public static function turnstileAllows(Request $request): bool
+    {
+        return ! self::isTurnstileEnabled() || self::turnstilePasses($request);
+    }
+
     public static function startedAtToken(): string
     {
         return Crypt::encryptString((string) now()->getTimestamp());
@@ -48,7 +56,7 @@ final class ContactSpam
             return self::REASON_HONEYPOT;
         }
 
-        if (self::isTurnstileEnabled() && ! self::turnstilePasses($request)) {
+        if (! self::turnstileAllows($request)) {
             return self::REASON_TURNSTILE;
         }
 

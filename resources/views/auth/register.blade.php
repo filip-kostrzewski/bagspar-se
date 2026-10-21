@@ -78,6 +78,16 @@
                 <p class="form-field__error" id="terms-error">{{ $message }}</p>
             @enderror
 
+            @if (\App\Support\ContactSpam::isTurnstileEnabled())
+                <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.site_key') }}"></div>
+                @pushOnce('scripts')
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+                @endPushOnce
+                @error('turnstile')
+                    <p class="form-field__error" id="turnstile-error">{{ $message }}</p>
+                @enderror
+            @endif
+
             <p class="auth-privacy-note">Genom att skapa konto kan vi behandla uppgifterna enligt vår <a class="workshop-text-link" href="{{ route('privacy') }}">integritetspolicy</a>.</p>
             <button class="workshop-button workshop-button--primary workshop-button--wide" type="submit">Skapa verkstadskonto</button>
         </form>

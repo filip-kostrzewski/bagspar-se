@@ -40,7 +40,7 @@ return [
     ],
 
     /*
-    | Cloudflare Turnstile on the public contact form.
+    | Cloudflare Turnstile on the public contact form and the registration form.
     | Empty keys skip the widget and server-side verification.
     */
     'turnstile' => [

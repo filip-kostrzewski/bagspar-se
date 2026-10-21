@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Workshop;
+use App\Support\ContactSpam;
 use App\Support\TrialPeriod;
 use Closure;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Throwable;
 
@@ -66,6 +68,12 @@ class RegisteredUserController extends Controller
             'password.min' => 'Lösenordet måste innehålla minst 12 tecken.',
             'terms.accepted' => 'Godkänn villkoren och personuppgiftsbiträdesavtalet för att skapa kontot.',
         ]);
+
+        if (! ContactSpam::turnstileAllows($request)) {
+            throw ValidationException::withMessages([
+                'turnstile' => 'Vi kunde inte bekräfta att du inte är en robot. Försök igen.',
+            ]);
+        }
 
         $user = DB::transaction(function () use ($validated): User {
             $workshop = Workshop::query()->create([
