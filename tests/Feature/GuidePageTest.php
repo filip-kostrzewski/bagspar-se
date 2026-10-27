@@ -192,6 +192,55 @@ class GuidePageTest extends TestCase
         $this->assertArticleSchema($html, 'Dokumentera fönsterrenoveringen', route('guides.document-renovation'));
     }
 
+    public function test_brf_report_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/rapport-till-brf-fonsterrenovering');
+
+        $response->assertOk();
+        $response->assertSee('<title>Rapport till bostadsrättsföreningen efter fönsterrenovering — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Så sammanställer fönsterverkstaden underlaget till en bostadsrättsförening: en rad per båge, bilder före och efter, steg och anteckningar, samlat i en projektrapport som PDF.">', false);
+        $response->assertSee('<h1 class="display-heading">Rapport till bostadsrättsföreningen efter fönsterrenovering</h1>', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.marking').'"', false);
+        $response->assertSee('href="'.route('guides.document-renovation').'"', false);
+        $response->assertSee('href="'.route('guides.work-card').'"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Rapport till bostadsrättsföreningen efter fönsterrenovering',
+            route('guides.brf-report'),
+            '2026-10-27',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/rapport-till-brf-fonsterrenovering</loc>', false);
+    }
+
+    public function test_brf_report_guide_is_linked_from_the_index_and_the_renovation_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.brf-report').'"', false)
+            ->assertSee('Rapport till bostadsrättsföreningen', false);
+
+        $this->get(route('guides.document-renovation'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Projektrapport till kunden eller föreningen',
+                'href="'.route('guides.brf-report').'"',
+                'Vanliga misstag',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -204,6 +253,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.document-renovation'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/dokumentera-fonsterrenovering">', false);
+
+        $this->get(route('guides.brf-report'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/rapport-till-brf-fonsterrenovering">', false);
 
         $this->get(route('terms'))
             ->assertOk()
@@ -225,7 +278,7 @@ class GuidePageTest extends TestCase
         );
     }
 
-    private function assertArticleSchema(string $html, string $headline, string $pageUrl): void
+    private function assertArticleSchema(string $html, string $headline, string $pageUrl, string $publishedOn = '2026-10-17'): void
     {
         preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches);
         $schema = null;
@@ -244,8 +297,8 @@ class GuidePageTest extends TestCase
         $this->assertSame('Article', $schema['@type']);
         $this->assertSame($headline, $schema['headline']);
         $this->assertSame('sv', $schema['inLanguage']);
-        $this->assertSame('2026-10-17', $schema['datePublished']);
-        $this->assertSame('2026-10-17', $schema['dateModified']);
+        $this->assertSame($publishedOn, $schema['datePublished']);
+        $this->assertSame($publishedOn, $schema['dateModified']);
         $this->assertSame($pageUrl, $schema['mainEntityOfPage']['@id']);
         $this->assertSame('Prodi Digital AB', $schema['author']['name']);
         $this->assertSame('Organization', $schema['publisher']['@type']);

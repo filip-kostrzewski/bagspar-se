@@ -2,14 +2,16 @@
     /** @var string $headline */
     /** @var string $description */
     /** @var string $pageUrl */
+    /** @var string|null $datePublished */
+    $articleDate = $datePublished ?? '2026-10-17';
     $articleSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'Article',
         'headline' => $headline,
         'description' => $description,
         'inLanguage' => 'sv',
-        'datePublished' => '2026-10-17',
-        'dateModified' => '2026-10-17',
+        'datePublished' => $articleDate,
+        'dateModified' => $articleDate,
         'mainEntityOfPage' => [
             '@type' => 'WebPage',
             '@id' => $pageUrl,

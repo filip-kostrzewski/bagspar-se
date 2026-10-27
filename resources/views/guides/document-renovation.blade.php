@@ -32,7 +32,7 @@
 
         <h2>Projektrapport till kunden eller föreningen</h2>
         <p>När bågarna ska visas samlas korten i en projektrapport. Rapporten är det som står på korten: projektets namn, plats, antal bågar, anteckningar, varje båges nummer, rum, steg och de bilder som ligger på kortet. I Bågspår kan rapporten laddas ner som PDF eller skrivas ut.</p>
-        <p>Rapporten kan lämnas till kunden eller till en bostadsrättsförening som underlag för vad som är gjort på vilka bågar. Den visar de uppgifter verkstaden har skrivit in. Den lovar inte ett resultat, en kulör som ännu inte är vald, eller att en förening godkänner arbetet. Saknas en uppgift på kortet saknas den också i rapporten. Fyll i kortet innan rapporten skrivs ut, inte efteråt i ett annat dokument.</p>
+        <p>Rapporten kan lämnas till kunden eller till en bostadsrättsförening som underlag för vad som är gjort på vilka bågar. Den visar de uppgifter verkstaden har skrivit in. Den lovar inte ett resultat, en kulör som ännu inte är vald, eller att en förening godkänner arbetet. Saknas en uppgift på kortet saknas den också i rapporten. Fyll i kortet innan rapporten skrivs ut, inte efteråt i ett annat dokument. Hur rapporten sammanställs för styrelsen står i guiden om <a href="{{ route('guides.brf-report') }}">rapport till bostadsrättsföreningen efter fönsterrenovering</a>.</p>
         <p>Läs rapporten mot bågarna innan den lämnas vidare. Numret på lappen och i rapporten ska vara detsamma, och före- och efterbild ska ligga på den båge de visar. Stämmer det inte, rätta kortet och skriv ut igen. Skriv vilka våningar rapporten avser. En mening om att kulör inte är vald är tydligare än ett omdöme om arbetet.</p>
 
         <h2>Vanliga misstag</h2>

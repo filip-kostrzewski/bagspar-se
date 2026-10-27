@@ -53,6 +53,7 @@ Route::view('/arbetskort-fonsterbagar', 'guides.work-card')->name('guides.work-c
 Route::view('/markning-av-fonsterbagar', 'guides.marking')->name('guides.marking');
 Route::view('/guider', 'guides.index')->name('guides.index');
 Route::view('/guider/dokumentera-fonsterrenovering', 'guides.document-renovation')->name('guides.document-renovation');
+Route::view('/guider/rapport-till-brf-fonsterrenovering', 'guides.brf-report')->name('guides.brf-report');
 Route::redirect('/integritet', '/integritetspolicy', 301);
 Route::view('/integritetspolicy', 'privacy')->name('privacy');
 Route::view('/villkor', 'terms')->name('terms');

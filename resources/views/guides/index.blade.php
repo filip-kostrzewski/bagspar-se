@@ -15,6 +15,10 @@
         <p>Märkning, bilder före och efter per båge, arbetsstegen och projektrapporten till kunden eller föreningen, i en och samma genomgång.</p>
         <p><a href="{{ route('guides.document-renovation') }}">Läs guiden om att dokumentera en fönsterrenovering</a></p>
 
+        <h2>Rapport till bostadsrättsföreningen</h2>
+        <p>Underlaget till en bostadsrättsförening efter fönsterrenoveringen: en rad per båge, bilder före och efter, steg och anteckningar, samlat i en projektrapport som PDF.</p>
+        <p><a href="{{ route('guides.brf-report') }}">Läs guiden om rapport till bostadsrättsföreningen</a></p>
+
         <h2>Dokumentation vid öppningen</h2>
         <p>Vilka uppgifter som ska skrivas innan bågen lossas: plats, skick, glas, material, bilder och det första steget.</p>
         <p><a href="{{ route('guides.documentation') }}">Läs vad som ska följa med bågen</a></p>
