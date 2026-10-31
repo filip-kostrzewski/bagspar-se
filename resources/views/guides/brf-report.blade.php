@@ -29,7 +29,7 @@
 
         <h2>Bilder före och efter, på rätt båge</h2>
         <p>Ta före-bilden vid öppningen innan något skrapas, och en närbild på det som anteckningen nämner: kitt som släppt, mjukt trä, en sprucken ruta. Ta efter-bilden när momentet är gjort. Lägg bilden på den båge den visar, samma dag.</p>
-        <p>En gemensam mapp med hundra bilder från en fasad hjälper inte styrelsen. En bild som ligger på kortet för 3-VARD-F2-B1 gör det. Mer om bilderna står i guiden om att <a href="{{ route('guides.document-renovation') }}">dokumentera fönsterrenoveringen</a>.</p>
+        <p>En gemensam mapp med hundra bilder från en fasad hjälper inte styrelsen. En bild som ligger på kortet för 3-VARD-F2-B1 gör det. Mer om bilderna står i guiden om att <a href="{{ route('guides.document-renovation') }}">dokumentera fönsterrenoveringen</a>, och hur skicket skrivs och godkänns vid hämtningen står i guiden om <a href="{{ route('guides.intake-protocol') }}">mottagningsprotokoll för fönsterbågar</a>.</p>
 
         <h2>Steg och anteckningar som går att lita på</h2>
         <p>Varje båge har ett steg: mottagen, skrapning, trälagning, glasning, målning eller klar. Klar betyder att bågen kan lämna verkstaden mot sin öppning, inte att den redan sitter i väggen. Flytta inte steget i förväg, och skriv vad som återstår om något inte är gjort.</p>

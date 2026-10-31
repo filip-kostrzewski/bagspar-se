@@ -241,6 +241,56 @@ class GuidePageTest extends TestCase
             ], false);
     }
 
+    public function test_intake_protocol_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/mottagningsprotokoll-fonsterbagar');
+
+        $response->assertOk();
+        $response->assertSee('<title>Mottagningsprotokoll för fönsterbågar — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Så dokumenterar fönsterverkstaden skicket på varje båge när den hämtas: anmärkning och bild före per båge, och kundens godkännande via länk eller på plats, samlat i ett protokoll som PDF.">', false);
+        $response->assertSee('<h1 class="display-heading">Mottagningsprotokoll för fönsterbågar</h1>', false);
+        $response->assertSee('MOTTAGNINGSPROTOKOLL', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.marking').'"', false);
+        $response->assertSee('href="'.route('guides.document-renovation').'"', false);
+        $response->assertSee('href="'.route('guides.brf-report').'"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Mottagningsprotokoll för fönsterbågar',
+            route('guides.intake-protocol'),
+            '2026-10-31',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/mottagningsprotokoll-fonsterbagar</loc>', false);
+    }
+
+    public function test_intake_protocol_guide_is_linked_from_the_index_and_the_brf_report_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.intake-protocol').'"', false)
+            ->assertSee('Mottagningsprotokoll', false);
+
+        $this->get(route('guides.brf-report'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Bilder före och efter, på rätt båge',
+                'href="'.route('guides.intake-protocol').'"',
+                'Steg och anteckningar som går att lita på',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -257,6 +307,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.brf-report'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/rapport-till-brf-fonsterrenovering">', false);
+
+        $this->get(route('guides.intake-protocol'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/mottagningsprotokoll-fonsterbagar">', false);
 
         $this->get(route('terms'))
             ->assertOk()

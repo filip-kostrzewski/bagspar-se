@@ -23,6 +23,7 @@ class SitemapController extends Controller
         'guides.index',
         'guides.document-renovation',
         'guides.brf-report',
+        'guides.intake-protocol',
         'privacy',
         'terms',
         'dpa',

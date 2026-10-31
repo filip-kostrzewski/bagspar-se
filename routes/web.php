@@ -54,6 +54,7 @@ Route::view('/markning-av-fonsterbagar', 'guides.marking')->name('guides.marking
 Route::view('/guider', 'guides.index')->name('guides.index');
 Route::view('/guider/dokumentera-fonsterrenovering', 'guides.document-renovation')->name('guides.document-renovation');
 Route::view('/guider/rapport-till-brf-fonsterrenovering', 'guides.brf-report')->name('guides.brf-report');
+Route::view('/guider/mottagningsprotokoll-fonsterbagar', 'guides.intake-protocol')->name('guides.intake-protocol');
 Route::redirect('/integritet', '/integritetspolicy', 301);
 Route::view('/integritetspolicy', 'privacy')->name('privacy');
 Route::view('/villkor', 'terms')->name('terms');
