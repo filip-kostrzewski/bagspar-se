@@ -34,7 +34,7 @@
 
         <h2>Mottagningsprotokollet i Bågspår</h2>
         <p>I Bågspår skrivs skicket vid mottagning direkt på varje bågs arbetskort, och bilderna före läggs på samma kort. På projektsidan visas hur många bågar som har anmärkningar och hur många som har bilder före. Protokollet kan visas eller laddas ner som PDF.</p>
-        <p>Kunden godkänner via statuslänken. Godkänner kunden på plats hos er skriver ni in kundens namn, och tidpunkten sparas i protokollet. Samma uppgifter följer sedan med till <a href="{{ route('guides.brf-report') }}">projektrapporten</a> när arbetet är klart.</p>
+        <p>Kunden godkänner via statuslänken. Godkänner kunden på plats hos er skriver ni in kundens namn, och tidpunkten sparas i protokollet. Samma uppgifter följer sedan med till <a href="{{ route('guides.brf-report') }}">projektrapporten</a> när arbetet är klart. Tid och material skrivs på samma kort, och hur de hålls isär inför fakturan och rotavdraget står i guiden om <a href="{{ route('guides.rot') }}">rotavdrag vid fönsterrenovering</a>.</p>
 
         <h2>Checklista vid mottagning</h2>
         <ul>

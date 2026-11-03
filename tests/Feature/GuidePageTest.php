@@ -291,6 +291,65 @@ class GuidePageTest extends TestCase
             ], false);
     }
 
+    public function test_rot_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/rotavdrag-fonsterrenovering');
+
+        $response->assertOk();
+        $response->assertSee('<title>Rotavdrag vid fönsterrenovering — det verkstaden behöver hålla isär — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Vilken del av en fönsterrenovering som ger rotavdrag enligt Skatteverket, varför tiden i verkstaden inte räknas, och hur ni håller isär tid på plats, tid i verkstaden och material per båge.">', false);
+        $response->assertSee('<h1 class="display-heading">Rotavdrag vid fönsterrenovering</h1>', false);
+        $response->assertSee('ROTAVDRAG', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.brf-report').'"', false);
+        $response->assertSee('href="'.route('guides.intake-protocol').'"', false);
+        $response->assertSee('href="https://www.skatteverket.se/foretag/skatterochavdrag/rotochrut/safungerarrotavdraget.4.2ef18e6a125660db8b080002709.html" rel="noopener"', false);
+        $response->assertSee('href="https://www.skatteverket.se/foretag/skatterochavdrag/rotochrut/gerarbetetratttillrotavdrag.4.5c1163881590be297b5173bf.html" rel="noopener"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Rotavdrag vid fönsterrenovering',
+            route('guides.rot'),
+            '2026-11-03',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/rotavdrag-fonsterrenovering</loc>', false);
+    }
+
+    public function test_rot_guide_is_linked_from_the_index_the_intake_protocol_guide_and_the_brf_report_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.rot').'"', false)
+            ->assertSee('Rotavdrag', false);
+
+        $this->get(route('guides.intake-protocol'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Mottagningsprotokollet i Bågspår',
+                'href="'.route('guides.rot').'"',
+                'Checklista vid mottagning',
+            ], false);
+
+        $this->get(route('guides.brf-report'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Projektrapporten',
+                'href="'.route('guides.rot').'"',
+                'Checklista innan rapporten lämnas',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -311,6 +370,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.intake-protocol'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/mottagningsprotokoll-fonsterbagar">', false);
+
+        $this->get(route('guides.rot'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/rotavdrag-fonsterrenovering">', false);
 
         $this->get(route('terms'))
             ->assertOk()

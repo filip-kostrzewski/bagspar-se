@@ -23,6 +23,10 @@
         <p>Skick och bild före per båge när bågarna hämtas, och kundens godkännande via länk eller på plats, samlat i ett protokoll som PDF.</p>
         <p><a href="{{ route('guides.intake-protocol') }}">Läs guiden om mottagningsprotokoll för fönsterbågar</a></p>
 
+        <h2>Rotavdrag</h2>
+        <p>Vilken del av en fönsterrenovering som ger rotavdrag enligt Skatteverket, och hur tid på plats, tid i verkstaden och material hålls isär per båge.</p>
+        <p><a href="{{ route('guides.rot') }}">Läs guiden om rotavdrag vid fönsterrenovering</a></p>
+
         <h2>Dokumentation vid öppningen</h2>
         <p>Vilka uppgifter som ska skrivas innan bågen lossas: plats, skick, glas, material, bilder och det första steget.</p>
         <p><a href="{{ route('guides.documentation') }}">Läs vad som ska följa med bågen</a></p>
