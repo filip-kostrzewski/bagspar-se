@@ -37,7 +37,7 @@
             <li>Kundens namn och personnummer.</li>
             <li>Fastighetsbeteckning, eller föreningens organisationsnummer och lägenhetsnummer för en bostadsrätt.</li>
         </ul>
-        <p>I ansökan anger verkstaden det faktiska antalet arbetade timmar, även när arbetet är gjort till fast pris. Utan tidsrader blir det svårt att visa vilka timmar som gjordes på plats.</p>
+        <p>I ansökan anger verkstaden det faktiska antalet arbetade timmar, även när arbetet är gjort till fast pris. Utan tidsrader blir det svårt att visa vilka timmar som gjordes på plats. Priset i offerten bör redan stå före rotavdrag, vilket guiden om <a href="{{ route('guides.quote') }}">offert för fönsterrenovering</a> går igenom.</p>
 
         <h2>Skriv tiden per båge och plats samma dag</h2>
         <p>Det enklaste sättet att hålla isär tiden är att skriva den direkt när den görs: vilken båge, vem, hur länge och om det var på plats eller i verkstaden. Material skrivs på samma sätt, med mängd och pris. Då går det att ta fram arbetskostnaden för tiden på plats utan att gissa i efterhand.</p>

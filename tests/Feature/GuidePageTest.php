@@ -350,6 +350,64 @@ class GuidePageTest extends TestCase
             ], false);
     }
 
+    public function test_quote_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/offert-fonsterrenovering');
+
+        $response->assertOk();
+        $response->assertSee('<title>Offert för fönsterrenovering — så skriver verkstaden den per båge — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Så bygger fönsterverkstaden en offert för renovering av fönsterbågar: en rad per båge, tydligt pris före rotavdrag, giltighetstid och kundens godkännande med namn via länk.">', false);
+        $response->assertSee('<h1 class="display-heading">Offert för fönsterrenovering</h1>', false);
+        $response->assertSee('OFFERT', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.rot').'"', false);
+        $response->assertSee('href="'.route('guides.intake-protocol').'"', false);
+        $response->assertSee('href="https://www.skatteverket.se/foretag/skatterochavdrag/rotochrut/safungerarrotavdraget.4.2ef18e6a125660db8b080002709.html" rel="noopener"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Offert för fönsterrenovering',
+            route('guides.quote'),
+            '2026-11-06',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/offert-fonsterrenovering</loc>', false);
+    }
+
+    public function test_quote_guide_is_linked_from_the_index_the_rot_guide_and_the_intake_protocol_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.quote').'"', false)
+            ->assertSee('Offert', false);
+
+        $this->get(route('guides.rot'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Det som ska stå isär på fakturan',
+                'href="'.route('guides.quote').'"',
+                'Skriv tiden per båge och plats samma dag',
+            ], false);
+
+        $this->get(route('guides.intake-protocol'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Mottagningsprotokollet i Bågspår',
+                'href="'.route('guides.quote').'"',
+                'Checklista vid mottagning',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -374,6 +432,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.rot'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/rotavdrag-fonsterrenovering">', false);
+
+        $this->get(route('guides.quote'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/offert-fonsterrenovering">', false);
 
         $this->get(route('terms'))
             ->assertOk()
