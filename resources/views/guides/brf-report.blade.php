@@ -37,7 +37,7 @@
 
         <h2>Projektrapporten</h2>
         <p>När arbetet ska visas samlas korten i en projektrapport. I Bågspår innehåller den projektets namn, plats, antal bågar, anteckningar och för varje båge dess nummer, rum, steg och bilder. Rapporten kan laddas ner som PDF eller skrivas ut och lämnas till styrelsen.</p>
-        <p>Under arbetet kan kunden få en separat statuslänk som visar hur det går, utan verkstadens interna anteckningar. Hur korten används i verkstaden beskrivs på sidan om <a href="{{ route('guides.work-card') }}">arbetskort för fönsterbågar</a>. Skrivs tid och material på korten följer de med, och hur de hålls isär inför en faktura med rotavdrag står i guiden om <a href="{{ route('guides.rot') }}">rotavdrag vid fönsterrenovering</a>.</p>
+        <p>Under arbetet kan kunden få en separat statuslänk som visar hur det går, utan verkstadens interna anteckningar. Hur korten används i verkstaden beskrivs på sidan om <a href="{{ route('guides.work-card') }}">arbetskort för fönsterbågar</a>. Skrivs tid och material på korten följer de med, och hur de hålls isär inför en faktura med rotavdrag står i guiden om <a href="{{ route('guides.rot') }}">rotavdrag vid fönsterrenovering</a>. Ligger huset i en kulturhistoriskt värdefull miljö beskriver guiden om <a href="{{ route('guides.heritage') }}">fönsterrenovering i kulturhistoriskt värdefulla hus</a> vad som bör dokumenteras per båge.</p>
 
         <h2>Checklista innan rapporten lämnas</h2>
         <ul>

@@ -31,6 +31,10 @@
         <p>Hur verkstaden bygger en offert med en rad per båge, tydligt pris före rotavdrag, giltighetstid och kundens godkännande med namn via länk.</p>
         <p><a href="{{ route('guides.quote') }}">Läs guiden om offert för fönsterrenovering</a></p>
 
+        <h2>Kulturvärden</h2>
+        <p>Vad varsamhetskravet och förvanskningsförbudet i PBL betyder när bågar renoveras i äldre hus, och hur arbetet dokumenteras per båge.</p>
+        <p><a href="{{ route('guides.heritage') }}">Läs guiden om fönsterrenovering i kulturhistoriskt värdefulla hus</a></p>
+
         <h2>Dokumentation vid öppningen</h2>
         <p>Vilka uppgifter som ska skrivas innan bågen lossas: plats, skick, glas, material, bilder och det första steget.</p>
         <p><a href="{{ route('guides.documentation') }}">Läs vad som ska följa med bågen</a></p>

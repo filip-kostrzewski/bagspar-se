@@ -26,6 +26,7 @@ class SitemapController extends Controller
         'guides.intake-protocol',
         'guides.rot',
         'guides.quote',
+        'guides.heritage',
         'privacy',
         'terms',
         'dpa',

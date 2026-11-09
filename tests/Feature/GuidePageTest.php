@@ -408,6 +408,66 @@ class GuidePageTest extends TestCase
             ], false);
     }
 
+    public function test_heritage_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/fonsterrenovering-kulturhistorisk-byggnad');
+
+        $response->assertOk();
+        $response->assertSee('<title>Fönsterrenovering i kulturhistoriskt värdefulla hus — varsamhet och dokumentation — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Vad varsamhetskravet och förvanskningsförbudet i PBL betyder när fönsterverkstaden renoverar bågar i ett äldre eller kulturhistoriskt värdefullt hus, och hur arbetet dokumenteras per båge.">', false);
+        $response->assertSee('<h1 class="display-heading">Fönsterrenovering i kulturhistoriskt värdefulla hus</h1>', false);
+        $response->assertSee('KULTURVÄRDEN', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.intake-protocol').'"', false);
+        $response->assertSee('href="'.route('guides.document-renovation').'"', false);
+        $response->assertSee('href="'.route('guides.brf-report').'"', false);
+        $response->assertSee('href="https://www.boverket.se/sv/PBL-kunskapsbanken/teman/kulturvarden/kulturvarden-i-plan---och-bygglagen/krav-pa-byggnadsverk-och-tomter/varsamhetskravet/" rel="noopener"', false);
+        $response->assertSee('href="https://www.boverket.se/sv/PBL-kunskapsbanken/teman/kulturvarden/kulturvarden-i-plan---och-bygglagen/krav-pa-byggnadsverk-och-tomter/forvanskningsforbudet/" rel="noopener"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Fönsterrenovering i kulturhistoriskt värdefulla hus',
+            route('guides.heritage'),
+            '2026-11-09',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/fonsterrenovering-kulturhistorisk-byggnad</loc>', false);
+    }
+
+    public function test_heritage_guide_is_linked_from_the_index_the_document_renovation_guide_and_the_brf_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.heritage').'"', false)
+            ->assertSee('Kulturvärden', false);
+
+        $this->get(route('guides.document-renovation'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Projektrapport till kunden eller föreningen',
+                'href="'.route('guides.heritage').'"',
+                'Vanliga misstag',
+            ], false);
+
+        $this->get(route('guides.brf-report'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Projektrapporten',
+                'href="'.route('guides.heritage').'"',
+                'Checklista innan rapporten lämnas',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -436,6 +496,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.quote'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/offert-fonsterrenovering">', false);
+
+        $this->get(route('guides.heritage'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/fonsterrenovering-kulturhistorisk-byggnad">', false);
 
         $this->get(route('terms'))
             ->assertOk()
