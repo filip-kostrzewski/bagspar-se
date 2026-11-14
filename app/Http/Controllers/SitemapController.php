@@ -27,6 +27,7 @@ class SitemapController extends Controller
         'guides.rot',
         'guides.quote',
         'guides.heritage',
+        'guides.costing',
         'privacy',
         'terms',
         'dpa',

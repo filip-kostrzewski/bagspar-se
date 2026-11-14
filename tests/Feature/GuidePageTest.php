@@ -468,6 +468,63 @@ class GuidePageTest extends TestCase
             ], false);
     }
 
+    public function test_costing_guide_is_published_and_listed_in_the_sitemap(): void
+    {
+        $response = $this->get('/guider/efterkalkyl-fonsterrenovering');
+
+        $response->assertOk();
+        $response->assertSee('<title>Efterkalkyl för fönsterrenovering — tid och material per båge — Bågspår</title>', false);
+        $response->assertSee('<meta name="description" content="Så gör fönsterverkstaden en efterkalkyl: skriv tid och material på varje båge medan arbetet pågår, jämför med offerten och använd siffrorna när nästa offert ska räknas.">', false);
+        $response->assertSee('<h1 class="display-heading">Efterkalkyl för fönsterrenovering</h1>', false);
+        $response->assertSee('EFTERKALKYL', false);
+        $response->assertSee('href="'.route('guides.index').'"', false);
+        $response->assertSee('href="'.route('guides.quote').'"', false);
+        $response->assertSee('href="'.route('guides.rot').'"', false);
+        $response->assertSee('href="'.route('register').'"', false);
+        $response->assertSee('href="'.route('contact').'"', false);
+        $response->assertSee('Prova gratis i 30 dagar', false);
+        $response->assertDontSee('frazy', false);
+        $response->assertDontSee('fakty', false);
+        $response->assertDontSee('Kiko', false);
+
+        $html = $response->getContent();
+        $this->assertGreaterThan(0, $this->mainContentWordCount($html));
+        $this->assertArticleSchema(
+            $html,
+            'Efterkalkyl för fönsterrenovering',
+            route('guides.costing'),
+            '2026-11-14',
+        );
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.rtrim((string) config('app.url'), '/').'/guider/efterkalkyl-fonsterrenovering</loc>', false);
+    }
+
+    public function test_costing_guide_is_linked_from_the_index_the_quote_guide_and_the_document_renovation_guide(): void
+    {
+        $this->get(route('guides.index'))
+            ->assertOk()
+            ->assertSee('href="'.route('guides.costing').'"', false)
+            ->assertSee('Efterkalkyl', false);
+
+        $this->get(route('guides.quote'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'En rad per båge',
+                'href="'.route('guides.costing').'"',
+                'Rotavdraget hör till fakturan',
+            ], false);
+
+        $this->get(route('guides.document-renovation'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Projektrapport till kunden eller föreningen',
+                'href="'.route('guides.costing').'"',
+                'Vanliga misstag',
+            ], false);
+    }
+
     public function test_new_guide_pages_are_indexable_with_an_https_canonical_in_production(): void
     {
         $this->app['env'] = 'production';
@@ -500,6 +557,10 @@ class GuidePageTest extends TestCase
         $this->get(route('guides.heritage'))
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/fonsterrenovering-kulturhistorisk-byggnad">', false);
+
+        $this->get(route('guides.costing'))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://bagspar.se/guider/efterkalkyl-fonsterrenovering">', false);
 
         $this->get(route('terms'))
             ->assertOk()

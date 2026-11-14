@@ -35,6 +35,10 @@
         <p>Vad varsamhetskravet och förvanskningsförbudet i PBL betyder när bågar renoveras i äldre hus, och hur arbetet dokumenteras per båge.</p>
         <p><a href="{{ route('guides.heritage') }}">Läs guiden om fönsterrenovering i kulturhistoriskt värdefulla hus</a></p>
 
+        <h2>Efterkalkyl</h2>
+        <p>Hur verkstaden skriver tid och material på varje båge, jämför med offerten och använder siffrorna när nästa offert ska räknas.</p>
+        <p><a href="{{ route('guides.costing') }}">Läs guiden om efterkalkyl för fönsterrenovering</a></p>
+
         <h2>Dokumentation vid öppningen</h2>
         <p>Vilka uppgifter som ska skrivas innan bågen lossas: plats, skick, glas, material, bilder och det första steget.</p>
         <p><a href="{{ route('guides.documentation') }}">Läs vad som ska följa med bågen</a></p>

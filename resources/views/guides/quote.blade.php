@@ -21,7 +21,7 @@
         </ul>
 
         <h2>En rad per båge</h2>
-        <p>Skriv en rad för varje båge, med bågens nummer och rummet den sitter i, till exempel "Renovering av båge 2-KÖK-F1-B2 · Kök". Då ser kunden vad priset avser, och verkstaden kan senare jämföra offerten med arbetskorten per båge. Behöver en båge något särskilt, som byte av glas eller en större trälagning, får den en egen rad eller en tydlig rad intill.</p>
+        <p>Skriv en rad för varje båge, med bågens nummer och rummet den sitter i, till exempel "Renovering av båge 2-KÖK-F1-B2 · Kök". Då ser kunden vad priset avser, och verkstaden kan senare jämföra offerten med arbetskorten per båge, som guiden om <a href="{{ route('guides.costing') }}">efterkalkyl för fönsterrenovering</a> visar. Behöver en båge något särskilt, som byte av glas eller en större trälagning, får den en egen rad eller en tydlig rad intill.</p>
         <p>Varje rad har en beskrivning, ett antal och ett à-pris, och summan räknas per rad och totalt. Använd antal när flera bågar får samma behandling till samma pris.</p>
 
         <h2>Rotavdraget hör till fakturan</h2>
